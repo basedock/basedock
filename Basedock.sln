@@ -9,6 +9,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ServiceDefaults", "src\Serv
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AppHost", "src\AppHost\AppHost.csproj", "{45E4E0C7-6ACC-4696-B69B-E8FA7A9196E4}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WebApi", "src\WebApi\WebApi.csproj", "{AD627FCA-9B61-4F50-8475-EF994B888483}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -20,6 +22,7 @@ Global
 	GlobalSection(NestedProjects) = preSolution
 		{2C06C8F2-469E-4927-9954-457DB69B6A7C} = {A5431BDF-0307-44FA-B54F-1D6F2647EB38}
 		{45E4E0C7-6ACC-4696-B69B-E8FA7A9196E4} = {A5431BDF-0307-44FA-B54F-1D6F2647EB38}
+		{AD627FCA-9B61-4F50-8475-EF994B888483} = {A5431BDF-0307-44FA-B54F-1D6F2647EB38}
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
 		{2C06C8F2-469E-4927-9954-457DB69B6A7C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
@@ -30,5 +33,9 @@ Global
 		{45E4E0C7-6ACC-4696-B69B-E8FA7A9196E4}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{45E4E0C7-6ACC-4696-B69B-E8FA7A9196E4}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{45E4E0C7-6ACC-4696-B69B-E8FA7A9196E4}.Release|Any CPU.Build.0 = Release|Any CPU
+		{AD627FCA-9B61-4F50-8475-EF994B888483}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AD627FCA-9B61-4F50-8475-EF994B888483}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AD627FCA-9B61-4F50-8475-EF994B888483}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AD627FCA-9B61-4F50-8475-EF994B888483}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
