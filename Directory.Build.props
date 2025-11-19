@@ -1,7 +1,31 @@
 <Project>
   <!-- See https://aka.ms/dotnet/msbuild/customize for more details on customizing your build -->
+
   <PropertyGroup>
+    <!-- C# Language Features -->
+    <LangVersion>latest</LangVersion>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
 
+    <!-- Code Quality and Analysis -->
+    <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
+    <AnalysisLevel>latest</AnalysisLevel>
+    <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
 
+    <!-- Assembly Metadata -->
+    <Authors>BaseDock</Authors>
+    <Company>BaseDock</Company>
+    <Product>BaseDock</Product>
+    <Copyright>Copyright © $(Company)</Copyright>
+
+    <!-- Build Output -->
+    <GenerateDocumentationFile>false</GenerateDocumentationFile>
+    <NoWarn>$(NoWarn);1591</NoWarn> <!-- Suppress XML documentation warnings -->
   </PropertyGroup>
+
+  <!-- Enable Central Package Management -->
+  <PropertyGroup>
+    <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
+  </PropertyGroup>
+
 </Project>
