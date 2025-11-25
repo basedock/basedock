@@ -7,4 +7,10 @@
     <File Path="global.json" />
     <File Path="README.md" />
   </Folder>
+  <Project Path="src/BaseDock.Api/BaseDock.Api.csproj" />
+  <Project Path="src/BaseDock.AppHost/BaseDock.AppHost.csproj" />
+  <Project Path="src/BaseDock.Application/BaseDock.Application.csproj" />
+  <Project Path="src/BaseDock.Domain/BaseDock.Domain.csproj" />
+  <Project Path="src/BaseDock.Infrastructure/BaseDock.Infrastructure.csproj" />
+  <Project Path="src/BaseDock.ServiceDefaults/BaseDock.ServiceDefaults.csproj" />
 </Solution>

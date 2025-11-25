@@ -10,4 +10,10 @@
     <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="10.0.0" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\BaseDock.Application\BaseDock.Application.csproj" />
+    <ProjectReference Include="..\BaseDock.Infrastructure\BaseDock.Infrastructure.csproj" />
+    <ProjectReference Include="..\BaseDock.ServiceDefaults\BaseDock.ServiceDefaults.csproj" />
+  </ItemGroup>
+
 </Project>
