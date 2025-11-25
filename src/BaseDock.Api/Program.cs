@@ -1,5 +1,6 @@
 using BaseDock.Domain.Entities;
 using BaseDock.Infrastructure.Persistence;
+using BaseDock.Api.Hubs;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -16,6 +17,9 @@ builder.Services.AddIdentityApiEndpoints<ApplicationUser>()
     .AddEntityFrameworkStores<ApplicationDbContext>();
 
 builder.Services.AddInfrastructureServices();
+
+builder.Services.AddSignalR()
+    .AddStackExchangeRedis(builder.Configuration.GetConnectionString("redis") ?? throw new InvalidOperationException("Redis connection string not found."));
 
 // Add services to the container.
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
@@ -53,6 +57,7 @@ app.UseHttpsRedirection();
 app.UseAuthorization();
 
 app.MapIdentityApi<ApplicationUser>();
+app.MapHub<DockerHub>("/hubs/docker");
 
 var summaries = new[]
 {
