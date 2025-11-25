@@ -2,6 +2,8 @@
 
   <ItemGroup>
     <ProjectReference Include="..\BaseDock.Api\BaseDock.Api.csproj" />
+    <PackageReference Include="Aspire.Hosting.PostgreSQL" />
+    <PackageReference Include="Aspire.Hosting.Redis" />
   </ItemGroup>
 
   <PropertyGroup>
