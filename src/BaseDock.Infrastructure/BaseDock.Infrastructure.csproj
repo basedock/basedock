@@ -2,6 +2,9 @@
 
   <ItemGroup>
     <ProjectReference Include="..\BaseDock.Application\BaseDock.Application.csproj" />
+    <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" />
+    <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" />
+    <PackageReference Include="Aspire.Npgsql.EntityFrameworkCore.PostgreSQL" />
   </ItemGroup>
 
   <PropertyGroup>
