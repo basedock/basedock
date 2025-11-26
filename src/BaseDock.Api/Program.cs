@@ -1,6 +1,9 @@
 using BaseDock.Domain.Entities;
+using BaseDock.Infrastructure;
 using BaseDock.Infrastructure.Persistence;
 using BaseDock.Api.Hubs;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -8,9 +11,6 @@ builder.AddServiceDefaults();
 
 builder.AddNpgsqlDbContext<ApplicationDbContext>("postgres");
 
-builder.Services.AddAuthorization();
-builder.Services.AddIdentityApiEndpoints<ApplicationUser>()
-    .AddRoles<IdentityRole>()
 builder.Services.AddAuthorization();
 builder.Services.AddIdentityApiEndpoints<ApplicationUser>()
     .AddRoles<IdentityRole>()
