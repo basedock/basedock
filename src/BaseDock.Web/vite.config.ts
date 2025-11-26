@@ -22,4 +22,13 @@ export default defineConfig({
       '@': fileURLToPath(new URL('./src', import.meta.url)),
     },
   },
+  server: {
+    proxy: {
+      '/login': {
+        target: process.env.services__api__https__0 || process.env.services__api__http__0,
+        changeOrigin: true,
+        secure: false,
+      },
+    },
+  },
 })
