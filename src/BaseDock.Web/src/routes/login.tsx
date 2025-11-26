@@ -17,7 +17,8 @@ import {
     FieldLabel,
 } from "@/components/ui/field"
 import { Input } from "@/components/ui/input"
-import { GalleryVerticalEnd } from "lucide-react"
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
+import { AlertCircle, GalleryVerticalEnd } from "lucide-react"
 
 export const Route = createFileRoute('/login')({
     component: LoginPage,
@@ -31,7 +32,7 @@ const loginSchema = z.object({
 function LoginPage() {
     const loginMutation = useMutation({
         mutationFn: async (credentials: { email: string; password: string }) => {
-            const response = await fetch('/login', {
+            const response = await fetch('/api/login', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -49,8 +50,8 @@ function LoginPage() {
             // Handle successful login (e.g., redirect or update auth state)
             console.log('Login successful')
         },
-        onError: (error) => {
-            console.error('Login error:', error)
+        onError: () => {
+            // Error is displayed via Alert component
         },
     })
 
@@ -91,6 +92,15 @@ function LoginPage() {
                                 form.handleSubmit()
                             }}
                         >
+                            {loginMutation.isError && (
+                                <Alert variant="destructive" className="mb-4">
+                                    <AlertCircle className="h-4 w-4" />
+                                    <AlertTitle>Error</AlertTitle>
+                                    <AlertDescription>
+                                        {loginMutation.error?.message || 'An error occurred during login'}
+                                    </AlertDescription>
+                                </Alert>
+                            )}
                             <FieldGroup>
                                 <form.Field
                                     name="email"

@@ -9,7 +9,7 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.AddServiceDefaults();
 
-builder.AddNpgsqlDbContext<ApplicationDbContext>("postgres");
+builder.AddNpgsqlDbContext<ApplicationDbContext>("basedock");
 
 builder.Services.AddAuthorization();
 builder.Services.AddIdentityApiEndpoints<ApplicationUser>()
@@ -54,33 +54,24 @@ using (var scope = app.Services.CreateScope())
 
 app.UseHttpsRedirection();
 
+// Only allow login endpoint, disable all other Identity API endpoints
+app.Use(async (context, next) =>
+{
+    var path = context.Request.Path;
+    string[] disabledPaths = ["/api/register", "/api/refresh", "/api/confirmEmail",
+        "/api/resendConfirmationEmail", "/api/forgotPassword", "/api/resetPassword", "/api/manage"];
+
+    if (disabledPaths.Any(p => path.StartsWithSegments(p, StringComparison.OrdinalIgnoreCase)))
+    {
+        context.Response.StatusCode = StatusCodes.Status404NotFound;
+        return;
+    }
+    await next();
+});
+
 app.UseAuthorization();
 
-app.MapIdentityApi<ApplicationUser>();
+app.MapGroup("/api").MapIdentityApi<ApplicationUser>();
 app.MapHub<DockerHub>("/hubs/docker");
 
-var summaries = new[]
-{
-    "Freezing", "Bracing", "Chilly", "Cool", "Mild", "Warm", "Balmy", "Hot", "Sweltering", "Scorching"
-};
-
-app.MapGet("/weatherforecast", () =>
-{
-    var forecast =  Enumerable.Range(1, 5).Select(index =>
-        new WeatherForecast
-        (
-            DateOnly.FromDateTime(DateTime.Now.AddDays(index)),
-            Random.Shared.Next(-20, 55),
-            summaries[Random.Shared.Next(summaries.Length)]
-        ))
-        .ToArray();
-    return forecast;
-})
-.WithName("GetWeatherForecast");
-
 app.Run();
-
-record WeatherForecast(DateOnly Date, int TemperatureC, string? Summary)
-{
-    public int TemperatureF => 32 + (int)(TemperatureC / 0.5556);
-}

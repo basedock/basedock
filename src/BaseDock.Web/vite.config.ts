@@ -6,6 +6,8 @@ import tailwindcss from '@tailwindcss/vite'
 import { tanstackRouter } from '@tanstack/router-plugin/vite'
 import { fileURLToPath, URL } from 'node:url'
 
+const apiTarget = process.env.API_HTTPS || process.env.API_HTTP || 'http://localhost:5000'
+
 // https://vitejs.dev/config/
 export default defineConfig({
   plugins: [
@@ -20,6 +22,15 @@ export default defineConfig({
   resolve: {
     alias: {
       '@': fileURLToPath(new URL('./src', import.meta.url)),
+    },
+  },
+  server: {
+    proxy: {
+      '/api': {
+        target: apiTarget,
+        changeOrigin: true,
+        secure: apiTarget.startsWith('https'),
+      },
     },
   },
 })
