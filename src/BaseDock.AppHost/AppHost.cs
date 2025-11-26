@@ -1,19 +1,21 @@
 var builder = DistributedApplication.CreateBuilder(args);
 
 var postgres = builder.AddPostgres("postgres")
-    .WithDataVolume()
-    .WithPgAdmin();
+    .WithDataVolume(isReadOnly: false)
+    .WithPgWeb();
+
+var postgresdb = postgres.AddDatabase("basedock");
 
 var redis = builder.AddRedis("redis")
     .WithDataVolume();
 
 var api = builder.AddProject<Projects.BaseDock_Api>("api")
-    .WithReference(postgres)
+    .WithReference(postgresdb)
     .WithReference(redis);
 
-builder.AddNpmApp("web", "../BaseDock.Web")
+builder.AddViteApp("web", "../BaseDock.Web")
+    .WithPnpm()
     .WithReference(api)
-    .WithHttpEndpoint(env: "PORT")
     .WithExternalHttpEndpoints();
 
 builder.Build().Run();

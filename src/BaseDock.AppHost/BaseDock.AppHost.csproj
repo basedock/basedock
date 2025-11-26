@@ -4,7 +4,7 @@
     <ProjectReference Include="..\BaseDock.Api\BaseDock.Api.csproj" />
     <PackageReference Include="Aspire.Hosting.PostgreSQL" />
     <PackageReference Include="Aspire.Hosting.Redis" />
-    <PackageReference Include="Aspire.Hosting.NodeJs" />
+    <PackageReference Include="Aspire.Hosting.JavaScript" />
   </ItemGroup>
 
   <PropertyGroup>
