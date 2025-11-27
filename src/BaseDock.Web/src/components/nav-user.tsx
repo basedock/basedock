@@ -5,6 +5,8 @@ import {
   IconNotification,
   IconUserCircle,
 } from "@tabler/icons-react"
+import { useRouter } from "@tanstack/react-router"
+import { useAuth } from "@/lib/auth"
 
 import {
   Avatar,
@@ -37,6 +39,13 @@ export function NavUser({
   }
 }) {
   const { isMobile } = useSidebar()
+  const router = useRouter()
+  const auth = useAuth()
+
+  const handleLogout = async () => {
+    await auth.logout()
+    router.navigate({ to: '/login', search: { redirect: '/' } })
+  }
 
   return (
     <SidebarMenu>
@@ -96,7 +105,7 @@ export function NavUser({
               </DropdownMenuItem>
             </DropdownMenuGroup>
             <DropdownMenuSeparator />
-            <DropdownMenuItem>
+            <DropdownMenuItem onClick={handleLogout}>
               <IconLogout />
               Log out
             </DropdownMenuItem>

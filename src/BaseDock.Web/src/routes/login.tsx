@@ -1,7 +1,7 @@
-import { createFileRoute } from '@tanstack/react-router'
-import { useMutation } from '@tanstack/react-query'
+import { createFileRoute, redirect, useRouter } from '@tanstack/react-router'
 import { useForm } from '@tanstack/react-form'
 import { z } from 'zod'
+import { useState } from 'react'
 import { Button } from "@/components/ui/button"
 import {
     Card,
@@ -18,53 +18,54 @@ import {
 } from "@/components/ui/field"
 import { Input } from "@/components/ui/input"
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
+import { Checkbox } from "@/components/ui/checkbox"
 import { AlertCircle, GalleryVerticalEnd } from "lucide-react"
 
 export const Route = createFileRoute('/login')({
+    validateSearch: (search: Record<string, unknown>) => ({
+        redirect: (search.redirect as string) || '/',
+    }),
+    beforeLoad: ({ context, search }) => {
+        if (context.auth.isAuthenticated) {
+            throw redirect({ to: search.redirect })
+        }
+    },
     component: LoginPage,
 })
 
 const loginSchema = z.object({
     email: z.email('Invalid email address'),
     password: z.string().min(1, 'Password is required'),
+    rememberMe: z.boolean(),
 })
 
 function LoginPage() {
-    const loginMutation = useMutation({
-        mutationFn: async (credentials: { email: string; password: string }) => {
-            const response = await fetch('/api/login', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(credentials),
-            })
-
-            if (!response.ok) {
-                throw new Error('Login failed')
-            }
-
-            return response.json()
-        },
-        onSuccess: () => {
-            // Handle successful login (e.g., redirect or update auth state)
-            console.log('Login successful')
-        },
-        onError: () => {
-            // Error is displayed via Alert component
-        },
-    })
+    const router = useRouter()
+    const { auth } = Route.useRouteContext()
+    const { redirect: redirectUrl } = Route.useSearch()
+    const [error, setError] = useState<string | null>(null)
+    const [isLoading, setIsLoading] = useState(false)
 
     const form = useForm({
         defaultValues: {
             email: '',
             password: '',
+            rememberMe: false,
         },
         validators: {
             onChange: loginSchema,
         },
         onSubmit: async ({ value }) => {
-            await loginMutation.mutateAsync(value)
+            setError(null)
+            setIsLoading(true)
+            try {
+                await auth.login(value.email, value.password, value.rememberMe)
+                router.history.push(redirectUrl)
+            } catch {
+                setError('Invalid email or password')
+            } finally {
+                setIsLoading(false)
+            }
         },
     })
 
@@ -92,13 +93,11 @@ function LoginPage() {
                                 form.handleSubmit()
                             }}
                         >
-                            {loginMutation.isError && (
+                            {error && (
                                 <Alert variant="destructive" className="mb-4">
                                     <AlertCircle className="h-4 w-4" />
                                     <AlertTitle>Error</AlertTitle>
-                                    <AlertDescription>
-                                        {loginMutation.error?.message || 'An error occurred during login'}
-                                    </AlertDescription>
+                                    <AlertDescription>{error}</AlertDescription>
                                 </Alert>
                             )}
                             <FieldGroup>
@@ -144,15 +143,31 @@ function LoginPage() {
                                         </Field>
                                     )}
                                 />
+                                <form.Field
+                                    name="rememberMe"
+                                    children={({ state, handleChange, handleBlur }) => (
+                                        <div className="flex items-center gap-2">
+                                            <Checkbox
+                                                id="rememberMe"
+                                                checked={state.value}
+                                                onCheckedChange={(checked) => handleChange(checked === true)}
+                                                onBlur={handleBlur}
+                                            />
+                                            <label htmlFor="rememberMe" className="text-sm cursor-pointer">
+                                                Remember me
+                                            </label>
+                                        </div>
+                                    )}
+                                />
                                 <Field>
                                     <form.Subscribe
                                         selector={(state) => [state.canSubmit, state.isSubmitting]}
                                         children={([canSubmit, isSubmitting]) => (
                                             <Button
                                                 type="submit"
-                                                disabled={!canSubmit || loginMutation.isPending}
+                                                disabled={!canSubmit || isLoading}
                                             >
-                                                {isSubmitting || loginMutation.isPending ? 'Logging in...' : 'Login'}
+                                                {isSubmitting || isLoading ? 'Logging in...' : 'Login'}
                                             </Button>
                                         )}
                                     />

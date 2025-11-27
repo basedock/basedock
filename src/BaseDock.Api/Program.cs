@@ -43,7 +43,7 @@ using (var scope = app.Services.CreateScope())
     {
         var context = services.GetRequiredService<ApplicationDbContext>();
         context.Database.Migrate();
-        await DbInitializer.InitializeAsync(services);
+        await DbInitializer.InitializeAsync(services, app.Configuration);
     }
     catch (Exception ex)
     {
@@ -59,7 +59,7 @@ app.Use(async (context, next) =>
 {
     var path = context.Request.Path;
     string[] disabledPaths = ["/api/register", "/api/refresh", "/api/confirmEmail",
-        "/api/resendConfirmationEmail", "/api/forgotPassword", "/api/resetPassword", "/api/manage"];
+        "/api/resendConfirmationEmail", "/api/forgotPassword", "/api/resetPassword"];
 
     if (disabledPaths.Any(p => path.StartsWithSegments(p, StringComparison.OrdinalIgnoreCase)))
     {
@@ -72,6 +72,13 @@ app.Use(async (context, next) =>
 app.UseAuthorization();
 
 app.MapGroup("/api").MapIdentityApi<ApplicationUser>();
+
+app.MapPost("/api/logout", async (SignInManager<ApplicationUser> signInManager) =>
+{
+    await signInManager.SignOutAsync();
+    return TypedResults.Ok();
+}).RequireAuthorization();
+
 app.MapHub<DockerHub>("/hubs/docker");
 
 app.Run();

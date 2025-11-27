@@ -11,7 +11,9 @@ var redis = builder.AddRedis("redis")
 
 var api = builder.AddProject<Projects.BaseDock_Api>("api")
     .WithReference(postgresdb)
-    .WithReference(redis);
+    .WithReference(redis)
+    .WithEnvironment("ADMIN_EMAIL", "admin@basedock.local")
+    .WithEnvironment("ADMIN_PASSWORD", "Admin123!");
 
 builder.AddViteApp("web", "../BaseDock.Web")
     .WithPnpm()
