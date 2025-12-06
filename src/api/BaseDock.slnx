@@ -1,0 +1,6 @@
+<Solution>
+  <Project Path="BaseDock.Api/BaseDock.Api.csproj" />
+  <Project Path="BaseDock.Application/BaseDock.Application.csproj" />
+  <Project Path="BaseDock.Domain/BaseDock.Domain.csproj" />
+  <Project Path="BaseDock.Infrastructure/BaseDock.Infrastructure.csproj" />
+</Solution>
