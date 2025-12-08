@@ -1,6 +1,9 @@
 import { Container } from "lucide-react"
 import { useForm } from "@tanstack/react-form"
+import { useMutation } from "@tanstack/react-query"
+import { createFileRoute, useNavigate } from "@tanstack/react-router"
 import { z } from "zod"
+import { loginMutation } from "@/api/@tanstack/react-query.gen"
 import { Button } from "@/components/ui/button"
 import {
   Card,
@@ -16,7 +19,6 @@ import {
   FieldLabel,
 } from "@/components/ui/field"
 import { Input } from "@/components/ui/input"
-import { createFileRoute } from '@tanstack/react-router'
 
 const loginSchema = z.object({
   email: z.email("Please enter a valid email address"),
@@ -28,14 +30,26 @@ export const Route = createFileRoute('/login')({
 })
 
 function RouteComponent() {
+  const navigate = useNavigate()
+  const login = useMutation({
+    ...loginMutation(),
+    onSuccess: () => {
+      navigate({ to: "/" })
+    },
+  })
+
   const form = useForm({
     defaultValues: {
       email: "",
       password: "",
     },
     onSubmit: async ({ value }) => {
-      // TODO: Implement login logic
-      console.log("Login submitted:", value)
+      login.mutate({
+        body: {
+          email: value.email,
+          password: value.password,
+        },
+      })
     },
     validators: {
       onSubmit: ({ value }) => {
@@ -131,12 +145,21 @@ function RouteComponent() {
                       )
                     }}
                   </form.Field>
+                  {login.error && (
+                    <p className="text-destructive text-sm">
+                      {login.error.detail || "Invalid email or password"}
+                    </p>
+                  )}
                   <form.Subscribe
                     selector={(state) => [state.canSubmit, state.isSubmitting]}
                   >
                     {([canSubmit, isSubmitting]) => (
-                      <Button type="submit" className="w-full" disabled={!canSubmit}>
-                        {isSubmitting ? "Signing in..." : "Sign in"}
+                      <Button
+                        type="submit"
+                        className="w-full"
+                        disabled={!canSubmit || login.isPending}
+                      >
+                        {isSubmitting || login.isPending ? "Signing in..." : "Sign in"}
                       </Button>
                     )}
                   </form.Subscribe>
