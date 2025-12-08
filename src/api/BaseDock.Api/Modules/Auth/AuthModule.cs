@@ -125,7 +125,7 @@ public class AuthModule : ICarterModule
             HttpOnly = true,
             Secure = true,
             SameSite = SameSiteMode.Strict,
-            Path = "/api/auth",
+            Path = "/api",
             Expires = DateTime.UtcNow.AddDays(settings.RefreshTokenExpirationDays)
         });
     }
@@ -137,7 +137,7 @@ public class AuthModule : ICarterModule
             HttpOnly = true,
             Secure = true,
             SameSite = SameSiteMode.Strict,
-            Path = "/api/auth"
+            Path = "/api"
         });
     }
 

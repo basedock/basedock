@@ -90,7 +90,8 @@ public sealed class DualTokenAuthMiddleware
         }
 
         // Verify both tokens belong to the same user
-        var userIdClaim = principal.FindFirst("sub")?.Value;
+        // Note: JwtSecurityTokenHandler maps "sub" to ClaimTypes.NameIdentifier
+        var userIdClaim = principal.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
         if (string.IsNullOrEmpty(userIdClaim) || !Guid.TryParse(userIdClaim, out var userId) || userId != refreshTokenData.UserId)
         {
             _logger.LogWarning("Token user mismatch for path: {Path}", path);
