@@ -4,6 +4,16 @@ export type ClientOptions = {
     baseUrl: 'https://localhost:7073/' | (string & {});
 };
 
+export type AddMembersRequest = {
+    userIds: Array<string>;
+};
+
+export type CreateProjectRequest = {
+    name: string;
+    description: null | string;
+    memberIds: null | Array<string>;
+};
+
 export type CreateUserRequest = {
     email: string;
     displayName: string;
@@ -40,10 +50,36 @@ export type ProblemDetails = {
     instance?: null | string;
 };
 
+export type ProjectDto = {
+    id: string;
+    name: string;
+    description: null | string;
+    createdByUserId: string;
+    createdAt: string;
+    updatedAt: null | string;
+    members: Array<ProjectMemberDto>;
+};
+
+export type ProjectMemberDto = {
+    userId: string;
+    email: string;
+    displayName: string;
+    joinedAt: string;
+};
+
 export type RefreshApiResponse = {
     accessToken: string;
     accessTokenExpiresAt: string;
     user: UserDto;
+};
+
+export type RemoveMembersRequest = {
+    userIds: Array<string>;
+};
+
+export type UpdateProjectRequest = {
+    name: string;
+    description: null | string;
 };
 
 export type UpdateUserRequest = {
@@ -164,6 +200,214 @@ export type UpdateUserResponses = {
 };
 
 export type UpdateUserResponse = UpdateUserResponses[keyof UpdateUserResponses];
+
+export type GetProjectsData = {
+    body?: never;
+    path?: never;
+    query?: {
+        limit?: number | string;
+    };
+    url: '/api/projects';
+};
+
+export type GetProjectsResponses = {
+    /**
+     * OK
+     */
+    200: Array<ProjectDto>;
+};
+
+export type GetProjectsResponse = GetProjectsResponses[keyof GetProjectsResponses];
+
+export type CreateProjectData = {
+    body: CreateProjectRequest;
+    path?: never;
+    query?: never;
+    url: '/api/projects';
+};
+
+export type CreateProjectErrors = {
+    /**
+     * Bad Request
+     */
+    400: HttpValidationProblemDetails;
+    /**
+     * Forbidden
+     */
+    403: ProblemDetails;
+    /**
+     * Conflict
+     */
+    409: ProblemDetails;
+};
+
+export type CreateProjectError = CreateProjectErrors[keyof CreateProjectErrors];
+
+export type CreateProjectResponses = {
+    /**
+     * Created
+     */
+    201: ProjectDto;
+};
+
+export type CreateProjectResponse = CreateProjectResponses[keyof CreateProjectResponses];
+
+export type DeleteProjectData = {
+    body?: never;
+    path: {
+        id: string;
+    };
+    query?: never;
+    url: '/api/projects/{id}';
+};
+
+export type DeleteProjectErrors = {
+    /**
+     * Forbidden
+     */
+    403: ProblemDetails;
+    /**
+     * Not Found
+     */
+    404: ProblemDetails;
+};
+
+export type DeleteProjectError = DeleteProjectErrors[keyof DeleteProjectErrors];
+
+export type DeleteProjectResponses = {
+    /**
+     * OK
+     */
+    200: unknown;
+};
+
+export type GetProjectByIdData = {
+    body?: never;
+    path: {
+        id: string;
+    };
+    query?: never;
+    url: '/api/projects/{id}';
+};
+
+export type GetProjectByIdErrors = {
+    /**
+     * Forbidden
+     */
+    403: ProblemDetails;
+    /**
+     * Not Found
+     */
+    404: ProblemDetails;
+};
+
+export type GetProjectByIdError = GetProjectByIdErrors[keyof GetProjectByIdErrors];
+
+export type GetProjectByIdResponses = {
+    /**
+     * OK
+     */
+    200: ProjectDto;
+};
+
+export type GetProjectByIdResponse = GetProjectByIdResponses[keyof GetProjectByIdResponses];
+
+export type UpdateProjectData = {
+    body: UpdateProjectRequest;
+    path: {
+        id: string;
+    };
+    query?: never;
+    url: '/api/projects/{id}';
+};
+
+export type UpdateProjectErrors = {
+    /**
+     * Forbidden
+     */
+    403: ProblemDetails;
+    /**
+     * Not Found
+     */
+    404: ProblemDetails;
+    /**
+     * Conflict
+     */
+    409: ProblemDetails;
+};
+
+export type UpdateProjectError = UpdateProjectErrors[keyof UpdateProjectErrors];
+
+export type UpdateProjectResponses = {
+    /**
+     * OK
+     */
+    200: ProjectDto;
+};
+
+export type UpdateProjectResponse = UpdateProjectResponses[keyof UpdateProjectResponses];
+
+export type AddProjectMembersData = {
+    body: AddMembersRequest;
+    path: {
+        id: string;
+    };
+    query?: never;
+    url: '/api/projects/{id}/members';
+};
+
+export type AddProjectMembersErrors = {
+    /**
+     * Forbidden
+     */
+    403: ProblemDetails;
+    /**
+     * Not Found
+     */
+    404: ProblemDetails;
+};
+
+export type AddProjectMembersError = AddProjectMembersErrors[keyof AddProjectMembersErrors];
+
+export type AddProjectMembersResponses = {
+    /**
+     * OK
+     */
+    200: ProjectDto;
+};
+
+export type AddProjectMembersResponse = AddProjectMembersResponses[keyof AddProjectMembersResponses];
+
+export type RemoveProjectMembersData = {
+    body: RemoveMembersRequest;
+    path: {
+        id: string;
+    };
+    query?: never;
+    url: '/api/projects/{id}/members/remove';
+};
+
+export type RemoveProjectMembersErrors = {
+    /**
+     * Forbidden
+     */
+    403: ProblemDetails;
+    /**
+     * Not Found
+     */
+    404: ProblemDetails;
+};
+
+export type RemoveProjectMembersError = RemoveProjectMembersErrors[keyof RemoveProjectMembersErrors];
+
+export type RemoveProjectMembersResponses = {
+    /**
+     * OK
+     */
+    200: ProjectDto;
+};
+
+export type RemoveProjectMembersResponse = RemoveProjectMembersResponses[keyof RemoveProjectMembersResponses];
 
 export type LoginData = {
     body: LoginRequest;

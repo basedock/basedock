@@ -14,6 +14,10 @@ public class ApplicationDbContext : DbContext, IApplicationDbContext
 
     public DbSet<Session> Sessions => Set<Session>();
 
+    public DbSet<Project> Projects => Set<Project>();
+
+    public DbSet<ProjectMember> ProjectMembers => Set<ProjectMember>();
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.ApplyConfigurationsFromAssembly(typeof(ApplicationDbContext).Assembly);

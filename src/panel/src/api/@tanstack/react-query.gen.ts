@@ -3,8 +3,8 @@
 import { type DefaultError, queryOptions, type UseMutationOptions } from '@tanstack/react-query';
 
 import { client } from '../client.gen';
-import { createUser, getUserById, getUsers, login, logout, type Options, refreshToken, updateUser } from '../sdk.gen';
-import type { CreateUserData, CreateUserError, CreateUserResponse, GetUserByIdData, GetUserByIdError, GetUserByIdResponse, GetUsersData, GetUsersResponse, LoginData, LoginError, LoginResponse, LogoutData, LogoutError, LogoutResponse, RefreshTokenData, RefreshTokenError, RefreshTokenResponse, UpdateUserData, UpdateUserError, UpdateUserResponse } from '../types.gen';
+import { addProjectMembers, createProject, createUser, deleteProject, getProjectById, getProjects, getUserById, getUsers, login, logout, type Options, refreshToken, removeProjectMembers, updateProject, updateUser } from '../sdk.gen';
+import type { AddProjectMembersData, AddProjectMembersError, AddProjectMembersResponse, CreateProjectData, CreateProjectError, CreateProjectResponse, CreateUserData, CreateUserError, CreateUserResponse, DeleteProjectData, DeleteProjectError, GetProjectByIdData, GetProjectByIdError, GetProjectByIdResponse, GetProjectsData, GetProjectsResponse, GetUserByIdData, GetUserByIdError, GetUserByIdResponse, GetUsersData, GetUsersResponse, LoginData, LoginError, LoginResponse, LogoutData, LogoutError, LogoutResponse, RefreshTokenData, RefreshTokenError, RefreshTokenResponse, RemoveProjectMembersData, RemoveProjectMembersError, RemoveProjectMembersResponse, UpdateProjectData, UpdateProjectError, UpdateProjectResponse, UpdateUserData, UpdateUserError, UpdateUserResponse } from '../types.gen';
 
 export type QueryKey<TOptions extends Options> = [
     Pick<TOptions, 'baseUrl' | 'body' | 'headers' | 'path' | 'query'> & {
@@ -99,6 +99,127 @@ export const updateUserMutation = (options?: Partial<Options<UpdateUserData>>): 
     const mutationOptions: UseMutationOptions<UpdateUserResponse, UpdateUserError, Options<UpdateUserData>> = {
         mutationFn: async (fnOptions) => {
             const { data } = await updateUser({
+                ...options,
+                ...fnOptions,
+                throwOnError: true
+            });
+            return data;
+        }
+    };
+    return mutationOptions;
+};
+
+export const getProjectsQueryKey = (options?: Options<GetProjectsData>) => createQueryKey('getProjects', options);
+
+/**
+ * Get all projects for the current user
+ */
+export const getProjectsOptions = (options?: Options<GetProjectsData>) => queryOptions<GetProjectsResponse, DefaultError, GetProjectsResponse, ReturnType<typeof getProjectsQueryKey>>({
+    queryFn: async ({ queryKey, signal }) => {
+        const { data } = await getProjects({
+            ...options,
+            ...queryKey[0],
+            signal,
+            throwOnError: true
+        });
+        return data;
+    },
+    queryKey: getProjectsQueryKey(options)
+});
+
+/**
+ * Create a new project (Admin only)
+ */
+export const createProjectMutation = (options?: Partial<Options<CreateProjectData>>): UseMutationOptions<CreateProjectResponse, CreateProjectError, Options<CreateProjectData>> => {
+    const mutationOptions: UseMutationOptions<CreateProjectResponse, CreateProjectError, Options<CreateProjectData>> = {
+        mutationFn: async (fnOptions) => {
+            const { data } = await createProject({
+                ...options,
+                ...fnOptions,
+                throwOnError: true
+            });
+            return data;
+        }
+    };
+    return mutationOptions;
+};
+
+/**
+ * Delete a project (Admin only)
+ */
+export const deleteProjectMutation = (options?: Partial<Options<DeleteProjectData>>): UseMutationOptions<unknown, DeleteProjectError, Options<DeleteProjectData>> => {
+    const mutationOptions: UseMutationOptions<unknown, DeleteProjectError, Options<DeleteProjectData>> = {
+        mutationFn: async (fnOptions) => {
+            const { data } = await deleteProject({
+                ...options,
+                ...fnOptions,
+                throwOnError: true
+            });
+            return data;
+        }
+    };
+    return mutationOptions;
+};
+
+export const getProjectByIdQueryKey = (options: Options<GetProjectByIdData>) => createQueryKey('getProjectById', options);
+
+/**
+ * Get project by ID
+ */
+export const getProjectByIdOptions = (options: Options<GetProjectByIdData>) => queryOptions<GetProjectByIdResponse, GetProjectByIdError, GetProjectByIdResponse, ReturnType<typeof getProjectByIdQueryKey>>({
+    queryFn: async ({ queryKey, signal }) => {
+        const { data } = await getProjectById({
+            ...options,
+            ...queryKey[0],
+            signal,
+            throwOnError: true
+        });
+        return data;
+    },
+    queryKey: getProjectByIdQueryKey(options)
+});
+
+/**
+ * Update a project (Admin only)
+ */
+export const updateProjectMutation = (options?: Partial<Options<UpdateProjectData>>): UseMutationOptions<UpdateProjectResponse, UpdateProjectError, Options<UpdateProjectData>> => {
+    const mutationOptions: UseMutationOptions<UpdateProjectResponse, UpdateProjectError, Options<UpdateProjectData>> = {
+        mutationFn: async (fnOptions) => {
+            const { data } = await updateProject({
+                ...options,
+                ...fnOptions,
+                throwOnError: true
+            });
+            return data;
+        }
+    };
+    return mutationOptions;
+};
+
+/**
+ * Add members to a project (Admin only)
+ */
+export const addProjectMembersMutation = (options?: Partial<Options<AddProjectMembersData>>): UseMutationOptions<AddProjectMembersResponse, AddProjectMembersError, Options<AddProjectMembersData>> => {
+    const mutationOptions: UseMutationOptions<AddProjectMembersResponse, AddProjectMembersError, Options<AddProjectMembersData>> = {
+        mutationFn: async (fnOptions) => {
+            const { data } = await addProjectMembers({
+                ...options,
+                ...fnOptions,
+                throwOnError: true
+            });
+            return data;
+        }
+    };
+    return mutationOptions;
+};
+
+/**
+ * Remove members from a project (Admin only)
+ */
+export const removeProjectMembersMutation = (options?: Partial<Options<RemoveProjectMembersData>>): UseMutationOptions<RemoveProjectMembersResponse, RemoveProjectMembersError, Options<RemoveProjectMembersData>> => {
+    const mutationOptions: UseMutationOptions<RemoveProjectMembersResponse, RemoveProjectMembersError, Options<RemoveProjectMembersData>> = {
+        mutationFn: async (fnOptions) => {
+            const { data } = await removeProjectMembers({
                 ...options,
                 ...fnOptions,
                 throwOnError: true

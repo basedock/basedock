@@ -2,7 +2,7 @@
 
 import type { Client, Options as Options2, TDataShape } from './client';
 import { client } from './client.gen';
-import type { CreateUserData, CreateUserErrors, CreateUserResponses, GetUserByIdData, GetUserByIdErrors, GetUserByIdResponses, GetUsersData, GetUsersResponses, LoginData, LoginErrors, LoginResponses, LogoutData, LogoutErrors, LogoutResponses, RefreshTokenData, RefreshTokenErrors, RefreshTokenResponses, UpdateUserData, UpdateUserErrors, UpdateUserResponses } from './types.gen';
+import type { AddProjectMembersData, AddProjectMembersErrors, AddProjectMembersResponses, CreateProjectData, CreateProjectErrors, CreateProjectResponses, CreateUserData, CreateUserErrors, CreateUserResponses, DeleteProjectData, DeleteProjectErrors, DeleteProjectResponses, GetProjectByIdData, GetProjectByIdErrors, GetProjectByIdResponses, GetProjectsData, GetProjectsResponses, GetUserByIdData, GetUserByIdErrors, GetUserByIdResponses, GetUsersData, GetUsersResponses, LoginData, LoginErrors, LoginResponses, LogoutData, LogoutErrors, LogoutResponses, RefreshTokenData, RefreshTokenErrors, RefreshTokenResponses, RemoveProjectMembersData, RemoveProjectMembersErrors, RemoveProjectMembersResponses, UpdateProjectData, UpdateProjectErrors, UpdateProjectResponses, UpdateUserData, UpdateUserErrors, UpdateUserResponses } from './types.gen';
 
 export type Options<TData extends TDataShape = TDataShape, ThrowOnError extends boolean = boolean> = Options2<TData, ThrowOnError> & {
     /**
@@ -45,6 +45,69 @@ export const getUserById = <ThrowOnError extends boolean = false>(options: Optio
  */
 export const updateUser = <ThrowOnError extends boolean = false>(options: Options<UpdateUserData, ThrowOnError>) => (options.client ?? client).put<UpdateUserResponses, UpdateUserErrors, ThrowOnError>({
     url: '/api/users/{id}',
+    ...options,
+    headers: {
+        'Content-Type': 'application/json',
+        ...options.headers
+    }
+});
+
+/**
+ * Get all projects for the current user
+ */
+export const getProjects = <ThrowOnError extends boolean = false>(options?: Options<GetProjectsData, ThrowOnError>) => (options?.client ?? client).get<GetProjectsResponses, unknown, ThrowOnError>({ url: '/api/projects', ...options });
+
+/**
+ * Create a new project (Admin only)
+ */
+export const createProject = <ThrowOnError extends boolean = false>(options: Options<CreateProjectData, ThrowOnError>) => (options.client ?? client).post<CreateProjectResponses, CreateProjectErrors, ThrowOnError>({
+    url: '/api/projects',
+    ...options,
+    headers: {
+        'Content-Type': 'application/json',
+        ...options.headers
+    }
+});
+
+/**
+ * Delete a project (Admin only)
+ */
+export const deleteProject = <ThrowOnError extends boolean = false>(options: Options<DeleteProjectData, ThrowOnError>) => (options.client ?? client).delete<DeleteProjectResponses, DeleteProjectErrors, ThrowOnError>({ url: '/api/projects/{id}', ...options });
+
+/**
+ * Get project by ID
+ */
+export const getProjectById = <ThrowOnError extends boolean = false>(options: Options<GetProjectByIdData, ThrowOnError>) => (options.client ?? client).get<GetProjectByIdResponses, GetProjectByIdErrors, ThrowOnError>({ url: '/api/projects/{id}', ...options });
+
+/**
+ * Update a project (Admin only)
+ */
+export const updateProject = <ThrowOnError extends boolean = false>(options: Options<UpdateProjectData, ThrowOnError>) => (options.client ?? client).put<UpdateProjectResponses, UpdateProjectErrors, ThrowOnError>({
+    url: '/api/projects/{id}',
+    ...options,
+    headers: {
+        'Content-Type': 'application/json',
+        ...options.headers
+    }
+});
+
+/**
+ * Add members to a project (Admin only)
+ */
+export const addProjectMembers = <ThrowOnError extends boolean = false>(options: Options<AddProjectMembersData, ThrowOnError>) => (options.client ?? client).post<AddProjectMembersResponses, AddProjectMembersErrors, ThrowOnError>({
+    url: '/api/projects/{id}/members',
+    ...options,
+    headers: {
+        'Content-Type': 'application/json',
+        ...options.headers
+    }
+});
+
+/**
+ * Remove members from a project (Admin only)
+ */
+export const removeProjectMembers = <ThrowOnError extends boolean = false>(options: Options<RemoveProjectMembersData, ThrowOnError>) => (options.client ?? client).post<RemoveProjectMembersResponses, RemoveProjectMembersErrors, ThrowOnError>({
+    url: '/api/projects/{id}/members/remove',
     ...options,
     headers: {
         'Content-Type': 'application/json',

@@ -9,5 +9,9 @@ public interface IApplicationDbContext
 
     DbSet<Session> Sessions { get; }
 
+    DbSet<Project> Projects { get; }
+
+    DbSet<ProjectMember> ProjectMembers { get; }
+
     Task<int> SaveChangesAsync(CancellationToken cancellationToken = default);
 }

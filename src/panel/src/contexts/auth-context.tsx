@@ -212,7 +212,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           redirect: request.redirect,
           referrer: request.referrer,
           integrity: request.integrity,
-        });
+          duplex: 'half',
+        } as RequestInit);
       }
       return request;
     };
