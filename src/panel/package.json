@@ -7,7 +7,7 @@
     "build": "vite build && tsc",
     "serve": "vite preview",
     "test": "vitest run",
-    "generate-api": "openapi-ts"
+    "generate-api": "dotnet run --project ../api/BaseDock.Api --launch-profile https -- --export-openapi ../../panel/openapi.json && openapi-ts"
   },
   "dependencies": {
     "@radix-ui/react-label": "^2.1.8",

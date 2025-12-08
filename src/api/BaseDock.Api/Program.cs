@@ -31,11 +31,15 @@ if (args.Contains("--export-openapi"))
 
     var addressFeature = app.Services.GetRequiredService<Microsoft.AspNetCore.Hosting.Server.IServer>()
         .Features.Get<Microsoft.AspNetCore.Hosting.Server.Features.IServerAddressesFeature>();
-    var serverAddress = addressFeature?.Addresses.FirstOrDefault(a => a.StartsWith("http://"))
+    var serverAddress = addressFeature?.Addresses.FirstOrDefault(a => a.StartsWith("https://"))
         ?? addressFeature?.Addresses.FirstOrDefault()
-        ?? "http://localhost:5000";
+        ?? "https://localhost:7073";
 
-    using var httpClient = new HttpClient { BaseAddress = new Uri(serverAddress) };
+    var handler = new HttpClientHandler
+    {
+        ServerCertificateCustomValidationCallback = HttpClientHandler.DangerousAcceptAnyServerCertificateValidator
+    };
+    using var httpClient = new HttpClient(handler) { BaseAddress = new Uri(serverAddress) };
     var json = await httpClient.GetStringAsync("/openapi/v1.json");
 
     var outputPath = args.SkipWhile(a => a != "--export-openapi").Skip(1).FirstOrDefault() ?? "openapi.json";
