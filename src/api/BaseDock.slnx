@@ -1,6 +1,14 @@
 <Solution>
-  <Project Path="BaseDock.Api/BaseDock.Api.csproj" />
-  <Project Path="BaseDock.Application/BaseDock.Application.csproj" />
-  <Project Path="BaseDock.Domain/BaseDock.Domain.csproj" />
-  <Project Path="BaseDock.Infrastructure/BaseDock.Infrastructure.csproj" />
+  <Folder Name="/Solution Items/">
+    <File Path="compose.dev.yml" />
+    <File Path="Directory.Build.props" />
+    <File Path="Directory.Packages.props" />
+    <File Path="global.json" />
+  </Folder>
+  <Folder Name="/src/">
+    <Project Path="BaseDock.Api/BaseDock.Api.csproj" />
+    <Project Path="BaseDock.Application/BaseDock.Application.csproj" />
+    <Project Path="BaseDock.Domain/BaseDock.Domain.csproj" />
+    <Project Path="BaseDock.Infrastructure/BaseDock.Infrastructure.csproj" />
+  </Folder>
 </Solution>
