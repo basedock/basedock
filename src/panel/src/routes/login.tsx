@@ -1,6 +1,6 @@
 import { AlertCircle, Container } from "lucide-react"
 import { useForm } from "@tanstack/react-form"
-import { createFileRoute, useNavigate, useRouter } from "@tanstack/react-router"
+import { createFileRoute, redirect, useNavigate, useRouter } from "@tanstack/react-router"
 import { z } from "zod"
 import { Button } from "@/components/ui/button"
 import {
@@ -19,7 +19,7 @@ import {
 import { Input } from "@/components/ui/input"
 import { Alert, AlertDescription } from "@/components/ui/alert"
 import { useAuth } from "@/contexts/auth-context"
-import { useState } from "react"
+import { useState, useEffect } from "react"
 
 const loginSchema = z.object({
   email: z.email("Please enter a valid email address"),
@@ -30,6 +30,14 @@ export const Route = createFileRoute('/login')({
   validateSearch: (search: Record<string, unknown>) => ({
     redirect: (search.redirect as string) || undefined,
   }),
+  beforeLoad: ({ context }) => {
+    if (context.auth.isLoading) {
+      return
+    }
+    if (context.auth.isAuthenticated) {
+      throw redirect({ to: '/' })
+    }
+  },
   component: RouteComponent,
 })
 
@@ -37,9 +45,16 @@ function RouteComponent() {
   const navigate = useNavigate()
   const router = useRouter()
   const { redirect } = Route.useSearch()
-  const { login } = useAuth()
+  const { login, isAuthenticated, isLoading } = useAuth()
   const [error, setError] = useState<string | null>(null)
   const [isPending, setIsPending] = useState(false)
+
+  // Redirect to home if already authenticated
+  useEffect(() => {
+    if (!isLoading && isAuthenticated) {
+      navigate({ to: '/' })
+    }
+  }, [isLoading, isAuthenticated, navigate])
 
   const form = useForm({
     defaultValues: {

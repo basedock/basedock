@@ -11,6 +11,7 @@ public sealed class DualTokenAuthMiddleware
     {
         "/api/auth/login",
         "/api/auth/refresh",
+        "/api/auth/logout",
         "/openapi",
         "/scalar"
     };
