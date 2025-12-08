@@ -1,4 +1,4 @@
-import { Container } from "lucide-react"
+import { AlertCircle, Container } from "lucide-react"
 import { useForm } from "@tanstack/react-form"
 import { useMutation } from "@tanstack/react-query"
 import { createFileRoute, useNavigate } from "@tanstack/react-router"
@@ -19,6 +19,7 @@ import {
   FieldLabel,
 } from "@/components/ui/field"
 import { Input } from "@/components/ui/input"
+import { Alert, AlertDescription } from "@/components/ui/alert"
 
 const loginSchema = z.object({
   email: z.email("Please enter a valid email address"),
@@ -146,9 +147,12 @@ function RouteComponent() {
                     }}
                   </form.Field>
                   {login.error && (
-                    <p className="text-destructive text-sm">
-                      {login.error.detail || "Invalid email or password"}
-                    </p>
+                    <Alert variant="destructive">
+                      <AlertCircle />
+                      <AlertDescription>
+                        {login.error.detail || "Invalid email or password"}
+                      </AlertDescription>
+                    </Alert>
                   )}
                   <form.Subscribe
                     selector={(state) => [state.canSubmit, state.isSubmitting]}
