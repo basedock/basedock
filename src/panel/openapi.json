@@ -204,7 +204,7 @@
         "tags": [
           "Auth"
         ],
-        "summary": "Authenticate user and create session",
+        "summary": "Authenticate user and return access token",
         "operationId": "Login",
         "requestBody": {
           "content": {
@@ -222,10 +222,65 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/LoginResponse"
+                  "$ref": "#/components/schemas/LoginApiResponse"
                 }
               }
             }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/auth/refresh": {
+      "post": {
+        "tags": [
+          "Auth"
+        ],
+        "summary": "Refresh access token using refresh token cookie",
+        "operationId": "RefreshToken",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RefreshApiResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/auth/logout": {
+      "post": {
+        "tags": [
+          "Auth"
+        ],
+        "summary": "Logout and invalidate tokens",
+        "operationId": "Logout",
+        "responses": {
+          "204": {
+            "description": "No Content"
           },
           "401": {
             "description": "Unauthorized",
@@ -309,6 +364,26 @@
           }
         }
       },
+      "LoginApiResponse": {
+        "required": [
+          "accessToken",
+          "accessTokenExpiresAt",
+          "user"
+        ],
+        "type": "object",
+        "properties": {
+          "accessToken": {
+            "type": "string"
+          },
+          "accessTokenExpiresAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "user": {
+            "$ref": "#/components/schemas/UserDto"
+          }
+        }
+      },
       "LoginRequest": {
         "required": [
           "email",
@@ -321,23 +396,6 @@
           },
           "password": {
             "type": "string"
-          }
-        }
-      },
-      "LoginResponse": {
-        "required": [
-          "sessionId",
-          "expiresAt"
-        ],
-        "type": "object",
-        "properties": {
-          "sessionId": {
-            "type": "string",
-            "format": "uuid"
-          },
-          "expiresAt": {
-            "type": "string",
-            "format": "date-time"
           }
         }
       },
@@ -376,6 +434,26 @@
               "null",
               "string"
             ]
+          }
+        }
+      },
+      "RefreshApiResponse": {
+        "required": [
+          "accessToken",
+          "accessTokenExpiresAt",
+          "user"
+        ],
+        "type": "object",
+        "properties": {
+          "accessToken": {
+            "type": "string"
+          },
+          "accessTokenExpiresAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "user": {
+            "$ref": "#/components/schemas/UserDto"
           }
         }
       },

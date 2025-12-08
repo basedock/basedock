@@ -3,8 +3,8 @@
 import { type DefaultError, queryOptions, type UseMutationOptions } from '@tanstack/react-query';
 
 import { client } from '../client.gen';
-import { createUser, getUserById, getUsers, login, type Options, updateUser } from '../sdk.gen';
-import type { CreateUserData, CreateUserError, CreateUserResponse, GetUserByIdData, GetUserByIdError, GetUserByIdResponse, GetUsersData, GetUsersResponse, LoginData, LoginError, LoginResponse2, UpdateUserData, UpdateUserError, UpdateUserResponse } from '../types.gen';
+import { createUser, getUserById, getUsers, login, logout, type Options, refreshToken, updateUser } from '../sdk.gen';
+import type { CreateUserData, CreateUserError, CreateUserResponse, GetUserByIdData, GetUserByIdError, GetUserByIdResponse, GetUsersData, GetUsersResponse, LoginData, LoginError, LoginResponse, LogoutData, LogoutError, LogoutResponse, RefreshTokenData, RefreshTokenError, RefreshTokenResponse, UpdateUserData, UpdateUserError, UpdateUserResponse } from '../types.gen';
 
 export type QueryKey<TOptions extends Options> = [
     Pick<TOptions, 'baseUrl' | 'body' | 'headers' | 'path' | 'query'> & {
@@ -110,12 +110,46 @@ export const updateUserMutation = (options?: Partial<Options<UpdateUserData>>): 
 };
 
 /**
- * Authenticate user and create session
+ * Authenticate user and return access token
  */
-export const loginMutation = (options?: Partial<Options<LoginData>>): UseMutationOptions<LoginResponse2, LoginError, Options<LoginData>> => {
-    const mutationOptions: UseMutationOptions<LoginResponse2, LoginError, Options<LoginData>> = {
+export const loginMutation = (options?: Partial<Options<LoginData>>): UseMutationOptions<LoginResponse, LoginError, Options<LoginData>> => {
+    const mutationOptions: UseMutationOptions<LoginResponse, LoginError, Options<LoginData>> = {
         mutationFn: async (fnOptions) => {
             const { data } = await login({
+                ...options,
+                ...fnOptions,
+                throwOnError: true
+            });
+            return data;
+        }
+    };
+    return mutationOptions;
+};
+
+/**
+ * Refresh access token using refresh token cookie
+ */
+export const refreshTokenMutation = (options?: Partial<Options<RefreshTokenData>>): UseMutationOptions<RefreshTokenResponse, RefreshTokenError, Options<RefreshTokenData>> => {
+    const mutationOptions: UseMutationOptions<RefreshTokenResponse, RefreshTokenError, Options<RefreshTokenData>> = {
+        mutationFn: async (fnOptions) => {
+            const { data } = await refreshToken({
+                ...options,
+                ...fnOptions,
+                throwOnError: true
+            });
+            return data;
+        }
+    };
+    return mutationOptions;
+};
+
+/**
+ * Logout and invalidate tokens
+ */
+export const logoutMutation = (options?: Partial<Options<LogoutData>>): UseMutationOptions<LogoutResponse, LogoutError, Options<LogoutData>> => {
+    const mutationOptions: UseMutationOptions<LogoutResponse, LogoutError, Options<LogoutData>> = {
+        mutationFn: async (fnOptions) => {
+            const { data } = await logout({
                 ...options,
                 ...fnOptions,
                 throwOnError: true

@@ -1,8 +1,10 @@
 namespace BaseDock.Infrastructure;
 
 using BaseDock.Application.Abstractions.Data;
+using BaseDock.Application.Abstractions.Security;
 using BaseDock.Infrastructure.Persistence;
 using BaseDock.Infrastructure.Persistence.Seeding;
+using BaseDock.Infrastructure.Security;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -13,6 +15,7 @@ public static class DependencyInjection
         this IServiceCollection services,
         IConfiguration configuration)
     {
+        // Database
         var connectionString = configuration.GetConnectionString("DefaultConnection");
 
         services.AddDbContext<ApplicationDbContext>(options =>
@@ -22,6 +25,18 @@ public static class DependencyInjection
             sp.GetRequiredService<ApplicationDbContext>());
 
         services.AddScoped<DatabaseSeeder>();
+
+        // Redis
+        var redisConnectionString = configuration.GetConnectionString("Redis") ?? "localhost:6379";
+        services.AddSingleton(new RedisConnectionFactory(redisConnectionString));
+
+        // JWT Settings
+        services.Configure<JwtSettings>(configuration.GetSection(JwtSettings.SectionName));
+
+        // Security Services
+        services.AddSingleton<IJwtService, JwtService>();
+        services.AddScoped<IRefreshTokenService, RefreshTokenService>();
+        services.AddScoped<ITokenBlacklistService, TokenBlacklistService>();
 
         return services;
     }

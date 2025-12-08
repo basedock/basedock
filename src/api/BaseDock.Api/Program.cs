@@ -20,6 +20,23 @@ builder.Services.AddCarter();
 // OpenAPI
 builder.Services.AddOpenApi();
 
+// CORS for SPA
+builder.Services.AddCors(options =>
+{
+    options.AddDefaultPolicy(policy =>
+    {
+        policy
+            .WithOrigins(
+                "http://localhost:5173",  // Vite dev server
+                "http://localhost:3000",  // Alternative dev server
+                "https://localhost:5173"
+            )
+            .AllowAnyHeader()
+            .AllowAnyMethod()
+            .AllowCredentials();  // Required for cookies
+    });
+});
+
 var app = builder.Build();
 
 // Handle --export-openapi CLI argument
@@ -68,6 +85,9 @@ await using (var scope = app.Services.CreateAsyncScope())
 // Middleware pipeline
 app.UseMiddleware<ExceptionHandlingMiddleware>();
 
+// CORS must be before auth
+app.UseCors();
+
 if (app.Environment.IsDevelopment())
 {
     app.MapOpenApi();
@@ -75,6 +95,9 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+
+// Dual-token authentication middleware
+app.UseMiddleware<DualTokenAuthMiddleware>();
 
 // Map Carter modules
 app.MapCarter();

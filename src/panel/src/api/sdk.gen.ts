@@ -2,7 +2,7 @@
 
 import type { Client, Options as Options2, TDataShape } from './client';
 import { client } from './client.gen';
-import type { CreateUserData, CreateUserErrors, CreateUserResponses, GetUserByIdData, GetUserByIdErrors, GetUserByIdResponses, GetUsersData, GetUsersResponses, LoginData, LoginErrors, LoginResponses, UpdateUserData, UpdateUserErrors, UpdateUserResponses } from './types.gen';
+import type { CreateUserData, CreateUserErrors, CreateUserResponses, GetUserByIdData, GetUserByIdErrors, GetUserByIdResponses, GetUsersData, GetUsersResponses, LoginData, LoginErrors, LoginResponses, LogoutData, LogoutErrors, LogoutResponses, RefreshTokenData, RefreshTokenErrors, RefreshTokenResponses, UpdateUserData, UpdateUserErrors, UpdateUserResponses } from './types.gen';
 
 export type Options<TData extends TDataShape = TDataShape, ThrowOnError extends boolean = boolean> = Options2<TData, ThrowOnError> & {
     /**
@@ -53,7 +53,7 @@ export const updateUser = <ThrowOnError extends boolean = false>(options: Option
 });
 
 /**
- * Authenticate user and create session
+ * Authenticate user and return access token
  */
 export const login = <ThrowOnError extends boolean = false>(options: Options<LoginData, ThrowOnError>) => (options.client ?? client).post<LoginResponses, LoginErrors, ThrowOnError>({
     url: '/api/auth/login',
@@ -63,3 +63,13 @@ export const login = <ThrowOnError extends boolean = false>(options: Options<Log
         ...options.headers
     }
 });
+
+/**
+ * Refresh access token using refresh token cookie
+ */
+export const refreshToken = <ThrowOnError extends boolean = false>(options?: Options<RefreshTokenData, ThrowOnError>) => (options?.client ?? client).post<RefreshTokenResponses, RefreshTokenErrors, ThrowOnError>({ url: '/api/auth/refresh', ...options });
+
+/**
+ * Logout and invalidate tokens
+ */
+export const logout = <ThrowOnError extends boolean = false>(options?: Options<LogoutData, ThrowOnError>) => (options?.client ?? client).post<LogoutResponses, LogoutErrors, ThrowOnError>({ url: '/api/auth/logout', ...options });

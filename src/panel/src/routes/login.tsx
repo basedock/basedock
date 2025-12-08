@@ -1,9 +1,7 @@
 import { AlertCircle, Container } from "lucide-react"
 import { useForm } from "@tanstack/react-form"
-import { useMutation } from "@tanstack/react-query"
-import { createFileRoute, useNavigate } from "@tanstack/react-router"
+import { createFileRoute, useNavigate, useRouter } from "@tanstack/react-router"
 import { z } from "zod"
-import { loginMutation } from "@/api/@tanstack/react-query.gen"
 import { Button } from "@/components/ui/button"
 import {
   Card,
@@ -20,6 +18,8 @@ import {
 } from "@/components/ui/field"
 import { Input } from "@/components/ui/input"
 import { Alert, AlertDescription } from "@/components/ui/alert"
+import { useAuth } from "@/contexts/auth-context"
+import { useState } from "react"
 
 const loginSchema = z.object({
   email: z.email("Please enter a valid email address"),
@@ -27,17 +27,19 @@ const loginSchema = z.object({
 })
 
 export const Route = createFileRoute('/login')({
+  validateSearch: (search: Record<string, unknown>) => ({
+    redirect: (search.redirect as string) || undefined,
+  }),
   component: RouteComponent,
 })
 
 function RouteComponent() {
   const navigate = useNavigate()
-  const login = useMutation({
-    ...loginMutation(),
-    onSuccess: () => {
-      navigate({ to: "/" })
-    },
-  })
+  const router = useRouter()
+  const { redirect } = Route.useSearch()
+  const { login } = useAuth()
+  const [error, setError] = useState<string | null>(null)
+  const [isPending, setIsPending] = useState(false)
 
   const form = useForm({
     defaultValues: {
@@ -45,12 +47,23 @@ function RouteComponent() {
       password: "",
     },
     onSubmit: async ({ value }) => {
-      login.mutate({
-        body: {
-          email: value.email,
-          password: value.password,
-        },
-      })
+      setError(null)
+      setIsPending(true)
+      try {
+        await login(value.email, value.password)
+        // Invalidate router to re-check auth
+        await router.invalidate()
+        // Navigate to redirect URL or dashboard
+        if (redirect) {
+          router.history.push(redirect)
+        } else {
+          navigate({ to: "/" })
+        }
+      } catch (e) {
+        setError(e instanceof Error ? e.message : "Login failed")
+      } finally {
+        setIsPending(false)
+      }
     },
     validators: {
       onSubmit: ({ value }) => {
@@ -146,11 +159,11 @@ function RouteComponent() {
                       )
                     }}
                   </form.Field>
-                  {login.error && (
+                  {error && (
                     <Alert variant="destructive">
                       <AlertCircle />
                       <AlertDescription>
-                        {login.error.detail || "Invalid email or password"}
+                        {error}
                       </AlertDescription>
                     </Alert>
                   )}
@@ -161,9 +174,9 @@ function RouteComponent() {
                       <Button
                         type="submit"
                         className="w-full"
-                        disabled={!canSubmit || login.isPending}
+                        disabled={!canSubmit || isPending}
                       >
-                        {isSubmitting || login.isPending ? "Signing in..." : "Sign in"}
+                        {isSubmitting || isPending ? "Signing in..." : "Sign in"}
                       </Button>
                     )}
                   </form.Subscribe>

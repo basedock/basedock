@@ -21,14 +21,15 @@ export type HttpValidationProblemDetails = {
     };
 };
 
+export type LoginApiResponse = {
+    accessToken: string;
+    accessTokenExpiresAt: string;
+    user: UserDto;
+};
+
 export type LoginRequest = {
     email: string;
     password: string;
-};
-
-export type LoginResponse = {
-    sessionId: string;
-    expiresAt: string;
 };
 
 export type ProblemDetails = {
@@ -37,6 +38,12 @@ export type ProblemDetails = {
     status?: null | number | string;
     detail?: null | string;
     instance?: null | string;
+};
+
+export type RefreshApiResponse = {
+    accessToken: string;
+    accessTokenExpiresAt: string;
+    user: UserDto;
 };
 
 export type UpdateUserRequest = {
@@ -178,7 +185,57 @@ export type LoginResponses = {
     /**
      * OK
      */
-    200: LoginResponse;
+    200: LoginApiResponse;
 };
 
-export type LoginResponse2 = LoginResponses[keyof LoginResponses];
+export type LoginResponse = LoginResponses[keyof LoginResponses];
+
+export type RefreshTokenData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/api/auth/refresh';
+};
+
+export type RefreshTokenErrors = {
+    /**
+     * Unauthorized
+     */
+    401: ProblemDetails;
+};
+
+export type RefreshTokenError = RefreshTokenErrors[keyof RefreshTokenErrors];
+
+export type RefreshTokenResponses = {
+    /**
+     * OK
+     */
+    200: RefreshApiResponse;
+};
+
+export type RefreshTokenResponse = RefreshTokenResponses[keyof RefreshTokenResponses];
+
+export type LogoutData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/api/auth/logout';
+};
+
+export type LogoutErrors = {
+    /**
+     * Unauthorized
+     */
+    401: ProblemDetails;
+};
+
+export type LogoutError = LogoutErrors[keyof LogoutErrors];
+
+export type LogoutResponses = {
+    /**
+     * No Content
+     */
+    204: void;
+};
+
+export type LogoutResponse = LogoutResponses[keyof LogoutResponses];

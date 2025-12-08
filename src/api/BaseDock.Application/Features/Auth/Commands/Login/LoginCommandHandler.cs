@@ -2,15 +2,17 @@ namespace BaseDock.Application.Features.Auth.Commands.Login;
 
 using BaseDock.Application.Abstractions.Data;
 using BaseDock.Application.Abstractions.Messaging;
-using BaseDock.Domain.Entities;
+using BaseDock.Application.Abstractions.Security;
+using BaseDock.Application.Features.Users.Mappers;
 using BaseDock.Domain.Primitives;
 using Microsoft.EntityFrameworkCore;
 
-public sealed class LoginCommandHandler(IApplicationDbContext db)
+public sealed class LoginCommandHandler(
+    IApplicationDbContext db,
+    IJwtService jwtService,
+    IRefreshTokenService refreshTokenService)
     : ICommandHandler<LoginCommand, Result<LoginResponse>>
 {
-    private static readonly TimeSpan SessionExpiration = TimeSpan.FromDays(7);
-
     public async Task<Result<LoginResponse>> HandleAsync(
         LoginCommand command,
         CancellationToken cancellationToken = default)
@@ -38,11 +40,19 @@ public sealed class LoginCommandHandler(IApplicationDbContext db)
                 Error.Unauthorized("Invalid email or password."));
         }
 
-        var session = Session.Create(user.Id, SessionExpiration);
+        // Generate JWT access token
+        var accessToken = jwtService.GenerateAccessToken(user);
+        var accessTokenExpiration = jwtService.GetTokenExpiration(accessToken);
 
-        db.Sessions.Add(session);
-        await db.SaveChangesAsync(cancellationToken);
+        // Generate refresh token and store in Redis
+        var refreshToken = await refreshTokenService.GenerateRefreshTokenAsync(user.Id, cancellationToken);
 
-        return Result.Success(new LoginResponse(session.Id, session.ExpiresAt));
+        var userDto = user.ToDto();
+
+        return Result.Success(new LoginResponse(
+            accessToken,
+            accessTokenExpiration,
+            refreshToken,
+            userDto));
     }
 }

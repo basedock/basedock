@@ -1,4 +1,6 @@
-import { createFileRoute } from "@tanstack/react-router"
+import { createFileRoute, redirect, useNavigate } from "@tanstack/react-router"
+import { useEffect } from "react"
+import { useAuth } from "@/contexts/auth-context"
 import { AppSidebar } from "@/components/app-sidebar"
 import {
   Breadcrumb,
@@ -16,10 +18,47 @@ import {
 } from "@/components/ui/sidebar"
 
 export const Route = createFileRoute("/")({
-  component: App,
+  beforeLoad: ({ context }) => {
+    // Wait for auth to load
+    if (context.auth.isLoading) {
+      return
+    }
+
+    // If not authenticated, redirect to login
+    if (!context.auth.isAuthenticated) {
+      throw redirect({
+        to: "/login",
+        search: { redirect: undefined },
+      })
+    }
+  },
+  component: Dashboard,
 })
 
-function App() {
+function Dashboard() {
+  const { isAuthenticated, isLoading } = useAuth()
+  const navigate = useNavigate()
+
+  useEffect(() => {
+    if (!isLoading && !isAuthenticated) {
+      navigate({ to: '/login', search: { redirect: '/' } })
+    }
+  }, [isLoading, isAuthenticated, navigate])
+
+  // Show loading while auth is resolving
+  if (isLoading) {
+    return (
+      <div className="flex min-h-svh items-center justify-center">
+        <div className="text-muted-foreground">Loading...</div>
+      </div>
+    )
+  }
+
+  // Don't render if not authenticated (redirect will happen)
+  if (!isAuthenticated) {
+    return null
+  }
+
   return (
     <SidebarProvider>
       <AppSidebar />
@@ -35,12 +74,12 @@ function App() {
               <BreadcrumbList>
                 <BreadcrumbItem className="hidden md:block">
                   <BreadcrumbLink href="#">
-                    Building Your Application
+                    Dashboard
                   </BreadcrumbLink>
                 </BreadcrumbItem>
                 <BreadcrumbSeparator className="hidden md:block" />
                 <BreadcrumbItem>
-                  <BreadcrumbPage>Data Fetching</BreadcrumbPage>
+                  <BreadcrumbPage>Overview</BreadcrumbPage>
                 </BreadcrumbItem>
               </BreadcrumbList>
             </Breadcrumb>
