@@ -1,8 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router"
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query"
-import { useEffect } from "react"
 import { useAuth } from "@/contexts/auth-context"
-import { useDashboardHeader } from "@/contexts/dashboard-header-context"
 import {
   Card,
   CardHeader,
@@ -33,35 +31,29 @@ import type { ProjectDto } from "@/api/types.gen"
 import { CreateProjectDialog } from "@/components/create-project-dialog"
 import { useState } from "react"
 
+function CreateProjectButton() {
+  const [open, setOpen] = useState(false)
+  return (
+    <>
+      <Button onClick={() => setOpen(true)}>Create Project</Button>
+      <CreateProjectDialog open={open} onOpenChange={setOpen} />
+    </>
+  )
+}
+
 export const Route = createFileRoute("/_dashboard/projects/")({
+  beforeLoad: () => ({
+    getActions: ({ isAdmin }: { isAdmin: boolean }) =>
+      isAdmin ? <CreateProjectButton /> : null,
+  }),
   component: ProjectsPage,
 })
 
 function ProjectsPage() {
   const { user, isAuthenticated } = useAuth()
   const queryClient = useQueryClient()
-  const [createDialogOpen, setCreateDialogOpen] = useState(false)
-  const { setBreadcrumbs, setActions } = useDashboardHeader()
 
   const isAdmin = user?.isAdmin ?? false
-
-  useEffect(() => {
-    setBreadcrumbs([
-      { label: "Dashboard", href: "/" },
-      { label: "Projects" },
-    ])
-  }, [setBreadcrumbs])
-
-  useEffect(() => {
-    if (isAdmin) {
-      setActions(
-        <Button onClick={() => setCreateDialogOpen(true)}>
-          Create Project
-        </Button>
-      )
-    }
-    return () => setActions(null)
-  }, [isAdmin, setActions])
 
   const { data: projects, isLoading, error } = useQuery({
     queryKey: ["projects"],
@@ -110,9 +102,7 @@ function ProjectsPage() {
             </EmptyHeader>
             {isAdmin && (
               <EmptyContent>
-                <Button onClick={() => setCreateDialogOpen(true)}>
-                  Create Project
-                </Button>
+                <CreateProjectButton />
               </EmptyContent>
             )}
           </Empty>
@@ -177,11 +167,6 @@ function ProjectsPage() {
           </div>
         )}
       </div>
-
-      <CreateProjectDialog
-        open={createDialogOpen}
-        onOpenChange={setCreateDialogOpen}
-      />
     </>
   )
 }

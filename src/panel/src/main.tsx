@@ -1,4 +1,4 @@
-import { StrictMode } from 'react'
+import { StrictMode, type ReactNode } from 'react'
 import ReactDOM from 'react-dom/client'
 import { QueryClientProvider } from '@tanstack/react-query'
 import { RouterProvider, createRouter } from '@tanstack/react-router'
@@ -19,6 +19,8 @@ export interface RouterContext {
     isLoading: boolean
     user: User | null
   }
+  getTitle?: () => string
+  getActions?: (props: { isAdmin: boolean }) => ReactNode
 }
 
 // Create a new router instance

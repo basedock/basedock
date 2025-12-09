@@ -1,8 +1,6 @@
-import { createFileRoute } from "@tanstack/react-router"
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query"
-import { useEffect } from "react"
+import { createFileRoute, useRouter } from "@tanstack/react-router"
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 import { useAuth } from "@/contexts/auth-context"
-import { useDashboardHeader } from "@/contexts/dashboard-header-context"
 import {
   Card,
   CardHeader,
@@ -44,6 +42,14 @@ import {
 } from "@/components/ui/select"
 
 export const Route = createFileRoute("/_dashboard/projects/$id")({
+  loader: async ({ params }) => {
+    const response = await getProjectById({ path: { id: params.id } })
+    if (response.error) throw new Error("Project not found")
+    return response.data as ProjectDto
+  },
+  beforeLoad: () => ({
+    getTitle: () => "Project",
+  }),
   component: ProjectDetailPage,
 })
 
@@ -54,21 +60,12 @@ const projectSchema = z.object({
 
 function ProjectDetailPage() {
   const { id } = Route.useParams()
+  const project = Route.useLoaderData()
+  const router = useRouter()
   const { user, isAuthenticated } = useAuth()
   const queryClient = useQueryClient()
   const [addMemberDialogOpen, setAddMemberDialogOpen] = useState(false)
   const [selectedUserId, setSelectedUserId] = useState<string>("")
-  const { setBreadcrumbs } = useDashboardHeader()
-
-  const { data: project, isLoading, error } = useQuery({
-    queryKey: ["project", id],
-    queryFn: async () => {
-      const response = await getProjectById({ path: { id } })
-      if (response.error) throw new Error("Failed to fetch project")
-      return response.data as ProjectDto
-    },
-    enabled: isAuthenticated,
-  })
 
   const { data: users } = useQuery({
     queryKey: ["users"],
@@ -90,8 +87,8 @@ function ProjectDetailPage() {
       return response.data
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["project", id] })
       queryClient.invalidateQueries({ queryKey: ["projects"] })
+      router.invalidate()
     },
   })
 
@@ -105,7 +102,7 @@ function ProjectDetailPage() {
       return response.data
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["project", id] })
+      router.invalidate()
     },
   })
 
@@ -119,7 +116,7 @@ function ProjectDetailPage() {
       return response.data
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["project", id] })
+      router.invalidate()
       setAddMemberDialogOpen(false)
       setSelectedUserId("")
     },
@@ -145,39 +142,6 @@ function ProjectDetailPage() {
   if (project && form.state.values.name !== project.name) {
     form.setFieldValue("name", project.name)
     form.setFieldValue("description", project.description ?? "")
-  }
-
-  // Set breadcrumbs based on project state
-  useEffect(() => {
-    if (error || !project) {
-      setBreadcrumbs([
-        { label: "Dashboard", href: "/" },
-        { label: "Projects", href: "/projects" },
-        { label: "Not Found" },
-      ])
-    } else {
-      setBreadcrumbs([
-        { label: "Dashboard", href: "/" },
-        { label: "Projects", href: "/projects" },
-        { label: project.name },
-      ])
-    }
-  }, [setBreadcrumbs, project, error])
-
-  if (isLoading) {
-    return (
-      <div className="flex min-h-svh items-center justify-center">
-        <div className="text-muted-foreground">Loading...</div>
-      </div>
-    )
-  }
-
-  if (error || !project) {
-    return (
-      <div className="flex min-h-[50vh] items-center justify-center">
-        <div className="text-destructive">Project not found</div>
-      </div>
-    )
   }
 
   const isAdmin = user?.isAdmin ?? false

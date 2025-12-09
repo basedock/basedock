@@ -1,6 +1,7 @@
+import type { ReactNode } from "react"
 import {
   Breadcrumb,
-  BreadcrumbItem,
+  BreadcrumbItem as BreadcrumbItemUI,
   BreadcrumbLink,
   BreadcrumbList,
   BreadcrumbPage,
@@ -8,10 +9,18 @@ import {
 } from "@/components/ui/breadcrumb"
 import { Separator } from "@/components/ui/separator"
 import { SidebarTrigger } from "@/components/ui/sidebar"
-import { useDashboardHeader } from "@/contexts/dashboard-header-context"
 
-export function DashboardHeader() {
-  const { breadcrumbs, actions } = useDashboardHeader()
+export interface BreadcrumbItem {
+  label: string
+  href?: string
+}
+
+interface DashboardHeaderProps {
+  breadcrumbs: BreadcrumbItem[]
+  actions?: ReactNode
+}
+
+export function DashboardHeader({ breadcrumbs, actions }: DashboardHeaderProps) {
 
   return (
     <header className="flex h-16 shrink-0 items-center gap-2">
@@ -27,13 +36,13 @@ export function DashboardHeader() {
               const isLast = index === breadcrumbs.length - 1
               return (
                 <span key={item.label} className="contents">
-                  <BreadcrumbItem className={isLast ? undefined : "hidden md:block"}>
+                  <BreadcrumbItemUI className={isLast ? undefined : "hidden md:block"}>
                     {isLast || !item.href ? (
                       <BreadcrumbPage>{item.label}</BreadcrumbPage>
                     ) : (
                       <BreadcrumbLink href={item.href}>{item.label}</BreadcrumbLink>
                     )}
-                  </BreadcrumbItem>
+                  </BreadcrumbItemUI>
                   {!isLast && <BreadcrumbSeparator className="hidden md:block" />}
                 </span>
               )
