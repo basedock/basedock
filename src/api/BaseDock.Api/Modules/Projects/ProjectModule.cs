@@ -78,7 +78,7 @@ public class ProjectModule : ICarterModule
 
     private static bool IsAdmin(ClaimsPrincipal user)
     {
-        var isAdminClaim = user.FindFirst("is_admin")?.Value;
+        var isAdminClaim = user.FindFirst("isAdmin")?.Value;
         return bool.TryParse(isAdminClaim, out var isAdmin) && isAdmin;
     }
 
