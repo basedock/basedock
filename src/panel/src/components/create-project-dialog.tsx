@@ -103,9 +103,6 @@ export function CreateProjectDialog({ open, onOpenChange }: CreateProjectDialogP
                       placeholder="My Project"
                       autoComplete="off"
                     />
-                    <FieldDescription>
-                      A unique name for your project.
-                    </FieldDescription>
                     {isInvalid && <FieldError errors={field.state.meta.errors} />}
                   </Field>
                 )
