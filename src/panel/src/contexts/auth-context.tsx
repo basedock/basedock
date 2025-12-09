@@ -202,18 +202,25 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       if (token) {
         const headers = new Headers(request.headers);
         headers.set('Authorization', `Bearer ${token}`);
-        return new Request(request.url, {
+
+        const init: RequestInit = {
           method: request.method,
           headers,
           body: request.body,
           mode: request.mode,
-          credentials: request.credentials,
+          credentials: 'include',  // Explicitly set to 'include' instead of copying
           cache: request.cache,
           redirect: request.redirect,
           referrer: request.referrer,
           integrity: request.integrity,
-          duplex: 'half',
-        } as RequestInit);
+        };
+
+        // Only add duplex if body exists (for POST/PUT requests)
+        if (request.body) {
+          (init as any).duplex = 'half';
+        }
+
+        return new Request(request.url, init);
       }
       return request;
     };

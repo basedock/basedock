@@ -120,11 +120,13 @@ public class AuthModule : ICarterModule
 
     private static void SetRefreshTokenCookie(HttpContext httpContext, string token, JwtSettings settings)
     {
+        var isDevelopment = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") == "Development";
+
         httpContext.Response.Cookies.Append(RefreshTokenCookieName, token, new CookieOptions
         {
             HttpOnly = true,
             Secure = true,
-            SameSite = SameSiteMode.Strict,
+            SameSite = isDevelopment ? SameSiteMode.None : SameSiteMode.Strict,
             Path = "/api",
             Expires = DateTime.UtcNow.AddDays(settings.RefreshTokenExpirationDays)
         });
@@ -132,11 +134,13 @@ public class AuthModule : ICarterModule
 
     private static void ClearRefreshTokenCookie(HttpContext httpContext)
     {
+        var isDevelopment = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") == "Development";
+
         httpContext.Response.Cookies.Delete(RefreshTokenCookieName, new CookieOptions
         {
             HttpOnly = true,
             Secure = true,
-            SameSite = SameSiteMode.Strict,
+            SameSite = isDevelopment ? SameSiteMode.None : SameSiteMode.Strict,
             Path = "/api"
         });
     }

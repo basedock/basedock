@@ -15,7 +15,7 @@ export default defineConfig({
     {
       name: "@hey-api/client-fetch",
       bundle: true,
-      baseUrl: "",
+      baseUrl: "https://localhost:7073",
     },
     {
       name: "@tanstack/react-query",
