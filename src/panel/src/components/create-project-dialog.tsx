@@ -11,7 +11,7 @@ import {
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
-import { Field, FieldLabel, FieldError, FieldGroup, FieldDescription } from "@/components/ui/field"
+import { Field, FieldLabel, FieldError, FieldGroup } from "@/components/ui/field"
 import { createProject } from "@/api/sdk.gen"
 
 const projectSchema = z.object({
