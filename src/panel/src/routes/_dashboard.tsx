@@ -1,7 +1,9 @@
 import { createFileRoute, Outlet, redirect, useNavigate } from "@tanstack/react-router"
 import { useEffect } from "react"
 import { useAuth } from "@/contexts/auth-context"
+import { DashboardHeaderProvider } from "@/contexts/dashboard-header-context"
 import { AppSidebar } from "@/components/app-sidebar"
+import { DashboardHeader } from "@/components/dashboard-header"
 import {
   SidebarInset,
   SidebarProvider,
@@ -47,7 +49,10 @@ function AuthenticatedLayout() {
     <SidebarProvider>
       <AppSidebar />
       <SidebarInset>
-        <Outlet />
+        <DashboardHeaderProvider>
+          <DashboardHeader />
+          <Outlet />
+        </DashboardHeaderProvider>
       </SidebarInset>
     </SidebarProvider>
   )

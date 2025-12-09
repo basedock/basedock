@@ -1,16 +1,8 @@
 import { createFileRoute, Link } from "@tanstack/react-router"
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query"
+import { useEffect } from "react"
 import { useAuth } from "@/contexts/auth-context"
-import {
-  Breadcrumb,
-  BreadcrumbItem,
-  BreadcrumbLink,
-  BreadcrumbList,
-  BreadcrumbPage,
-  BreadcrumbSeparator,
-} from "@/components/ui/breadcrumb"
-import { Separator } from "@/components/ui/separator"
-import { SidebarTrigger } from "@/components/ui/sidebar"
+import { useDashboardHeader } from "@/contexts/dashboard-header-context"
 import {
   Card,
   CardHeader,
@@ -49,6 +41,27 @@ function ProjectsPage() {
   const { user, isAuthenticated } = useAuth()
   const queryClient = useQueryClient()
   const [createDialogOpen, setCreateDialogOpen] = useState(false)
+  const { setBreadcrumbs, setActions } = useDashboardHeader()
+
+  const isAdmin = user?.isAdmin ?? false
+
+  useEffect(() => {
+    setBreadcrumbs([
+      { label: "Dashboard", href: "/" },
+      { label: "Projects" },
+    ])
+  }, [setBreadcrumbs])
+
+  useEffect(() => {
+    if (isAdmin) {
+      setActions(
+        <Button onClick={() => setCreateDialogOpen(true)}>
+          Create Project
+        </Button>
+      )
+    }
+    return () => setActions(null)
+  }, [isAdmin, setActions])
 
   const { data: projects, isLoading, error } = useQuery({
     queryKey: ["projects"],
@@ -71,8 +84,6 @@ function ProjectsPage() {
     },
   })
 
-  const isAdmin = user?.isAdmin ?? false
-
   if (isLoading) {
     return (
       <div className="flex min-h-svh items-center justify-center">
@@ -83,31 +94,6 @@ function ProjectsPage() {
 
   return (
     <>
-      <header className="flex h-16 shrink-0 items-center gap-2">
-        <div className="flex items-center gap-2 px-4">
-          <SidebarTrigger className="-ml-1" />
-          <Separator orientation="vertical" className="mr-2 data-[orientation=vertical]:h-4" />
-          <Breadcrumb>
-            <BreadcrumbList>
-              <BreadcrumbItem className="hidden md:block">
-                <BreadcrumbLink href="/">Dashboard</BreadcrumbLink>
-              </BreadcrumbItem>
-              <BreadcrumbSeparator className="hidden md:block" />
-              <BreadcrumbItem>
-                <BreadcrumbPage>Projects</BreadcrumbPage>
-              </BreadcrumbItem>
-            </BreadcrumbList>
-          </Breadcrumb>
-        </div>
-        {isAdmin && (
-          <div className="ml-auto pr-4">
-            <Button onClick={() => setCreateDialogOpen(true)}>
-              Create Project
-            </Button>
-          </div>
-        )}
-      </header>
-
       <div className="flex flex-1 flex-col gap-4 p-4 pt-0">
         {error ? (
           <div className="text-destructive">Failed to load projects</div>

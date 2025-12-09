@@ -1,16 +1,8 @@
 import { createFileRoute } from "@tanstack/react-router"
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query"
+import { useEffect } from "react"
 import { useAuth } from "@/contexts/auth-context"
-import {
-  Breadcrumb,
-  BreadcrumbItem,
-  BreadcrumbLink,
-  BreadcrumbList,
-  BreadcrumbPage,
-  BreadcrumbSeparator,
-} from "@/components/ui/breadcrumb"
-import { Separator } from "@/components/ui/separator"
-import { SidebarTrigger } from "@/components/ui/sidebar"
+import { useDashboardHeader } from "@/contexts/dashboard-header-context"
 import {
   Card,
   CardHeader,
@@ -66,6 +58,7 @@ function ProjectDetailPage() {
   const queryClient = useQueryClient()
   const [addMemberDialogOpen, setAddMemberDialogOpen] = useState(false)
   const [selectedUserId, setSelectedUserId] = useState<string>("")
+  const { setBreadcrumbs } = useDashboardHeader()
 
   const { data: project, isLoading, error } = useQuery({
     queryKey: ["project", id],
@@ -154,6 +147,23 @@ function ProjectDetailPage() {
     form.setFieldValue("description", project.description ?? "")
   }
 
+  // Set breadcrumbs based on project state
+  useEffect(() => {
+    if (error || !project) {
+      setBreadcrumbs([
+        { label: "Dashboard", href: "/" },
+        { label: "Projects", href: "/projects" },
+        { label: "Not Found" },
+      ])
+    } else {
+      setBreadcrumbs([
+        { label: "Dashboard", href: "/" },
+        { label: "Projects", href: "/projects" },
+        { label: project.name },
+      ])
+    }
+  }, [setBreadcrumbs, project, error])
+
   if (isLoading) {
     return (
       <div className="flex min-h-svh items-center justify-center">
@@ -164,32 +174,9 @@ function ProjectDetailPage() {
 
   if (error || !project) {
     return (
-      <>
-        <header className="flex h-16 shrink-0 items-center gap-2">
-          <div className="flex items-center gap-2 px-4">
-            <SidebarTrigger className="-ml-1" />
-            <Separator orientation="vertical" className="mr-2 data-[orientation=vertical]:h-4" />
-            <Breadcrumb>
-              <BreadcrumbList>
-                <BreadcrumbItem className="hidden md:block">
-                  <BreadcrumbLink href="/">Dashboard</BreadcrumbLink>
-                </BreadcrumbItem>
-                <BreadcrumbSeparator className="hidden md:block" />
-                <BreadcrumbItem className="hidden md:block">
-                  <BreadcrumbLink href="/projects">Projects</BreadcrumbLink>
-                </BreadcrumbItem>
-                <BreadcrumbSeparator className="hidden md:block" />
-                <BreadcrumbItem>
-                  <BreadcrumbPage>Not Found</BreadcrumbPage>
-                </BreadcrumbItem>
-              </BreadcrumbList>
-            </Breadcrumb>
-          </div>
-        </header>
-        <div className="flex min-h-[50vh] items-center justify-center">
-          <div className="text-destructive">Project not found</div>
-        </div>
-      </>
+      <div className="flex min-h-[50vh] items-center justify-center">
+        <div className="text-destructive">Project not found</div>
+      </div>
     )
   }
 
@@ -199,28 +186,6 @@ function ProjectDetailPage() {
 
   return (
     <>
-      <header className="flex h-16 shrink-0 items-center gap-2">
-        <div className="flex items-center gap-2 px-4">
-          <SidebarTrigger className="-ml-1" />
-          <Separator orientation="vertical" className="mr-2 data-[orientation=vertical]:h-4" />
-          <Breadcrumb>
-            <BreadcrumbList>
-              <BreadcrumbItem className="hidden md:block">
-                <BreadcrumbLink href="/">Dashboard</BreadcrumbLink>
-              </BreadcrumbItem>
-              <BreadcrumbSeparator className="hidden md:block" />
-              <BreadcrumbItem className="hidden md:block">
-                <BreadcrumbLink href="/projects">Projects</BreadcrumbLink>
-              </BreadcrumbItem>
-              <BreadcrumbSeparator className="hidden md:block" />
-              <BreadcrumbItem>
-                <BreadcrumbPage>{project.name}</BreadcrumbPage>
-              </BreadcrumbItem>
-            </BreadcrumbList>
-          </Breadcrumb>
-        </div>
-      </header>
-
       <div className="flex flex-1 flex-col gap-6 p-4 pt-0">
         {isAdmin && (
           <Card>
