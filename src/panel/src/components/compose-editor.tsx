@@ -40,34 +40,11 @@ export function ComposeEditor({ projectId, initialContent, onSave }: ComposeEdit
     setHasChanges(value !== (initialContent ?? ""))
   }
 
-  const placeholder = `version: '3.8'
-
-services:
-  web:
-    image: nginx:latest
-    ports:
-      - '80:80'
-    volumes:
-      - ./html:/usr/share/nginx/html
-
-  db:
-    image: postgres:16-alpine
-    environment:
-      POSTGRES_USER: app
-      POSTGRES_PASSWORD: secret
-      POSTGRES_DB: myapp
-    volumes:
-      - db_data:/var/lib/postgresql/data
-
-volumes:
-  db_data:`
-
   return (
     <div className="space-y-4">
       <CodeMirrorEditor
         value={content}
         onChange={handleChange}
-        placeholder={placeholder}
         minHeight="400px"
       />
       {saveMutation.isError && (

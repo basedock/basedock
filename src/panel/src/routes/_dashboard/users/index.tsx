@@ -15,8 +15,8 @@ import { getUsers, deleteUser } from "@/api/sdk.gen"
 import type { UserDto } from "@/api/types.gen"
 import { CreateUserDialog } from "@/components/create-user-dialog"
 import { useState, useMemo } from "react"
-import { DataTable } from "./data-table"
-import { getColumns } from "./columns"
+import { DataTable } from "@/components/users/data-table"
+import { getColumns } from "@/components/users/columns"
 
 function CreateUserButton() {
   const [open, setOpen] = useState(false)
