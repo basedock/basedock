@@ -1,6 +1,6 @@
-// In-memory token storage (NOT localStorage - XSS protection)
-// Tokens are stored in memory and lost on page refresh
-// This is intentional - user will need to re-authenticate or use refresh token
+// Session storage for auth tokens
+// Uses sessionStorage for persistence across page refreshes within the same tab
+// sessionStorage is cleared when the browser tab/window is closed
 
 export interface User {
   id: string;
@@ -17,11 +17,35 @@ interface AuthState {
   user: User | null;
 }
 
-const state: AuthState = {
-  accessToken: null,
-  accessTokenExpiresAt: null,
-  user: null,
-};
+const STORAGE_KEY = 'auth_state';
+
+function loadState(): AuthState {
+  try {
+    const stored = sessionStorage.getItem(STORAGE_KEY);
+    if (stored) {
+      const parsed = JSON.parse(stored);
+      return {
+        ...parsed,
+        accessTokenExpiresAt: parsed.accessTokenExpiresAt
+          ? new Date(parsed.accessTokenExpiresAt)
+          : null,
+      };
+    }
+  } catch {
+    // Ignore errors (e.g., invalid JSON, no sessionStorage)
+  }
+  return { accessToken: null, accessTokenExpiresAt: null, user: null };
+}
+
+function saveState(state: AuthState): void {
+  try {
+    sessionStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+  } catch {
+    // Ignore errors (e.g., quota exceeded)
+  }
+}
+
+let state: AuthState = loadState();
 
 export const authStore = {
   getAccessToken: (): string | null => state.accessToken,
@@ -29,12 +53,14 @@ export const authStore = {
   setAccessToken: (token: string | null, expiresAt?: Date | null): void => {
     state.accessToken = token;
     state.accessTokenExpiresAt = expiresAt ?? null;
+    saveState(state);
   },
 
   getUser: (): User | null => state.user,
 
   setUser: (user: User | null): void => {
     state.user = user;
+    saveState(state);
   },
 
   isAuthenticated: (): boolean => {
@@ -67,5 +93,6 @@ export const authStore = {
     state.accessToken = null;
     state.accessTokenExpiresAt = null;
     state.user = null;
+    sessionStorage.removeItem(STORAGE_KEY);
   },
 };

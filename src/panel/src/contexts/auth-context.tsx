@@ -151,8 +151,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         url: '/api/auth/logout',
         headers: token
           ? {
-              Authorization: `Bearer ${token}`,
-            }
+            Authorization: `Bearer ${token}`,
+          }
           : undefined,
       });
     } catch {
@@ -175,6 +175,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const initialize = async () => {
       setIsLoading(true);
       try {
+        // If we have a valid token in sessionStorage, use it
+        if (authStore.isAuthenticated()) {
+          setUser(authStore.getUser());
+          scheduleRefresh();
+          setIsLoading(false);
+          return;
+        }
+
         // Try to refresh using the cookie
         const success = await refresh();
         if (success) {
