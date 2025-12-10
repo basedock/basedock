@@ -34,6 +34,10 @@ public static class DependencyInjection
         var redisConnectionString = configuration.GetConnectionString("Redis") ?? "localhost:6379";
         services.AddSingleton(new RedisConnectionFactory(redisConnectionString));
 
+        // File System Settings
+        services.Configure<FileSystem.FileSystemSettings>(
+            configuration.GetSection(FileSystem.FileSystemSettings.SectionName));
+
         // JWT Settings
         services.Configure<JwtSettings>(configuration.GetSection(JwtSettings.SectionName));
 

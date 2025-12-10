@@ -1,5 +1,6 @@
 namespace BaseDock.Infrastructure.Docker;
 
+using System.Diagnostics;
 using BaseDock.Application.Abstractions.Docker;
 using BaseDock.Application.Features.Docker.DTOs;
 using BaseDock.Domain.Primitives;
@@ -23,55 +24,88 @@ public class DockerComposeService : IDockerComposeService
 
     public async Task<Result> DeployAsync(string projectName, string composeFilePath, CancellationToken ct = default)
     {
-        return await Task.Run(() =>
+        try
         {
-            try
-            {
-                _logger.LogInformation("Deploying project {ProjectName} from {ComposeFilePath}", projectName, composeFilePath);
+            _logger.LogInformation("Deploying project {ProjectName} from {ComposeFilePath}", projectName, composeFilePath);
 
-                using var svc = new Builder()
-                    .UseContainer()
-                    .UseCompose()
-                    .FromFile(composeFilePath)
-                    .ServiceName(projectName.ToLowerInvariant())
-                    .RemoveOrphans()
-                    .Build();
-
-                svc.Start();
-                return Result.Success();
-            }
-            catch (Exception ex)
+            var startInfo = new ProcessStartInfo
             {
-                _logger.LogError(ex, "Failed to deploy project {ProjectName}", projectName);
-                return Result.Failure(Error.DockerError(ex.Message));
+                FileName = "docker",
+                Arguments = $"compose -f \"{composeFilePath}\" -p {projectName.ToLowerInvariant()} up -d --remove-orphans",
+                RedirectStandardOutput = true,
+                RedirectStandardError = true,
+                UseShellExecute = false,
+                CreateNoWindow = true
+            };
+
+            using var process = Process.Start(startInfo);
+            if (process == null)
+            {
+                return Result.Failure(Error.DockerError("Failed to start docker compose process"));
             }
-        }, ct);
+
+            await process.WaitForExitAsync(ct);
+
+            var output = await process.StandardOutput.ReadToEndAsync(ct);
+            var error = await process.StandardError.ReadToEndAsync(ct);
+
+            _logger.LogInformation("Docker compose output: {Output}", output);
+
+            if (process.ExitCode != 0)
+            {
+                _logger.LogError("Docker compose failed with exit code {ExitCode}: {Error}", process.ExitCode, error);
+                return Result.Failure(Error.DockerError($"Docker compose failed: {error}"));
+            }
+
+            _logger.LogInformation("Deployment completed for project {ProjectName}", projectName);
+            return Result.Success();
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Failed to deploy project {ProjectName}", projectName);
+            return Result.Failure(Error.DockerError(ex.Message));
+        }
     }
 
     public async Task<Result> StopAsync(string projectName, string composeFilePath, CancellationToken ct = default)
     {
-        return await Task.Run(() =>
+        try
         {
-            try
-            {
-                _logger.LogInformation("Stopping project {ProjectName}", projectName);
+            _logger.LogInformation("Stopping project {ProjectName}", projectName);
 
-                using var svc = new Builder()
-                    .UseContainer()
-                    .UseCompose()
-                    .FromFile(composeFilePath)
-                    .ServiceName(projectName.ToLowerInvariant())
-                    .Build();
-
-                svc.Stop();
-                return Result.Success();
-            }
-            catch (Exception ex)
+            var startInfo = new ProcessStartInfo
             {
-                _logger.LogError(ex, "Failed to stop project {ProjectName}", projectName);
-                return Result.Failure(Error.DockerError(ex.Message));
+                FileName = "docker",
+                Arguments = $"compose -f \"{composeFilePath}\" -p {projectName.ToLowerInvariant()} stop",
+                RedirectStandardOutput = true,
+                RedirectStandardError = true,
+                UseShellExecute = false,
+                CreateNoWindow = true
+            };
+
+            using var process = Process.Start(startInfo);
+            if (process == null)
+            {
+                return Result.Failure(Error.DockerError("Failed to start docker compose process"));
             }
-        }, ct);
+
+            await process.WaitForExitAsync(ct);
+
+            var error = await process.StandardError.ReadToEndAsync(ct);
+
+            if (process.ExitCode != 0)
+            {
+                _logger.LogError("Docker compose stop failed: {Error}", error);
+                return Result.Failure(Error.DockerError($"Docker compose stop failed: {error}"));
+            }
+
+            return Result.Success();
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Failed to stop project {ProjectName}", projectName);
+            return Result.Failure(Error.DockerError(ex.Message));
+        }
     }
 
     public async Task<Result> RestartAsync(string projectName, string composeFilePath, CancellationToken ct = default)
@@ -84,28 +118,43 @@ public class DockerComposeService : IDockerComposeService
 
     public async Task<Result> RemoveAsync(string projectName, string composeFilePath, CancellationToken ct = default)
     {
-        return await Task.Run(() =>
+        try
         {
-            try
-            {
-                _logger.LogInformation("Removing project {ProjectName}", projectName);
+            _logger.LogInformation("Removing project {ProjectName}", projectName);
 
-                using var svc = new Builder()
-                    .UseContainer()
-                    .UseCompose()
-                    .FromFile(composeFilePath)
-                    .ServiceName(projectName.ToLowerInvariant())
-                    .Build();
-
-                // Dispose stops and removes containers
-                return Result.Success();
-            }
-            catch (Exception ex)
+            var startInfo = new ProcessStartInfo
             {
-                _logger.LogError(ex, "Failed to remove project {ProjectName}", projectName);
-                return Result.Failure(Error.DockerError(ex.Message));
+                FileName = "docker",
+                Arguments = $"compose -f \"{composeFilePath}\" -p {projectName.ToLowerInvariant()} down --remove-orphans",
+                RedirectStandardOutput = true,
+                RedirectStandardError = true,
+                UseShellExecute = false,
+                CreateNoWindow = true
+            };
+
+            using var process = Process.Start(startInfo);
+            if (process == null)
+            {
+                return Result.Failure(Error.DockerError("Failed to start docker compose process"));
             }
-        }, ct);
+
+            await process.WaitForExitAsync(ct);
+
+            var error = await process.StandardError.ReadToEndAsync(ct);
+
+            if (process.ExitCode != 0)
+            {
+                _logger.LogError("Docker compose down failed: {Error}", error);
+                return Result.Failure(Error.DockerError($"Docker compose down failed: {error}"));
+            }
+
+            return Result.Success();
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Failed to remove project {ProjectName}", projectName);
+            return Result.Failure(Error.DockerError(ex.Message));
+        }
     }
 
     public async Task<Result<IEnumerable<ContainerInfo>>> GetStatusAsync(string projectName, CancellationToken ct = default)
@@ -126,6 +175,8 @@ public class DockerComposeService : IDockerComposeService
                     })
                     .Select(MapToContainerInfo)
                     .ToList();
+
+                _logger.LogInformation("Found {ContainerCount} containers for project {ProjectName}", projectContainers.Count, projectName);
 
                 return Result.Success<IEnumerable<ContainerInfo>>(projectContainers);
             }

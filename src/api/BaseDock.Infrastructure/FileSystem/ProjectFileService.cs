@@ -3,16 +3,27 @@ namespace BaseDock.Infrastructure.FileSystem;
 using System.Text.RegularExpressions;
 using BaseDock.Application.Abstractions.FileSystem;
 using BaseDock.Domain.Primitives;
+using Microsoft.Extensions.Options;
 
 public partial class ProjectFileService : IProjectFileService
 {
-    private const string BasePath = "/var/basedock/projects";
+    private readonly string _basePath;
     private const string ComposeFileName = "compose.yml";
+
+    public ProjectFileService(IOptions<FileSystemSettings> settings)
+    {
+        var basePath = settings.Value.BasePath;
+
+        // Convert to absolute path if relative
+        _basePath = Path.IsPathRooted(basePath)
+            ? basePath
+            : Path.GetFullPath(basePath);
+    }
 
     public string GetProjectPath(string projectName)
     {
         var sanitized = SanitizeProjectName(projectName);
-        return Path.Combine(BasePath, sanitized);
+        return Path.Combine(_basePath, sanitized);
     }
 
     public string GetComposeFilePath(string projectName)
@@ -38,9 +49,9 @@ public partial class ProjectFileService : IProjectFileService
             }
 
             // Ensure base directory exists
-            if (!Directory.Exists(BasePath))
+            if (!Directory.Exists(_basePath))
             {
-                Directory.CreateDirectory(BasePath);
+                Directory.CreateDirectory(_basePath);
             }
 
             Directory.CreateDirectory(path);
