@@ -1,7 +1,7 @@
 import { useState } from "react"
 import { useMutation, useQueryClient } from "@tanstack/react-query"
 import { Button } from "@/components/ui/button"
-import { Textarea } from "@/components/ui/textarea"
+import { CodeMirrorEditor } from "@/components/compose-editor/codemirror-editor"
 import { updateComposeFile } from "@/api/sdk.gen"
 import { Loader2, Save } from "lucide-react"
 
@@ -64,12 +64,11 @@ volumes:
 
   return (
     <div className="space-y-4">
-      <Textarea
+      <CodeMirrorEditor
         value={content}
-        onChange={(e) => handleChange(e.target.value)}
+        onChange={handleChange}
         placeholder={placeholder}
-        className="font-mono text-sm min-h-[400px] resize-y"
-        rows={20}
+        minHeight="400px"
       />
       {saveMutation.isError && (
         <div className="text-sm text-destructive">{saveMutation.error.message}</div>
