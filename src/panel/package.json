@@ -37,7 +37,8 @@
     "tailwind-merge": "^3.0.2",
     "tailwindcss": "^4.0.6",
     "tw-animate-css": "^1.3.6",
-    "zod": "^4.1.13"
+    "zod": "^4.1.13",
+    "@microsoft/signalr": "^8.0.7"
   },
   "devDependencies": {
     "@hey-api/openapi-ts": "^0.88.1",

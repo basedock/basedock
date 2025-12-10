@@ -19,8 +19,8 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table"
-import { Trash2, UserPlus } from "lucide-react"
-import { getProjectById, updateProject, removeProjectMembers, addProjectMembers, getUsers } from "@/api/sdk.gen"
+import { Trash2, UserPlus, Wifi, WifiOff } from "lucide-react"
+import { getProjectById, updateProject, removeProjectMembers, addProjectMembers, getUsers, getProjectDockerStatus } from "@/api/sdk.gen"
 import type { ProjectDto, UserDto } from "@/api/types.gen"
 import { useForm } from "@tanstack/react-form"
 import { z } from "zod"
@@ -40,6 +40,12 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
+import { DeploymentStatusBadge } from "@/components/deployment-status-badge"
+import { DeploymentControls } from "@/components/deployment-controls"
+import { ComposeEditor } from "@/components/compose-editor"
+import { ContainerList } from "@/components/container-list"
+import { LogsViewer } from "@/components/logs-viewer"
+import { useDeploymentHub } from "@/hooks/use-deployment-hub"
 
 export const Route = createFileRoute("/_dashboard/projects/$id")({
   loader: async ({ params }) => {
@@ -69,6 +75,20 @@ function ProjectDetailPage() {
   const queryClient = useQueryClient()
   const [addMemberDialogOpen, setAddMemberDialogOpen] = useState(false)
   const [selectedUserId, setSelectedUserId] = useState<string>("")
+
+  // SignalR connection for real-time updates
+  const { isConnected } = useDeploymentHub({ projectId: id })
+
+  // Query for live Docker status
+  const { data: dockerStatus } = useQuery({
+    queryKey: ["project-status", id],
+    queryFn: async () => {
+      const response = await getProjectDockerStatus({ path: { projectId: id } })
+      if (response.error) return null
+      return response.data
+    },
+    refetchInterval: 30000, // Fallback polling every 30s
+  })
 
   const { data: users } = useQuery({
     queryKey: ["users"],
@@ -154,6 +174,77 @@ function ProjectDetailPage() {
   return (
     <>
       <div className="flex flex-1 flex-col gap-6 p-4 pt-0">
+        {/* Docker Deployment Status Card */}
+        <Card>
+          <CardHeader>
+            <div className="flex items-center justify-between">
+              <div>
+                <CardTitle className="flex items-center gap-2">
+                  Deployment Status
+                  <DeploymentStatusBadge status={dockerStatus?.status ?? project.deploymentStatus} />
+                </CardTitle>
+                <CardDescription className="flex items-center gap-2 mt-1">
+                  {isConnected ? (
+                    <>
+                      <Wifi className="h-3 w-3 text-green-500" />
+                      <span className="text-green-600 dark:text-green-400">Real-time updates active</span>
+                    </>
+                  ) : (
+                    <>
+                      <WifiOff className="h-3 w-3 text-muted-foreground" />
+                      <span>Connecting...</span>
+                    </>
+                  )}
+                </CardDescription>
+              </div>
+              {isAdmin && (
+                <DeploymentControls
+                  projectId={id}
+                  status={dockerStatus?.status ?? project.deploymentStatus}
+                  hasComposeFile={!!project.composeFileContent}
+                />
+              )}
+            </div>
+          </CardHeader>
+          <CardContent>
+            {dockerStatus?.lastError && (
+              <div className="mb-4 p-3 bg-destructive/10 text-destructive text-sm rounded-md">
+                {dockerStatus.lastError}
+              </div>
+            )}
+            <ContainerList containers={dockerStatus?.containers ?? []} />
+          </CardContent>
+        </Card>
+
+        {/* Compose File Editor - Admin only */}
+        {isAdmin && (
+          <Card>
+            <CardHeader>
+              <CardTitle>Docker Compose</CardTitle>
+              <CardDescription>
+                Define your project's services using Docker Compose
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <ComposeEditor
+                projectId={id}
+                initialContent={project.composeFileContent}
+              />
+            </CardContent>
+          </Card>
+        )}
+
+        {/* Logs Viewer */}
+        <Card>
+          <CardHeader>
+            <CardTitle>Logs</CardTitle>
+            <CardDescription>View container logs</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <LogsViewer projectId={id} autoRefresh={isConnected} />
+          </CardContent>
+        </Card>
+
         {isAdmin && (
           <Card>
             <CardHeader>

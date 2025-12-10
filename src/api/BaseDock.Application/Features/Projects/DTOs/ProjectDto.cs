@@ -1,5 +1,7 @@
 namespace BaseDock.Application.Features.Projects.DTOs;
 
+using BaseDock.Domain.Enums;
+
 public sealed record ProjectDto(
     Guid Id,
     string Name,
@@ -7,6 +9,10 @@ public sealed record ProjectDto(
     Guid CreatedByUserId,
     DateTime CreatedAt,
     DateTime? UpdatedAt,
+    string? ComposeFileContent,
+    DeploymentStatus DeploymentStatus,
+    DateTime? LastDeployedAt,
+    string? LastDeploymentError,
     IEnumerable<ProjectMemberDto> Members);
 
 public sealed record ProjectMemberDto(
@@ -29,3 +35,6 @@ public sealed record AddMembersRequest(
 
 public sealed record RemoveMembersRequest(
     IEnumerable<Guid> UserIds);
+
+public sealed record UpdateComposeFileRequest(
+    string ComposeFileContent);

@@ -1,6 +1,7 @@
 namespace BaseDock.Infrastructure.Persistence.Configurations;
 
 using BaseDock.Domain.Entities;
+using BaseDock.Domain.Enums;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
@@ -37,6 +38,24 @@ public class ProjectConfiguration : IEntityTypeConfiguration<Project>
 
         builder.Property(p => p.UpdatedAt)
             .HasColumnName("updated_at");
+
+        // Docker Compose configuration
+        builder.Property(p => p.ComposeFileContent)
+            .HasColumnName("compose_file_content")
+            .HasColumnType("text");
+
+        builder.Property(p => p.DeploymentStatus)
+            .HasColumnName("deployment_status")
+            .HasConversion<string>()
+            .HasMaxLength(50)
+            .HasDefaultValue(DeploymentStatus.NotDeployed);
+
+        builder.Property(p => p.LastDeployedAt)
+            .HasColumnName("last_deployed_at");
+
+        builder.Property(p => p.LastDeploymentError)
+            .HasColumnName("last_deployment_error")
+            .HasMaxLength(2000);
 
         // Relationships
         builder.HasOne(p => p.CreatedBy)

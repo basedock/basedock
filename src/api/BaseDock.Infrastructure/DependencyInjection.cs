@@ -1,7 +1,11 @@
 namespace BaseDock.Infrastructure;
 
 using BaseDock.Application.Abstractions.Data;
+using BaseDock.Application.Abstractions.Docker;
+using BaseDock.Application.Abstractions.FileSystem;
 using BaseDock.Application.Abstractions.Security;
+using BaseDock.Infrastructure.Docker;
+using BaseDock.Infrastructure.FileSystem;
 using BaseDock.Infrastructure.Persistence;
 using BaseDock.Infrastructure.Persistence.Seeding;
 using BaseDock.Infrastructure.Security;
@@ -37,6 +41,10 @@ public static class DependencyInjection
         services.AddSingleton<IJwtService, JwtService>();
         services.AddScoped<IRefreshTokenService, RefreshTokenService>();
         services.AddScoped<ITokenBlacklistService, TokenBlacklistService>();
+
+        // Docker Services
+        services.AddSingleton<IProjectFileService, ProjectFileService>();
+        services.AddSingleton<IDockerComposeService, DockerComposeService>();
 
         return services;
     }

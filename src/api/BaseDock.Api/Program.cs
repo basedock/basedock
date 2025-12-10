@@ -1,6 +1,9 @@
+using BaseDock.Api.Hubs;
 using BaseDock.Api.Middleware;
 using BaseDock.Application;
+using BaseDock.Application.Abstractions.Notifications;
 using BaseDock.Infrastructure;
+using BaseDock.Infrastructure.Notifications;
 using BaseDock.Infrastructure.Persistence;
 using BaseDock.Infrastructure.Persistence.Seeding;
 using Carter;
@@ -16,6 +19,10 @@ builder.Services
 
 // Add Carter for modular endpoints
 builder.Services.AddCarter();
+
+// SignalR for real-time updates
+builder.Services.AddSignalR();
+builder.Services.AddScoped<IDeploymentNotificationService, DeploymentNotificationService<DeploymentHub>>();
 
 // OpenAPI
 builder.Services.AddOpenApi();
@@ -99,5 +106,8 @@ app.UseMiddleware<DualTokenAuthMiddleware>();
 
 // Map Carter modules
 app.MapCarter();
+
+// Map SignalR hubs
+app.MapHub<DeploymentHub>("/hubs/deployment");
 
 app.Run();

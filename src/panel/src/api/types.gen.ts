@@ -8,6 +8,15 @@ export type AddMembersRequest = {
     userIds: Array<string>;
 };
 
+export type ContainerInfo = {
+    id: string;
+    name: string;
+    service: string;
+    state: string;
+    status: string;
+    ports: Array<PortMapping>;
+};
+
 export type CreateProjectRequest = {
     name: string;
     description: null | string;
@@ -18,6 +27,15 @@ export type CreateUserRequest = {
     email: string;
     displayName: string;
     password: string;
+};
+
+export type DeploymentStatus = number;
+
+export type DeploymentStatusDto = {
+    status: DeploymentStatus;
+    lastDeployedAt: null | string;
+    lastError: null | string;
+    containers: Array<ContainerInfo>;
 };
 
 export type HttpValidationProblemDetails = {
@@ -42,6 +60,12 @@ export type LoginRequest = {
     password: string;
 };
 
+export type PortMapping = {
+    privatePort: number | string;
+    publicPort: null | number | string;
+    protocol: string;
+};
+
 export type ProblemDetails = {
     type?: null | string;
     title?: null | string;
@@ -57,6 +81,10 @@ export type ProjectDto = {
     createdByUserId: string;
     createdAt: string;
     updatedAt: null | string;
+    composeFileContent: null | string;
+    deploymentStatus: DeploymentStatus;
+    lastDeployedAt: null | string;
+    lastDeploymentError: null | string;
     members: Array<ProjectMemberDto>;
 };
 
@@ -75,6 +103,10 @@ export type RefreshApiResponse = {
 
 export type RemoveMembersRequest = {
     userIds: Array<string>;
+};
+
+export type UpdateComposeFileRequest = {
+    composeFileContent: string;
 };
 
 export type UpdateProjectRequest = {
@@ -462,6 +494,226 @@ export type RemoveProjectMembersResponses = {
 };
 
 export type RemoveProjectMembersResponse = RemoveProjectMembersResponses[keyof RemoveProjectMembersResponses];
+
+export type UpdateComposeFileData = {
+    body: UpdateComposeFileRequest;
+    path: {
+        projectId: string;
+    };
+    query?: never;
+    url: '/api/projects/{projectId}/docker/compose';
+};
+
+export type UpdateComposeFileErrors = {
+    /**
+     * Bad Request
+     */
+    400: HttpValidationProblemDetails;
+    /**
+     * Forbidden
+     */
+    403: ProblemDetails;
+    /**
+     * Not Found
+     */
+    404: ProblemDetails;
+};
+
+export type UpdateComposeFileError = UpdateComposeFileErrors[keyof UpdateComposeFileErrors];
+
+export type UpdateComposeFileResponses = {
+    /**
+     * OK
+     */
+    200: ProjectDto;
+};
+
+export type UpdateComposeFileResponse = UpdateComposeFileResponses[keyof UpdateComposeFileResponses];
+
+export type DeployProjectData = {
+    body?: never;
+    path: {
+        projectId: string;
+    };
+    query?: never;
+    url: '/api/projects/{projectId}/docker/deploy';
+};
+
+export type DeployProjectErrors = {
+    /**
+     * Bad Request
+     */
+    400: HttpValidationProblemDetails;
+    /**
+     * Forbidden
+     */
+    403: ProblemDetails;
+    /**
+     * Not Found
+     */
+    404: ProblemDetails;
+};
+
+export type DeployProjectError = DeployProjectErrors[keyof DeployProjectErrors];
+
+export type DeployProjectResponses = {
+    /**
+     * OK
+     */
+    200: DeploymentStatusDto;
+};
+
+export type DeployProjectResponse = DeployProjectResponses[keyof DeployProjectResponses];
+
+export type StopProjectData = {
+    body?: never;
+    path: {
+        projectId: string;
+    };
+    query?: never;
+    url: '/api/projects/{projectId}/docker/stop';
+};
+
+export type StopProjectErrors = {
+    /**
+     * Forbidden
+     */
+    403: ProblemDetails;
+    /**
+     * Not Found
+     */
+    404: ProblemDetails;
+};
+
+export type StopProjectError = StopProjectErrors[keyof StopProjectErrors];
+
+export type StopProjectResponses = {
+    /**
+     * OK
+     */
+    200: DeploymentStatusDto;
+};
+
+export type StopProjectResponse = StopProjectResponses[keyof StopProjectResponses];
+
+export type RestartProjectData = {
+    body?: never;
+    path: {
+        projectId: string;
+    };
+    query?: never;
+    url: '/api/projects/{projectId}/docker/restart';
+};
+
+export type RestartProjectErrors = {
+    /**
+     * Forbidden
+     */
+    403: ProblemDetails;
+    /**
+     * Not Found
+     */
+    404: ProblemDetails;
+};
+
+export type RestartProjectError = RestartProjectErrors[keyof RestartProjectErrors];
+
+export type RestartProjectResponses = {
+    /**
+     * OK
+     */
+    200: DeploymentStatusDto;
+};
+
+export type RestartProjectResponse = RestartProjectResponses[keyof RestartProjectResponses];
+
+export type RemoveProjectContainersData = {
+    body?: never;
+    path: {
+        projectId: string;
+    };
+    query?: never;
+    url: '/api/projects/{projectId}/docker';
+};
+
+export type RemoveProjectContainersErrors = {
+    /**
+     * Forbidden
+     */
+    403: ProblemDetails;
+    /**
+     * Not Found
+     */
+    404: ProblemDetails;
+};
+
+export type RemoveProjectContainersError = RemoveProjectContainersErrors[keyof RemoveProjectContainersErrors];
+
+export type RemoveProjectContainersResponses = {
+    /**
+     * OK
+     */
+    200: DeploymentStatusDto;
+};
+
+export type RemoveProjectContainersResponse = RemoveProjectContainersResponses[keyof RemoveProjectContainersResponses];
+
+export type GetProjectDockerStatusData = {
+    body?: never;
+    path: {
+        projectId: string;
+    };
+    query?: never;
+    url: '/api/projects/{projectId}/docker/status';
+};
+
+export type GetProjectDockerStatusErrors = {
+    /**
+     * Not Found
+     */
+    404: ProblemDetails;
+};
+
+export type GetProjectDockerStatusError = GetProjectDockerStatusErrors[keyof GetProjectDockerStatusErrors];
+
+export type GetProjectDockerStatusResponses = {
+    /**
+     * OK
+     */
+    200: DeploymentStatusDto;
+};
+
+export type GetProjectDockerStatusResponse = GetProjectDockerStatusResponses[keyof GetProjectDockerStatusResponses];
+
+export type GetProjectLogsData = {
+    body?: never;
+    path: {
+        projectId: string;
+    };
+    query?: {
+        serviceName?: string;
+        tailLines?: number | string;
+    };
+    url: '/api/projects/{projectId}/docker/logs';
+};
+
+export type GetProjectLogsErrors = {
+    /**
+     * Not Found
+     */
+    404: ProblemDetails;
+};
+
+export type GetProjectLogsError = GetProjectLogsErrors[keyof GetProjectLogsErrors];
+
+export type GetProjectLogsResponses = {
+    /**
+     * OK
+     */
+    200: string;
+};
+
+export type GetProjectLogsResponse = GetProjectLogsResponses[keyof GetProjectLogsResponses];
 
 export type LoginData = {
     body: LoginRequest;

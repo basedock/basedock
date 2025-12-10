@@ -2,7 +2,7 @@
 
 import type { Client, Options as Options2, TDataShape } from './client';
 import { client } from './client.gen';
-import type { AddProjectMembersData, AddProjectMembersErrors, AddProjectMembersResponses, CreateProjectData, CreateProjectErrors, CreateProjectResponses, CreateUserData, CreateUserErrors, CreateUserResponses, DeleteProjectData, DeleteProjectErrors, DeleteProjectResponses, DeleteUserData, DeleteUserErrors, DeleteUserResponses, GetProjectByIdData, GetProjectByIdErrors, GetProjectByIdResponses, GetProjectsData, GetProjectsResponses, GetUserByIdData, GetUserByIdErrors, GetUserByIdResponses, GetUsersData, GetUsersErrors, GetUsersResponses, LoginData, LoginErrors, LoginResponses, LogoutData, LogoutErrors, LogoutResponses, RefreshTokenData, RefreshTokenErrors, RefreshTokenResponses, RemoveProjectMembersData, RemoveProjectMembersErrors, RemoveProjectMembersResponses, UpdateProjectData, UpdateProjectErrors, UpdateProjectResponses, UpdateUserData, UpdateUserErrors, UpdateUserResponses } from './types.gen';
+import type { AddProjectMembersData, AddProjectMembersErrors, AddProjectMembersResponses, CreateProjectData, CreateProjectErrors, CreateProjectResponses, CreateUserData, CreateUserErrors, CreateUserResponses, DeleteProjectData, DeleteProjectErrors, DeleteProjectResponses, DeleteUserData, DeleteUserErrors, DeleteUserResponses, DeployProjectData, DeployProjectErrors, DeployProjectResponses, GetProjectByIdData, GetProjectByIdErrors, GetProjectByIdResponses, GetProjectDockerStatusData, GetProjectDockerStatusErrors, GetProjectDockerStatusResponses, GetProjectLogsData, GetProjectLogsErrors, GetProjectLogsResponses, GetProjectsData, GetProjectsResponses, GetUserByIdData, GetUserByIdErrors, GetUserByIdResponses, GetUsersData, GetUsersErrors, GetUsersResponses, LoginData, LoginErrors, LoginResponses, LogoutData, LogoutErrors, LogoutResponses, RefreshTokenData, RefreshTokenErrors, RefreshTokenResponses, RemoveProjectContainersData, RemoveProjectContainersErrors, RemoveProjectContainersResponses, RemoveProjectMembersData, RemoveProjectMembersErrors, RemoveProjectMembersResponses, RestartProjectData, RestartProjectErrors, RestartProjectResponses, StopProjectData, StopProjectErrors, StopProjectResponses, UpdateComposeFileData, UpdateComposeFileErrors, UpdateComposeFileResponses, UpdateProjectData, UpdateProjectErrors, UpdateProjectResponses, UpdateUserData, UpdateUserErrors, UpdateUserResponses } from './types.gen';
 
 export type Options<TData extends TDataShape = TDataShape, ThrowOnError extends boolean = boolean> = Options2<TData, ThrowOnError> & {
     /**
@@ -119,6 +119,48 @@ export const removeProjectMembers = <ThrowOnError extends boolean = false>(optio
         ...options.headers
     }
 });
+
+/**
+ * Update project compose file (Admin only)
+ */
+export const updateComposeFile = <ThrowOnError extends boolean = false>(options: Options<UpdateComposeFileData, ThrowOnError>) => (options.client ?? client).put<UpdateComposeFileResponses, UpdateComposeFileErrors, ThrowOnError>({
+    url: '/api/projects/{projectId}/docker/compose',
+    ...options,
+    headers: {
+        'Content-Type': 'application/json',
+        ...options.headers
+    }
+});
+
+/**
+ * Deploy project containers (Admin only)
+ */
+export const deployProject = <ThrowOnError extends boolean = false>(options: Options<DeployProjectData, ThrowOnError>) => (options.client ?? client).post<DeployProjectResponses, DeployProjectErrors, ThrowOnError>({ url: '/api/projects/{projectId}/docker/deploy', ...options });
+
+/**
+ * Stop project containers (Admin only)
+ */
+export const stopProject = <ThrowOnError extends boolean = false>(options: Options<StopProjectData, ThrowOnError>) => (options.client ?? client).post<StopProjectResponses, StopProjectErrors, ThrowOnError>({ url: '/api/projects/{projectId}/docker/stop', ...options });
+
+/**
+ * Restart project containers (Admin only)
+ */
+export const restartProject = <ThrowOnError extends boolean = false>(options: Options<RestartProjectData, ThrowOnError>) => (options.client ?? client).post<RestartProjectResponses, RestartProjectErrors, ThrowOnError>({ url: '/api/projects/{projectId}/docker/restart', ...options });
+
+/**
+ * Remove project containers and deployment files (Admin only)
+ */
+export const removeProjectContainers = <ThrowOnError extends boolean = false>(options: Options<RemoveProjectContainersData, ThrowOnError>) => (options.client ?? client).delete<RemoveProjectContainersResponses, RemoveProjectContainersErrors, ThrowOnError>({ url: '/api/projects/{projectId}/docker', ...options });
+
+/**
+ * Get project deployment status
+ */
+export const getProjectDockerStatus = <ThrowOnError extends boolean = false>(options: Options<GetProjectDockerStatusData, ThrowOnError>) => (options.client ?? client).get<GetProjectDockerStatusResponses, GetProjectDockerStatusErrors, ThrowOnError>({ url: '/api/projects/{projectId}/docker/status', ...options });
+
+/**
+ * Get project container logs
+ */
+export const getProjectLogs = <ThrowOnError extends boolean = false>(options: Options<GetProjectLogsData, ThrowOnError>) => (options.client ?? client).get<GetProjectLogsResponses, GetProjectLogsErrors, ThrowOnError>({ url: '/api/projects/{projectId}/docker/logs', ...options });
 
 /**
  * Authenticate user and return access token

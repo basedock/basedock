@@ -3,8 +3,8 @@
 import { type DefaultError, queryOptions, type UseMutationOptions } from '@tanstack/react-query';
 
 import { client } from '../client.gen';
-import { addProjectMembers, createProject, createUser, deleteProject, deleteUser, getProjectById, getProjects, getUserById, getUsers, login, logout, type Options, refreshToken, removeProjectMembers, updateProject, updateUser } from '../sdk.gen';
-import type { AddProjectMembersData, AddProjectMembersError, AddProjectMembersResponse, CreateProjectData, CreateProjectError, CreateProjectResponse, CreateUserData, CreateUserError, CreateUserResponse, DeleteProjectData, DeleteProjectError, DeleteUserData, DeleteUserError, GetProjectByIdData, GetProjectByIdError, GetProjectByIdResponse, GetProjectsData, GetProjectsResponse, GetUserByIdData, GetUserByIdError, GetUserByIdResponse, GetUsersData, GetUsersError, GetUsersResponse, LoginData, LoginError, LoginResponse, LogoutData, LogoutError, LogoutResponse, RefreshTokenData, RefreshTokenError, RefreshTokenResponse, RemoveProjectMembersData, RemoveProjectMembersError, RemoveProjectMembersResponse, UpdateProjectData, UpdateProjectError, UpdateProjectResponse, UpdateUserData, UpdateUserError, UpdateUserResponse } from '../types.gen';
+import { addProjectMembers, createProject, createUser, deleteProject, deleteUser, deployProject, getProjectById, getProjectDockerStatus, getProjectLogs, getProjects, getUserById, getUsers, login, logout, type Options, refreshToken, removeProjectContainers, removeProjectMembers, restartProject, stopProject, updateComposeFile, updateProject, updateUser } from '../sdk.gen';
+import type { AddProjectMembersData, AddProjectMembersError, AddProjectMembersResponse, CreateProjectData, CreateProjectError, CreateProjectResponse, CreateUserData, CreateUserError, CreateUserResponse, DeleteProjectData, DeleteProjectError, DeleteUserData, DeleteUserError, DeployProjectData, DeployProjectError, DeployProjectResponse, GetProjectByIdData, GetProjectByIdError, GetProjectByIdResponse, GetProjectDockerStatusData, GetProjectDockerStatusError, GetProjectDockerStatusResponse, GetProjectLogsData, GetProjectLogsError, GetProjectLogsResponse, GetProjectsData, GetProjectsResponse, GetUserByIdData, GetUserByIdError, GetUserByIdResponse, GetUsersData, GetUsersError, GetUsersResponse, LoginData, LoginError, LoginResponse, LogoutData, LogoutError, LogoutResponse, RefreshTokenData, RefreshTokenError, RefreshTokenResponse, RemoveProjectContainersData, RemoveProjectContainersError, RemoveProjectContainersResponse, RemoveProjectMembersData, RemoveProjectMembersError, RemoveProjectMembersResponse, RestartProjectData, RestartProjectError, RestartProjectResponse, StopProjectData, StopProjectError, StopProjectResponse, UpdateComposeFileData, UpdateComposeFileError, UpdateComposeFileResponse, UpdateProjectData, UpdateProjectError, UpdateProjectResponse, UpdateUserData, UpdateUserError, UpdateUserResponse } from '../types.gen';
 
 export type QueryKey<TOptions extends Options> = [
     Pick<TOptions, 'baseUrl' | 'body' | 'headers' | 'path' | 'query'> & {
@@ -246,6 +246,127 @@ export const removeProjectMembersMutation = (options?: Partial<Options<RemovePro
     };
     return mutationOptions;
 };
+
+/**
+ * Update project compose file (Admin only)
+ */
+export const updateComposeFileMutation = (options?: Partial<Options<UpdateComposeFileData>>): UseMutationOptions<UpdateComposeFileResponse, UpdateComposeFileError, Options<UpdateComposeFileData>> => {
+    const mutationOptions: UseMutationOptions<UpdateComposeFileResponse, UpdateComposeFileError, Options<UpdateComposeFileData>> = {
+        mutationFn: async (fnOptions) => {
+            const { data } = await updateComposeFile({
+                ...options,
+                ...fnOptions,
+                throwOnError: true
+            });
+            return data;
+        }
+    };
+    return mutationOptions;
+};
+
+/**
+ * Deploy project containers (Admin only)
+ */
+export const deployProjectMutation = (options?: Partial<Options<DeployProjectData>>): UseMutationOptions<DeployProjectResponse, DeployProjectError, Options<DeployProjectData>> => {
+    const mutationOptions: UseMutationOptions<DeployProjectResponse, DeployProjectError, Options<DeployProjectData>> = {
+        mutationFn: async (fnOptions) => {
+            const { data } = await deployProject({
+                ...options,
+                ...fnOptions,
+                throwOnError: true
+            });
+            return data;
+        }
+    };
+    return mutationOptions;
+};
+
+/**
+ * Stop project containers (Admin only)
+ */
+export const stopProjectMutation = (options?: Partial<Options<StopProjectData>>): UseMutationOptions<StopProjectResponse, StopProjectError, Options<StopProjectData>> => {
+    const mutationOptions: UseMutationOptions<StopProjectResponse, StopProjectError, Options<StopProjectData>> = {
+        mutationFn: async (fnOptions) => {
+            const { data } = await stopProject({
+                ...options,
+                ...fnOptions,
+                throwOnError: true
+            });
+            return data;
+        }
+    };
+    return mutationOptions;
+};
+
+/**
+ * Restart project containers (Admin only)
+ */
+export const restartProjectMutation = (options?: Partial<Options<RestartProjectData>>): UseMutationOptions<RestartProjectResponse, RestartProjectError, Options<RestartProjectData>> => {
+    const mutationOptions: UseMutationOptions<RestartProjectResponse, RestartProjectError, Options<RestartProjectData>> = {
+        mutationFn: async (fnOptions) => {
+            const { data } = await restartProject({
+                ...options,
+                ...fnOptions,
+                throwOnError: true
+            });
+            return data;
+        }
+    };
+    return mutationOptions;
+};
+
+/**
+ * Remove project containers and deployment files (Admin only)
+ */
+export const removeProjectContainersMutation = (options?: Partial<Options<RemoveProjectContainersData>>): UseMutationOptions<RemoveProjectContainersResponse, RemoveProjectContainersError, Options<RemoveProjectContainersData>> => {
+    const mutationOptions: UseMutationOptions<RemoveProjectContainersResponse, RemoveProjectContainersError, Options<RemoveProjectContainersData>> = {
+        mutationFn: async (fnOptions) => {
+            const { data } = await removeProjectContainers({
+                ...options,
+                ...fnOptions,
+                throwOnError: true
+            });
+            return data;
+        }
+    };
+    return mutationOptions;
+};
+
+export const getProjectDockerStatusQueryKey = (options: Options<GetProjectDockerStatusData>) => createQueryKey('getProjectDockerStatus', options);
+
+/**
+ * Get project deployment status
+ */
+export const getProjectDockerStatusOptions = (options: Options<GetProjectDockerStatusData>) => queryOptions<GetProjectDockerStatusResponse, GetProjectDockerStatusError, GetProjectDockerStatusResponse, ReturnType<typeof getProjectDockerStatusQueryKey>>({
+    queryFn: async ({ queryKey, signal }) => {
+        const { data } = await getProjectDockerStatus({
+            ...options,
+            ...queryKey[0],
+            signal,
+            throwOnError: true
+        });
+        return data;
+    },
+    queryKey: getProjectDockerStatusQueryKey(options)
+});
+
+export const getProjectLogsQueryKey = (options: Options<GetProjectLogsData>) => createQueryKey('getProjectLogs', options);
+
+/**
+ * Get project container logs
+ */
+export const getProjectLogsOptions = (options: Options<GetProjectLogsData>) => queryOptions<GetProjectLogsResponse, GetProjectLogsError, GetProjectLogsResponse, ReturnType<typeof getProjectLogsQueryKey>>({
+    queryFn: async ({ queryKey, signal }) => {
+        const { data } = await getProjectLogs({
+            ...options,
+            ...queryKey[0],
+            signal,
+            throwOnError: true
+        });
+        return data;
+    },
+    queryKey: getProjectLogsQueryKey(options)
+});
 
 /**
  * Authenticate user and return access token

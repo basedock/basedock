@@ -19,4 +19,13 @@ public sealed record Error(string Code, string Message)
 
     public static Error Forbidden(string message = "Access is forbidden.") =>
         new("Error.Forbidden", message);
+
+    public static Error DockerError(string message) =>
+        new("Docker.Error", message);
+
+    public static Error DockerConnectionFailed(string message = "Failed to connect to Docker daemon.") =>
+        new("Docker.ConnectionFailed", message);
+
+    public static Error DockerComposeInvalid(string message) =>
+        new("Docker.ComposeInvalid", message);
 }
