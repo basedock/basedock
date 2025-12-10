@@ -10,8 +10,8 @@
     <PackageReference Include="Riok.Mapperly" />
     <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" />
     <PackageReference Include="Microsoft.EntityFrameworkCore" />
-    <PackageReference Include="BCrypt.Net-Next" />
     <PackageReference Include="YamlDotNet" />
+    <PackageReference Include="NSec.Cryptography" />
   </ItemGroup>
 
   <ItemGroup>

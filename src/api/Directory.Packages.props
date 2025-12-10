@@ -14,11 +14,11 @@
     <!-- Infrastructure Layer -->
     <PackageVersion Include="Microsoft.EntityFrameworkCore" Version="10.0.1" />
     <PackageVersion Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="10.0.0" />
-    <PackageVersion Include="BCrypt.Net-Next" Version="4.0.3" />
     <PackageVersion Include="Microsoft.EntityFrameworkCore.Design" Version="10.0.1" />
     <!-- Security -->
     <PackageVersion Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="10.0.1" />
     <PackageVersion Include="StackExchange.Redis" Version="2.10.1" />
+    <PackageVersion Include="NSec.Cryptography" Version="25.4.0" />
     <!-- Docker -->
     <PackageVersion Include="Ductus.FluentDocker" Version="2.85.0" />
     <PackageVersion Include="YamlDotNet" Version="16.3.0" />

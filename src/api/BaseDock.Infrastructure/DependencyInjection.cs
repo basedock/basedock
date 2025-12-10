@@ -45,6 +45,7 @@ public static class DependencyInjection
         services.AddSingleton<IJwtService, JwtService>();
         services.AddScoped<IRefreshTokenService, RefreshTokenService>();
         services.AddScoped<ITokenBlacklistService, TokenBlacklistService>();
+        services.AddSingleton<IPasswordHasher, Argon2PasswordHasher>();
 
         // Docker Services
         services.AddSingleton<IProjectFileService, ProjectFileService>();

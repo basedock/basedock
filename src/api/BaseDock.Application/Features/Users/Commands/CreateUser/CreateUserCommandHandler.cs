@@ -2,13 +2,14 @@ namespace BaseDock.Application.Features.Users.Commands.CreateUser;
 
 using BaseDock.Application.Abstractions.Data;
 using BaseDock.Application.Abstractions.Messaging;
+using BaseDock.Application.Abstractions.Security;
 using BaseDock.Application.Features.Users.DTOs;
 using BaseDock.Application.Features.Users.Mappers;
 using BaseDock.Domain.Entities;
 using BaseDock.Domain.Primitives;
 using Microsoft.EntityFrameworkCore;
 
-public sealed class CreateUserCommandHandler(IApplicationDbContext db)
+public sealed class CreateUserCommandHandler(IApplicationDbContext db, IPasswordHasher passwordHasher)
     : ICommandHandler<CreateUserCommand, Result<UserDto>>
 {
     public async Task<Result<UserDto>> HandleAsync(
@@ -24,7 +25,7 @@ public sealed class CreateUserCommandHandler(IApplicationDbContext db)
                 Error.Conflict("User.EmailExists", $"A user with email '{command.Email}' already exists."));
         }
 
-        var passwordHash = BCrypt.Net.BCrypt.HashPassword(command.Password);
+        var passwordHash = passwordHasher.HashPassword(command.Password);
 
         var user = User.Create(
             command.Email,

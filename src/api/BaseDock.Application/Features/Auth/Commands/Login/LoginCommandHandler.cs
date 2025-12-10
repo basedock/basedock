@@ -10,7 +10,8 @@ using Microsoft.EntityFrameworkCore;
 public sealed class LoginCommandHandler(
     IApplicationDbContext db,
     IJwtService jwtService,
-    IRefreshTokenService refreshTokenService)
+    IRefreshTokenService refreshTokenService,
+    IPasswordHasher passwordHasher)
     : ICommandHandler<LoginCommand, Result<LoginResponse>>
 {
     public async Task<Result<LoginResponse>> HandleAsync(
@@ -32,7 +33,7 @@ public sealed class LoginCommandHandler(
                 Error.Unauthorized("Invalid email or password."));
         }
 
-        var isValidPassword = BCrypt.Net.BCrypt.Verify(command.Password, user.PasswordHash);
+        var isValidPassword = passwordHasher.VerifyPassword(command.Password, user.PasswordHash);
 
         if (!isValidPassword)
         {

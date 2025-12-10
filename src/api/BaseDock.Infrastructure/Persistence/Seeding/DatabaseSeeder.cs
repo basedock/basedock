@@ -1,5 +1,6 @@
 namespace BaseDock.Infrastructure.Persistence.Seeding;
 
+using BaseDock.Application.Abstractions.Security;
 using BaseDock.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -8,7 +9,8 @@ using Microsoft.Extensions.Logging;
 public class DatabaseSeeder(
     ApplicationDbContext db,
     IConfiguration configuration,
-    ILogger<DatabaseSeeder> logger)
+    ILogger<DatabaseSeeder> logger,
+    IPasswordHasher passwordHasher)
 {
     public async Task SeedAsync(CancellationToken cancellationToken = default)
     {
@@ -34,7 +36,7 @@ public class DatabaseSeeder(
             return;
         }
 
-        var passwordHash = BCrypt.Net.BCrypt.HashPassword(adminPassword);
+        var passwordHash = passwordHasher.HashPassword(adminPassword);
         var admin = User.Create(adminEmail, "Admin", passwordHash, isAdmin: true);
 
         db.Users.Add(admin);
