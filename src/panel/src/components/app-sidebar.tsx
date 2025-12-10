@@ -1,6 +1,7 @@
 "use client"
 
 import * as React from "react"
+import { Link } from "@tanstack/react-router"
 import {
   BookOpen,
   Bot,
@@ -9,16 +10,20 @@ import {
   Send,
   Settings2,
   SquareTerminal,
+  Users,
 } from "lucide-react"
 
 import { NavMain } from "@/components/nav-main"
 import { NavProjects } from "@/components/nav-projects"
 import { NavSecondary } from "@/components/nav-secondary"
 import { NavUser } from "@/components/nav-user"
+import { useAuth } from "@/contexts/auth-context"
 import {
   Sidebar,
   SidebarContent,
   SidebarFooter,
+  SidebarGroup,
+  SidebarGroupLabel,
   SidebarHeader,
   SidebarMenu,
   SidebarMenuButton,
@@ -128,6 +133,9 @@ const data = {
 }
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
+  const { user } = useAuth()
+  const isAdmin = user?.isAdmin ?? false
+
   return (
     <Sidebar variant="inset" {...props}>
       <SidebarHeader>
@@ -150,6 +158,21 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       <SidebarContent>
         <NavMain items={data.navMain} />
         <NavProjects />
+        {isAdmin && (
+          <SidebarGroup className="group-data-[collapsible=icon]:hidden">
+            <SidebarGroupLabel>Administration</SidebarGroupLabel>
+            <SidebarMenu>
+              <SidebarMenuItem>
+                <SidebarMenuButton asChild>
+                  <Link to="/users">
+                    <Users />
+                    <span>Users</span>
+                  </Link>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+            </SidebarMenu>
+          </SidebarGroup>
+        )}
         <NavSecondary items={data.navSecondary} className="mt-auto" />
       </SidebarContent>
       <SidebarFooter>

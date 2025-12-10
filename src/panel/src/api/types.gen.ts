@@ -105,6 +105,15 @@ export type GetUsersData = {
     url: '/api/users';
 };
 
+export type GetUsersErrors = {
+    /**
+     * Forbidden
+     */
+    403: ProblemDetails;
+};
+
+export type GetUsersError = GetUsersErrors[keyof GetUsersErrors];
+
 export type GetUsersResponses = {
     /**
      * OK
@@ -127,6 +136,10 @@ export type CreateUserErrors = {
      */
     400: HttpValidationProblemDetails;
     /**
+     * Forbidden
+     */
+    403: ProblemDetails;
+    /**
      * Conflict
      */
     409: ProblemDetails;
@@ -143,6 +156,39 @@ export type CreateUserResponses = {
 
 export type CreateUserResponse = CreateUserResponses[keyof CreateUserResponses];
 
+export type DeleteUserData = {
+    body?: never;
+    path: {
+        id: string;
+    };
+    query?: never;
+    url: '/api/users/{id}';
+};
+
+export type DeleteUserErrors = {
+    /**
+     * Bad Request
+     */
+    400: ProblemDetails;
+    /**
+     * Forbidden
+     */
+    403: ProblemDetails;
+    /**
+     * Not Found
+     */
+    404: ProblemDetails;
+};
+
+export type DeleteUserError = DeleteUserErrors[keyof DeleteUserErrors];
+
+export type DeleteUserResponses = {
+    /**
+     * OK
+     */
+    200: unknown;
+};
+
 export type GetUserByIdData = {
     body?: never;
     path: {
@@ -153,6 +199,10 @@ export type GetUserByIdData = {
 };
 
 export type GetUserByIdErrors = {
+    /**
+     * Forbidden
+     */
+    403: ProblemDetails;
     /**
      * Not Found
      */
@@ -180,6 +230,10 @@ export type UpdateUserData = {
 };
 
 export type UpdateUserErrors = {
+    /**
+     * Forbidden
+     */
+    403: ProblemDetails;
     /**
      * Not Found
      */

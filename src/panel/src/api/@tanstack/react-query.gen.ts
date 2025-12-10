@@ -3,8 +3,8 @@
 import { type DefaultError, queryOptions, type UseMutationOptions } from '@tanstack/react-query';
 
 import { client } from '../client.gen';
-import { addProjectMembers, createProject, createUser, deleteProject, getProjectById, getProjects, getUserById, getUsers, login, logout, type Options, refreshToken, removeProjectMembers, updateProject, updateUser } from '../sdk.gen';
-import type { AddProjectMembersData, AddProjectMembersError, AddProjectMembersResponse, CreateProjectData, CreateProjectError, CreateProjectResponse, CreateUserData, CreateUserError, CreateUserResponse, DeleteProjectData, DeleteProjectError, GetProjectByIdData, GetProjectByIdError, GetProjectByIdResponse, GetProjectsData, GetProjectsResponse, GetUserByIdData, GetUserByIdError, GetUserByIdResponse, GetUsersData, GetUsersResponse, LoginData, LoginError, LoginResponse, LogoutData, LogoutError, LogoutResponse, RefreshTokenData, RefreshTokenError, RefreshTokenResponse, RemoveProjectMembersData, RemoveProjectMembersError, RemoveProjectMembersResponse, UpdateProjectData, UpdateProjectError, UpdateProjectResponse, UpdateUserData, UpdateUserError, UpdateUserResponse } from '../types.gen';
+import { addProjectMembers, createProject, createUser, deleteProject, deleteUser, getProjectById, getProjects, getUserById, getUsers, login, logout, type Options, refreshToken, removeProjectMembers, updateProject, updateUser } from '../sdk.gen';
+import type { AddProjectMembersData, AddProjectMembersError, AddProjectMembersResponse, CreateProjectData, CreateProjectError, CreateProjectResponse, CreateUserData, CreateUserError, CreateUserResponse, DeleteProjectData, DeleteProjectError, DeleteUserData, DeleteUserError, GetProjectByIdData, GetProjectByIdError, GetProjectByIdResponse, GetProjectsData, GetProjectsResponse, GetUserByIdData, GetUserByIdError, GetUserByIdResponse, GetUsersData, GetUsersError, GetUsersResponse, LoginData, LoginError, LoginResponse, LogoutData, LogoutError, LogoutResponse, RefreshTokenData, RefreshTokenError, RefreshTokenResponse, RemoveProjectMembersData, RemoveProjectMembersError, RemoveProjectMembersResponse, UpdateProjectData, UpdateProjectError, UpdateProjectResponse, UpdateUserData, UpdateUserError, UpdateUserResponse } from '../types.gen';
 
 export type QueryKey<TOptions extends Options> = [
     Pick<TOptions, 'baseUrl' | 'body' | 'headers' | 'path' | 'query'> & {
@@ -42,9 +42,9 @@ const createQueryKey = <TOptions extends Options>(id: string, options?: TOptions
 export const getUsersQueryKey = (options?: Options<GetUsersData>) => createQueryKey('getUsers', options);
 
 /**
- * Get all users
+ * Get all users (Admin only)
  */
-export const getUsersOptions = (options?: Options<GetUsersData>) => queryOptions<GetUsersResponse, DefaultError, GetUsersResponse, ReturnType<typeof getUsersQueryKey>>({
+export const getUsersOptions = (options?: Options<GetUsersData>) => queryOptions<GetUsersResponse, GetUsersError, GetUsersResponse, ReturnType<typeof getUsersQueryKey>>({
     queryFn: async ({ queryKey, signal }) => {
         const { data } = await getUsers({
             ...options,
@@ -58,7 +58,7 @@ export const getUsersOptions = (options?: Options<GetUsersData>) => queryOptions
 });
 
 /**
- * Create a new user
+ * Create a new user (Admin only)
  */
 export const createUserMutation = (options?: Partial<Options<CreateUserData>>): UseMutationOptions<CreateUserResponse, CreateUserError, Options<CreateUserData>> => {
     const mutationOptions: UseMutationOptions<CreateUserResponse, CreateUserError, Options<CreateUserData>> = {
@@ -74,10 +74,27 @@ export const createUserMutation = (options?: Partial<Options<CreateUserData>>): 
     return mutationOptions;
 };
 
+/**
+ * Delete a user (Admin only)
+ */
+export const deleteUserMutation = (options?: Partial<Options<DeleteUserData>>): UseMutationOptions<unknown, DeleteUserError, Options<DeleteUserData>> => {
+    const mutationOptions: UseMutationOptions<unknown, DeleteUserError, Options<DeleteUserData>> = {
+        mutationFn: async (fnOptions) => {
+            const { data } = await deleteUser({
+                ...options,
+                ...fnOptions,
+                throwOnError: true
+            });
+            return data;
+        }
+    };
+    return mutationOptions;
+};
+
 export const getUserByIdQueryKey = (options: Options<GetUserByIdData>) => createQueryKey('getUserById', options);
 
 /**
- * Get user by ID
+ * Get user by ID (Admin only)
  */
 export const getUserByIdOptions = (options: Options<GetUserByIdData>) => queryOptions<GetUserByIdResponse, GetUserByIdError, GetUserByIdResponse, ReturnType<typeof getUserByIdQueryKey>>({
     queryFn: async ({ queryKey, signal }) => {
@@ -93,7 +110,7 @@ export const getUserByIdOptions = (options: Options<GetUserByIdData>) => queryOp
 });
 
 /**
- * Update a user
+ * Update a user (Admin only)
  */
 export const updateUserMutation = (options?: Partial<Options<UpdateUserData>>): UseMutationOptions<UpdateUserResponse, UpdateUserError, Options<UpdateUserData>> => {
     const mutationOptions: UseMutationOptions<UpdateUserResponse, UpdateUserError, Options<UpdateUserData>> = {

@@ -2,7 +2,7 @@
 
 import type { Client, Options as Options2, TDataShape } from './client';
 import { client } from './client.gen';
-import type { AddProjectMembersData, AddProjectMembersErrors, AddProjectMembersResponses, CreateProjectData, CreateProjectErrors, CreateProjectResponses, CreateUserData, CreateUserErrors, CreateUserResponses, DeleteProjectData, DeleteProjectErrors, DeleteProjectResponses, GetProjectByIdData, GetProjectByIdErrors, GetProjectByIdResponses, GetProjectsData, GetProjectsResponses, GetUserByIdData, GetUserByIdErrors, GetUserByIdResponses, GetUsersData, GetUsersResponses, LoginData, LoginErrors, LoginResponses, LogoutData, LogoutErrors, LogoutResponses, RefreshTokenData, RefreshTokenErrors, RefreshTokenResponses, RemoveProjectMembersData, RemoveProjectMembersErrors, RemoveProjectMembersResponses, UpdateProjectData, UpdateProjectErrors, UpdateProjectResponses, UpdateUserData, UpdateUserErrors, UpdateUserResponses } from './types.gen';
+import type { AddProjectMembersData, AddProjectMembersErrors, AddProjectMembersResponses, CreateProjectData, CreateProjectErrors, CreateProjectResponses, CreateUserData, CreateUserErrors, CreateUserResponses, DeleteProjectData, DeleteProjectErrors, DeleteProjectResponses, DeleteUserData, DeleteUserErrors, DeleteUserResponses, GetProjectByIdData, GetProjectByIdErrors, GetProjectByIdResponses, GetProjectsData, GetProjectsResponses, GetUserByIdData, GetUserByIdErrors, GetUserByIdResponses, GetUsersData, GetUsersErrors, GetUsersResponses, LoginData, LoginErrors, LoginResponses, LogoutData, LogoutErrors, LogoutResponses, RefreshTokenData, RefreshTokenErrors, RefreshTokenResponses, RemoveProjectMembersData, RemoveProjectMembersErrors, RemoveProjectMembersResponses, UpdateProjectData, UpdateProjectErrors, UpdateProjectResponses, UpdateUserData, UpdateUserErrors, UpdateUserResponses } from './types.gen';
 
 export type Options<TData extends TDataShape = TDataShape, ThrowOnError extends boolean = boolean> = Options2<TData, ThrowOnError> & {
     /**
@@ -19,12 +19,12 @@ export type Options<TData extends TDataShape = TDataShape, ThrowOnError extends 
 };
 
 /**
- * Get all users
+ * Get all users (Admin only)
  */
-export const getUsers = <ThrowOnError extends boolean = false>(options?: Options<GetUsersData, ThrowOnError>) => (options?.client ?? client).get<GetUsersResponses, unknown, ThrowOnError>({ url: '/api/users', ...options });
+export const getUsers = <ThrowOnError extends boolean = false>(options?: Options<GetUsersData, ThrowOnError>) => (options?.client ?? client).get<GetUsersResponses, GetUsersErrors, ThrowOnError>({ url: '/api/users', ...options });
 
 /**
- * Create a new user
+ * Create a new user (Admin only)
  */
 export const createUser = <ThrowOnError extends boolean = false>(options: Options<CreateUserData, ThrowOnError>) => (options.client ?? client).post<CreateUserResponses, CreateUserErrors, ThrowOnError>({
     url: '/api/users',
@@ -36,12 +36,17 @@ export const createUser = <ThrowOnError extends boolean = false>(options: Option
 });
 
 /**
- * Get user by ID
+ * Delete a user (Admin only)
+ */
+export const deleteUser = <ThrowOnError extends boolean = false>(options: Options<DeleteUserData, ThrowOnError>) => (options.client ?? client).delete<DeleteUserResponses, DeleteUserErrors, ThrowOnError>({ url: '/api/users/{id}', ...options });
+
+/**
+ * Get user by ID (Admin only)
  */
 export const getUserById = <ThrowOnError extends boolean = false>(options: Options<GetUserByIdData, ThrowOnError>) => (options.client ?? client).get<GetUserByIdResponses, GetUserByIdErrors, ThrowOnError>({ url: '/api/users/{id}', ...options });
 
 /**
- * Update a user
+ * Update a user (Admin only)
  */
 export const updateUser = <ThrowOnError extends boolean = false>(options: Options<UpdateUserData, ThrowOnError>) => (options.client ?? client).put<UpdateUserResponses, UpdateUserErrors, ThrowOnError>({
     url: '/api/users/{id}',

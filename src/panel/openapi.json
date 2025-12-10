@@ -15,7 +15,7 @@
         "tags": [
           "Users"
         ],
-        "summary": "Get all users",
+        "summary": "Get all users (Admin only)",
         "operationId": "GetUsers",
         "parameters": [
           {
@@ -44,6 +44,16 @@
                 }
               }
             }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
           }
         }
       },
@@ -51,7 +61,7 @@
         "tags": [
           "Users"
         ],
-        "summary": "Create a new user",
+        "summary": "Create a new user (Admin only)",
         "operationId": "CreateUser",
         "requestBody": {
           "content": {
@@ -93,6 +103,16 @@
                 }
               }
             }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
           }
         }
       }
@@ -102,7 +122,7 @@
         "tags": [
           "Users"
         ],
-        "summary": "Get user by ID",
+        "summary": "Get user by ID (Admin only)",
         "operationId": "GetUserById",
         "parameters": [
           {
@@ -135,6 +155,16 @@
                 }
               }
             }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
           }
         }
       },
@@ -142,7 +172,7 @@
         "tags": [
           "Users"
         ],
-        "summary": "Update a user",
+        "summary": "Update a user (Admin only)",
         "operationId": "UpdateUser",
         "parameters": [
           {
@@ -188,6 +218,69 @@
           },
           "409": {
             "description": "Conflict",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Users"
+        ],
+        "summary": "Delete a user (Admin only)",
+        "operationId": "DeleteUser",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
             "content": {
               "application/problem+json": {
                 "schema": {
