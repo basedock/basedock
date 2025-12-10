@@ -30,6 +30,9 @@ export const Route = createFileRoute('/login')({
   validateSearch: (search: Record<string, unknown>) => ({
     redirect: (search.redirect as string) || undefined,
   }),
+  head: () => ({
+    meta: [{ title: 'Login - Basedock' }],
+  }),
   beforeLoad: ({ context }) => {
     if (context.auth.isLoading) {
       return

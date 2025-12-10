@@ -47,6 +47,9 @@ export const Route = createFileRoute("/_dashboard/projects/$id")({
     if (response.error) throw new Error("Project not found")
     return response.data as ProjectDto
   },
+  head: ({ loaderData }) => ({
+    meta: [{ title: `${loaderData?.name ?? 'Project'} - Basedock` }],
+  }),
   beforeLoad: () => ({
     getTitle: () => "Project",
   }),
