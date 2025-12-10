@@ -8,19 +8,54 @@ interface DockerComposeService {
   ports?: (string | number | Record<string, unknown>)[]
   volumes?: (string | Record<string, unknown>)[]
   restart?: string
+  pull_policy?: string
+  network_mode?: string
   depends_on?: string[] | Record<string, unknown>
   environment?: Record<string, unknown> | string[]
   networks?: string[] | Record<string, unknown>
+  configs?: string[] | Record<string, unknown>[]
+  secrets?: string[] | Record<string, unknown>[]
+  deploy?: {
+    mode?: string
+    endpoint_mode?: string
+    [key: string]: unknown
+  }
+  develop?: {
+    watch?: {
+      action?: string
+      path?: string
+      target?: string
+      [key: string]: unknown
+    }[]
+  }
   [key: string]: unknown
+}
+
+interface DockerComposeConfig {
+  file?: string
+  environment?: string
+  content?: string
+  external?: boolean
+  name?: string
+}
+
+interface DockerComposeSecret {
+  file?: string
+  environment?: string
+  external?: boolean
+  name?: string
 }
 
 interface DockerComposeFile {
   version?: string
+  name?: string
   services?: Record<string, DockerComposeService>
   volumes?: Record<string, unknown>
   networks?: Record<string, unknown>
-  configs?: Record<string, unknown>
-  secrets?: Record<string, unknown>
+  configs?: Record<string, DockerComposeConfig | null>
+  secrets?: Record<string, DockerComposeSecret | null>
+  include?: string[] | Record<string, unknown>[]
+  models?: Record<string, unknown>
   [key: string]: unknown
 }
 
@@ -70,15 +105,33 @@ function isValidPortMapping(port: string | number): boolean {
 // Valid restart policies
 const validRestartPolicies = ["no", "always", "on-failure", "unless-stopped"]
 
+// Valid pull policies
+const validPullPolicies = ["always", "never", "missing", "build", "daily", "weekly"]
+
+// Valid network modes (prefixes for service: and container:)
+const validNetworkModes = ["none", "host", "bridge"]
+const validNetworkModePrefixes = ["service:", "container:"]
+
+// Valid deploy modes
+const validDeployModes = ["global", "replicated", "replicated-job", "global-job"]
+
+// Valid deploy endpoint modes
+const validEndpointModes = ["vip", "dnsrr"]
+
+// Valid watch actions
+const validWatchActions = ["rebuild", "restart", "sync", "sync+restart", "sync+exec"]
+
 // Valid top-level keys
 const validTopLevelKeys = [
   "version",
+  "name",
   "services",
   "volumes",
   "networks",
   "configs",
   "secrets",
-  "name",
+  "include",
+  "models",
 ]
 
 // Validate YAML syntax
@@ -184,6 +237,122 @@ function validateDockerComposeSchema(
       })
     }
 
+    // Validate pull_policy
+    if (service.pull_policy && !validPullPolicies.includes(service.pull_policy)) {
+      const pullPolicyLine = findLineForKey(content, "pull_policy", serviceLine - 1)
+      const pullPolicyLineInfo = view.state.doc.line(
+        Math.min(pullPolicyLine, view.state.doc.lines)
+      )
+      diagnostics.push({
+        from: pullPolicyLineInfo.from,
+        to: pullPolicyLineInfo.to,
+        severity: "error",
+        message: `Invalid pull_policy: "${service.pull_policy}". Valid values: ${validPullPolicies.join(", ")}`,
+      })
+    }
+
+    // Validate network_mode
+    if (service.network_mode) {
+      const isValidMode = validNetworkModes.includes(service.network_mode) ||
+        validNetworkModePrefixes.some(prefix => service.network_mode!.startsWith(prefix))
+      if (!isValidMode) {
+        const networkModeLine = findLineForKey(content, "network_mode", serviceLine - 1)
+        const networkModeLineInfo = view.state.doc.line(
+          Math.min(networkModeLine, view.state.doc.lines)
+        )
+        diagnostics.push({
+          from: networkModeLineInfo.from,
+          to: networkModeLineInfo.to,
+          severity: "error",
+          message: `Invalid network_mode: "${service.network_mode}". Valid values: ${validNetworkModes.join(", ")}, service:<name>, container:<name>`,
+        })
+      }
+    }
+
+    // Validate deploy section
+    if (service.deploy) {
+      // Validate deploy mode
+      if (service.deploy.mode && !validDeployModes.includes(service.deploy.mode)) {
+        const deployLine = findLineForKey(content, "deploy", serviceLine - 1)
+        const modeLine = findLineForKey(content, "mode", deployLine)
+        const modeLineInfo = view.state.doc.line(
+          Math.min(modeLine, view.state.doc.lines)
+        )
+        diagnostics.push({
+          from: modeLineInfo.from,
+          to: modeLineInfo.to,
+          severity: "error",
+          message: `Invalid deploy mode: "${service.deploy.mode}". Valid values: ${validDeployModes.join(", ")}`,
+        })
+      }
+
+      // Validate deploy endpoint_mode
+      if (service.deploy.endpoint_mode && !validEndpointModes.includes(service.deploy.endpoint_mode)) {
+        const deployLine = findLineForKey(content, "deploy", serviceLine - 1)
+        const endpointModeLine = findLineForKey(content, "endpoint_mode", deployLine)
+        const endpointModeLineInfo = view.state.doc.line(
+          Math.min(endpointModeLine, view.state.doc.lines)
+        )
+        diagnostics.push({
+          from: endpointModeLineInfo.from,
+          to: endpointModeLineInfo.to,
+          severity: "error",
+          message: `Invalid endpoint_mode: "${service.deploy.endpoint_mode}". Valid values: ${validEndpointModes.join(", ")}`,
+        })
+      }
+    }
+
+    // Validate develop.watch section
+    if (service.develop?.watch && Array.isArray(service.develop.watch)) {
+      const developLine = findLineForKey(content, "develop", serviceLine - 1)
+      for (const watchRule of service.develop.watch) {
+        if (watchRule && typeof watchRule === "object") {
+          // Validate watch action
+          if (watchRule.action && !validWatchActions.includes(watchRule.action)) {
+            const watchLine = findLineForKey(content, "watch", developLine)
+            const actionLine = findLineForKey(content, "action", watchLine)
+            const actionLineInfo = view.state.doc.line(
+              Math.min(actionLine, view.state.doc.lines)
+            )
+            diagnostics.push({
+              from: actionLineInfo.from,
+              to: actionLineInfo.to,
+              severity: "error",
+              message: `Invalid watch action: "${watchRule.action}". Valid values: ${validWatchActions.join(", ")}`,
+            })
+          }
+
+          // Validate path is required
+          if (!watchRule.path) {
+            const watchLine = findLineForKey(content, "watch", developLine)
+            const watchLineInfo = view.state.doc.line(
+              Math.min(watchLine, view.state.doc.lines)
+            )
+            diagnostics.push({
+              from: watchLineInfo.from,
+              to: watchLineInfo.to,
+              severity: "error",
+              message: "Watch rule must have a 'path' defined",
+            })
+          }
+
+          // Validate target is required for sync actions
+          if (watchRule.action?.startsWith("sync") && !watchRule.target) {
+            const watchLine = findLineForKey(content, "watch", developLine)
+            const watchLineInfo = view.state.doc.line(
+              Math.min(watchLine, view.state.doc.lines)
+            )
+            diagnostics.push({
+              from: watchLineInfo.from,
+              to: watchLineInfo.to,
+              severity: "error",
+              message: `Watch action "${watchRule.action}" requires a 'target' path`,
+            })
+          }
+        }
+      }
+    }
+
     // Validate port mappings
     if (service.ports && Array.isArray(service.ports)) {
       for (const port of service.ports) {
@@ -280,6 +449,106 @@ function validateDockerComposeSchema(
           to: volumeLineInfo.to,
           severity: "info",
           message: `Volume "${volumeName}" is defined but not used by any service`,
+        })
+      }
+    }
+  }
+
+  // Validate configs are defined correctly and used
+  if (doc.configs) {
+    for (const [configName, config] of Object.entries(doc.configs)) {
+      // Check config has a valid source (file, environment, content, or external)
+      if (config && typeof config === "object" && !config.external) {
+        if (!config.file && !config.environment && !config.content) {
+          const configLine = findLineForKey(content, configName)
+          const configLineInfo = view.state.doc.line(
+            Math.min(configLine, view.state.doc.lines)
+          )
+          diagnostics.push({
+            from: configLineInfo.from,
+            to: configLineInfo.to,
+            severity: "warning",
+            message: `Config "${configName}" should have "file", "environment", "content", or "external" defined`,
+          })
+        }
+      }
+
+      // Check if config is used by any service
+      let configUsed = false
+      if (doc.services) {
+        for (const service of Object.values(doc.services)) {
+          if (service.configs) {
+            for (const cfg of service.configs) {
+              const cfgName = typeof cfg === "string" ? cfg : (cfg as Record<string, unknown>)?.source
+              if (cfgName === configName) {
+                configUsed = true
+                break
+              }
+            }
+          }
+          if (configUsed) break
+        }
+      }
+      if (!configUsed && config !== null) {
+        const configLine = findLineForKey(content, configName)
+        const configLineInfo = view.state.doc.line(
+          Math.min(configLine, view.state.doc.lines)
+        )
+        diagnostics.push({
+          from: configLineInfo.from,
+          to: configLineInfo.to,
+          severity: "info",
+          message: `Config "${configName}" is defined but not used by any service`,
+        })
+      }
+    }
+  }
+
+  // Validate secrets are defined correctly and used
+  if (doc.secrets) {
+    for (const [secretName, secret] of Object.entries(doc.secrets)) {
+      // Check secret has a valid source (file, environment, or external)
+      if (secret && typeof secret === "object" && !secret.external) {
+        if (!secret.file && !secret.environment) {
+          const secretLine = findLineForKey(content, secretName)
+          const secretLineInfo = view.state.doc.line(
+            Math.min(secretLine, view.state.doc.lines)
+          )
+          diagnostics.push({
+            from: secretLineInfo.from,
+            to: secretLineInfo.to,
+            severity: "warning",
+            message: `Secret "${secretName}" should have "file", "environment", or "external" defined`,
+          })
+        }
+      }
+
+      // Check if secret is used by any service
+      let secretUsed = false
+      if (doc.services) {
+        for (const service of Object.values(doc.services)) {
+          if (service.secrets) {
+            for (const sec of service.secrets) {
+              const secName = typeof sec === "string" ? sec : (sec as Record<string, unknown>)?.source
+              if (secName === secretName) {
+                secretUsed = true
+                break
+              }
+            }
+          }
+          if (secretUsed) break
+        }
+      }
+      if (!secretUsed && secret !== null) {
+        const secretLine = findLineForKey(content, secretName)
+        const secretLineInfo = view.state.doc.line(
+          Math.min(secretLine, view.state.doc.lines)
+        )
+        diagnostics.push({
+          from: secretLineInfo.from,
+          to: secretLineInfo.to,
+          severity: "info",
+          message: `Secret "${secretName}" is defined but not used by any service`,
         })
       }
     }
