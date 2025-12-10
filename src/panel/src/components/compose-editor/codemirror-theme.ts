@@ -185,7 +185,7 @@ const darkHighlightStyle = HighlightStyle.define([
   { tag: tags.meta, color: "#8b949e" },
 ])
 
-export function createTheme(isDark: boolean): Extension {
+export function createTheme(isDark: boolean): Extension[] {
   return isDark
     ? [baseTheme, darkTheme, syntaxHighlighting(darkHighlightStyle)]
     : [baseTheme, lightTheme, syntaxHighlighting(lightHighlightStyle)]

@@ -1,5 +1,6 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query"
 import { Button } from "@/components/ui/button"
+import { ButtonGroup, ButtonGroupSeparator } from "@/components/ui/button-group"
 import { Play, Square, RotateCw, Trash2, Loader2 } from "lucide-react"
 import {
   deployProject,
@@ -78,7 +79,7 @@ export function DeploymentControls({
     removeMutation.isPending
 
   return (
-    <div className="flex flex-wrap gap-2">
+    <ButtonGroup>
       {/* Deploy / Redeploy button */}
       <Button
         onClick={() => deployMutation.mutate()}
@@ -128,6 +129,9 @@ export function DeploymentControls({
         </Button>
       )}
 
+      {/* Separator before destructive action */}
+      {!isNotDeployed && <ButtonGroupSeparator />}
+
       {/* Remove button - show when deployed */}
       {!isNotDeployed && (
         <Button
@@ -144,6 +148,6 @@ export function DeploymentControls({
           Remove
         </Button>
       )}
-    </div>
+    </ButtonGroup>
   )
 }

@@ -1,5 +1,5 @@
 import { useEffect, useRef, useCallback } from "react"
-import { EditorState, Compartment } from "@codemirror/state"
+import { EditorState } from "@codemirror/state"
 import {
   EditorView,
   keymap,
@@ -51,7 +51,7 @@ export function CodeMirrorEditor({
 }: CodeMirrorEditorProps) {
   const editorRef = useRef<HTMLDivElement>(null)
   const viewRef = useRef<EditorView | null>(null)
-  const themeCompartment = useRef(new Compartment())
+  // const themeCompartment = useRef(new Compartment()) // Removed temporarily due to extension validation issues
   const isExternalUpdate = useRef(false)
 
   // Detect dark mode
@@ -85,8 +85,8 @@ export function CodeMirrorEditor({
       indentOnInput(),
       highlightSelectionMatches(),
 
-      // Theme (in compartment for dynamic switching)
-      themeCompartment.current.of(createTheme(isDark())),
+      // Theme
+      ...createTheme(isDark()),
 
       // Language
       yaml(),
@@ -141,25 +141,11 @@ export function CodeMirrorEditor({
 
     viewRef.current = view
 
-    // Listen for theme changes on document and body
-    const observer = new MutationObserver(() => {
-      view.dispatch({
-        effects: themeCompartment.current.reconfigure(createTheme(isDark())),
-      })
-    })
-
-    observer.observe(document.documentElement, {
-      attributes: true,
-      attributeFilter: ["class"],
-    })
-
-    observer.observe(document.body, {
-      attributes: true,
-      attributeFilter: ["class"],
-    })
+    // Note: Dynamic theme switching disabled temporarily
+    // Theme will use initial system preference
+    // TODO: Implement proper theme switching without Compartment issues
 
     return () => {
-      observer.disconnect()
       view.destroy()
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps

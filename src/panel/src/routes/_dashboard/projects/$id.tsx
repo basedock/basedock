@@ -40,6 +40,12 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
+import {
+  Tabs,
+  TabsContent,
+  TabsList,
+  TabsTrigger,
+} from "@/components/ui/tabs"
 import { DeploymentStatusBadge } from "@/components/deployment-status-badge"
 import { DeploymentControls } from "@/components/deployment-controls"
 import { ComposeEditor } from "@/components/compose-editor"
@@ -174,206 +180,267 @@ function ProjectDetailPage() {
   return (
     <>
       <div className="flex flex-1 flex-col gap-6 p-4 pt-0">
-        {/* Docker Deployment Status Card */}
+        {/* Header Card - Always visible, compact */}
         <Card>
           <CardHeader>
-            <div className="flex items-center justify-between">
-              <div>
-                <CardTitle className="flex items-center gap-2">
-                  Deployment Status
-                  <DeploymentStatusBadge status={dockerStatus?.status ?? project.deploymentStatus} />
-                </CardTitle>
-                <CardDescription className="flex items-center gap-2 mt-1">
+            <div className="flex items-start justify-between gap-4">
+              <div className="flex-1 min-w-0">
+                <CardTitle className="text-2xl">{project.name}</CardTitle>
+                {project.description && (
+                  <CardDescription className="mt-1.5 text-base">
+                    {project.description}
+                  </CardDescription>
+                )}
+              </div>
+              <div className="flex flex-col items-end gap-3 flex-shrink-0">
+                <DeploymentStatusBadge status={dockerStatus?.status ?? project.deploymentStatus} />
+                <div className="flex items-center gap-2 text-sm text-muted-foreground">
                   {isConnected ? (
                     <>
-                      <Wifi className="h-3 w-3 text-green-500" />
-                      <span className="text-green-600 dark:text-green-400">Real-time updates active</span>
+                      <Wifi className="h-3.5 w-3.5 text-green-500" />
+                      <span className="text-green-600 dark:text-green-400">Live</span>
                     </>
                   ) : (
                     <>
-                      <WifiOff className="h-3 w-3 text-muted-foreground" />
+                      <WifiOff className="h-3.5 w-3.5" />
                       <span>Connecting...</span>
                     </>
                   )}
-                </CardDescription>
+                </div>
               </div>
-              {isAdmin && (
+            </div>
+            {dockerStatus?.lastError && (
+              <div className="mt-4 p-3 bg-destructive/10 text-destructive text-sm rounded-md flex items-start gap-2">
+                <span className="font-medium">Error:</span>
+                <span className="flex-1">{dockerStatus.lastError}</span>
+              </div>
+            )}
+            {isAdmin && (
+              <div className="mt-4 pt-4 border-t">
                 <DeploymentControls
                   projectId={id}
                   status={dockerStatus?.status ?? project.deploymentStatus}
                   hasComposeFile={!!project.composeFileContent}
                 />
-              )}
-            </div>
-          </CardHeader>
-          <CardContent>
-            {dockerStatus?.lastError && (
-              <div className="mb-4 p-3 bg-destructive/10 text-destructive text-sm rounded-md">
-                {dockerStatus.lastError}
               </div>
             )}
-            <ContainerList containers={dockerStatus?.containers ?? []} />
-          </CardContent>
-        </Card>
-
-        {/* Compose File Editor - Admin only */}
-        {isAdmin && (
-          <Card>
-            <CardHeader>
-              <CardTitle>Docker Compose</CardTitle>
-              <CardDescription>
-                Define your project's services using Docker Compose
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <ComposeEditor
-                projectId={id}
-                initialContent={project.composeFileContent}
-              />
-            </CardContent>
-          </Card>
-        )}
-
-        {/* Logs Viewer */}
-        <Card>
-          <CardHeader>
-            <CardTitle>Logs</CardTitle>
-            <CardDescription>View container logs</CardDescription>
           </CardHeader>
-          <CardContent>
-            <LogsViewer projectId={id} autoRefresh={isConnected} />
-          </CardContent>
         </Card>
 
-        {isAdmin && (
-          <Card>
-            <CardHeader>
-              <CardTitle>Project Details</CardTitle>
-              <CardDescription>Update project information</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <form
-                onSubmit={(e) => {
-                  e.preventDefault()
-                  form.handleSubmit()
-                }}
-              >
-                <FieldGroup>
-                  <form.Field
-                    name="name"
-                    children={(field) => {
-                      const isInvalid = field.state.meta.isTouched && !field.state.meta.isValid
-                      return (
-                        <Field data-invalid={isInvalid}>
-                          <FieldLabel htmlFor={field.name}>Name</FieldLabel>
-                          <Input
-                            id={field.name}
-                            name={field.name}
-                            value={field.state.value}
-                            onBlur={field.handleBlur}
-                            onChange={(e) => field.handleChange(e.target.value)}
-                            aria-invalid={isInvalid}
-                            placeholder="Project name"
-                          />
-                          {isInvalid && <FieldError errors={field.state.meta.errors} />}
-                        </Field>
-                      )
-                    }}
-                  />
-                  <form.Field
-                    name="description"
-                    children={(field) => {
-                      const isInvalid = field.state.meta.isTouched && !field.state.meta.isValid
-                      return (
-                        <Field data-invalid={isInvalid}>
-                          <FieldLabel htmlFor={field.name}>Description</FieldLabel>
-                          <Textarea
-                            id={field.name}
-                            name={field.name}
-                            value={field.state.value}
-                            onBlur={field.handleBlur}
-                            onChange={(e) => field.handleChange(e.target.value)}
-                            aria-invalid={isInvalid}
-                            placeholder="Project description (optional)"
-                            rows={3}
-                          />
-                          {isInvalid && <FieldError errors={field.state.meta.errors} />}
-                        </Field>
-                      )
-                    }}
-                  />
-                </FieldGroup>
-                <div className="mt-4">
-                  <Button type="submit" disabled={updateMutation.isPending}>
-                    {updateMutation.isPending ? "Saving..." : "Save Changes"}
-                  </Button>
+        {/* Tabs for content organization */}
+        <Tabs defaultValue="overview" className="flex-1">
+          <TabsList className="grid w-full grid-cols-4">
+            <TabsTrigger value="overview">Overview</TabsTrigger>
+            <TabsTrigger value="compose">Compose</TabsTrigger>
+            <TabsTrigger value="logs">Logs</TabsTrigger>
+            <TabsTrigger value="settings">Settings</TabsTrigger>
+          </TabsList>
+
+          <TabsContent value="overview" className="space-y-4">
+            <Card>
+              <CardHeader>
+                <CardTitle>Containers</CardTitle>
+                <CardDescription>
+                  Running containers and their status
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <ContainerList containers={dockerStatus?.containers ?? []} />
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader>
+                <CardTitle>Project Info</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="grid gap-4 sm:grid-cols-2">
+                  <div>
+                    <div className="text-sm font-medium text-muted-foreground">Members</div>
+                    <div className="text-2xl font-bold">{project.members.length}</div>
+                  </div>
+                  <div>
+                    <div className="text-sm font-medium text-muted-foreground">Containers</div>
+                    <div className="text-2xl font-bold">{dockerStatus?.containers?.length ?? 0}</div>
+                  </div>
                 </div>
-              </form>
-            </CardContent>
-          </Card>
-        )}
+              </CardContent>
+            </Card>
+          </TabsContent>
 
-        <Card>
-          <CardHeader>
-            <CardTitle>Members</CardTitle>
-            <CardDescription>
-              {project.members.length} member{project.members.length !== 1 ? "s" : ""}
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            {isAdmin && availableUsers.length > 0 && (
-              <div className="mb-4">
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => setAddMemberDialogOpen(true)}
-                >
-                  <UserPlus className="mr-2 h-4 w-4" />
-                  Add Member
-                </Button>
-              </div>
+          <TabsContent value="compose" className="space-y-4">
+            {isAdmin ? (
+              <Card>
+                <CardHeader>
+                  <CardTitle>Docker Compose</CardTitle>
+                  <CardDescription>
+                    Define your project's services using Docker Compose
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <ComposeEditor
+                    projectId={id}
+                    initialContent={project.composeFileContent}
+                  />
+                </CardContent>
+              </Card>
+            ) : (
+              <Card>
+                <CardContent className="pt-6">
+                  <div className="text-center text-muted-foreground">
+                    You don't have permission to edit the Docker Compose file.
+                  </div>
+                </CardContent>
+              </Card>
             )}
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Name</TableHead>
-                  <TableHead>Email</TableHead>
-                  <TableHead>Joined</TableHead>
-                  {isAdmin && <TableHead className="w-[50px]"></TableHead>}
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {project.members.map((member) => (
-                  <TableRow key={member.userId}>
-                    <TableCell className="font-medium">{member.displayName}</TableCell>
-                    <TableCell>{member.email}</TableCell>
-                    <TableCell>
-                      {new Date(member.joinedAt).toLocaleDateString()}
-                    </TableCell>
-                    {isAdmin && (
-                      <TableCell>
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          className="text-destructive hover:text-destructive"
-                          onClick={() => {
-                            if (confirm(`Remove ${member.displayName} from this project?`)) {
-                              removeMemberMutation.mutate(member.userId)
-                            }
-                          }}
-                          disabled={removeMemberMutation.isPending}
-                        >
-                          <Trash2 className="h-4 w-4" />
-                          <span className="sr-only">Remove</span>
-                        </Button>
-                      </TableCell>
-                    )}
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          </CardContent>
-        </Card>
+          </TabsContent>
+
+          <TabsContent value="logs" className="space-y-4">
+            <Card>
+              <CardHeader>
+                <CardTitle>Container Logs</CardTitle>
+                <CardDescription>View real-time container logs</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <LogsViewer projectId={id} autoRefresh={isConnected} />
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          <TabsContent value="settings" className="space-y-4">
+            {isAdmin && (
+              <Card>
+                <CardHeader>
+                  <CardTitle>Project Details</CardTitle>
+                  <CardDescription>Update project information</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <form
+                    onSubmit={(e) => {
+                      e.preventDefault()
+                      form.handleSubmit()
+                    }}
+                  >
+                    <FieldGroup>
+                      <form.Field
+                        name="name"
+                        children={(field) => {
+                          const isInvalid = field.state.meta.isTouched && !field.state.meta.isValid
+                          return (
+                            <Field data-invalid={isInvalid}>
+                              <FieldLabel htmlFor={field.name}>Name</FieldLabel>
+                              <Input
+                                id={field.name}
+                                name={field.name}
+                                value={field.state.value}
+                                onBlur={field.handleBlur}
+                                onChange={(e) => field.handleChange(e.target.value)}
+                                aria-invalid={isInvalid}
+                                placeholder="Project name"
+                              />
+                              {isInvalid && <FieldError errors={field.state.meta.errors} />}
+                            </Field>
+                          )
+                        }}
+                      />
+                      <form.Field
+                        name="description"
+                        children={(field) => {
+                          const isInvalid = field.state.meta.isTouched && !field.state.meta.isValid
+                          return (
+                            <Field data-invalid={isInvalid}>
+                              <FieldLabel htmlFor={field.name}>Description</FieldLabel>
+                              <Textarea
+                                id={field.name}
+                                name={field.name}
+                                value={field.state.value}
+                                onBlur={field.handleBlur}
+                                onChange={(e) => field.handleChange(e.target.value)}
+                                aria-invalid={isInvalid}
+                                placeholder="Project description (optional)"
+                                rows={3}
+                              />
+                              {isInvalid && <FieldError errors={field.state.meta.errors} />}
+                            </Field>
+                          )
+                        }}
+                      />
+                    </FieldGroup>
+                    <div className="mt-4">
+                      <Button type="submit" disabled={updateMutation.isPending}>
+                        {updateMutation.isPending ? "Saving..." : "Save Changes"}
+                      </Button>
+                    </div>
+                  </form>
+                </CardContent>
+              </Card>
+            )}
+
+            <Card>
+              <CardHeader>
+                <CardTitle>Members</CardTitle>
+                <CardDescription>
+                  {project.members.length} member{project.members.length !== 1 ? "s" : ""}
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                {isAdmin && availableUsers.length > 0 && (
+                  <div className="mb-4">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => setAddMemberDialogOpen(true)}
+                    >
+                      <UserPlus className="mr-2 h-4 w-4" />
+                      Add Member
+                    </Button>
+                  </div>
+                )}
+                <div className="rounded-md border">
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead>Name</TableHead>
+                        <TableHead>Email</TableHead>
+                        <TableHead>Joined</TableHead>
+                        {isAdmin && <TableHead className="w-[50px]"></TableHead>}
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {project.members.map((member) => (
+                        <TableRow key={member.userId}>
+                          <TableCell className="font-medium">{member.displayName}</TableCell>
+                          <TableCell>{member.email}</TableCell>
+                          <TableCell>
+                            {new Date(member.joinedAt).toLocaleDateString()}
+                          </TableCell>
+                          {isAdmin && (
+                            <TableCell>
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                className="text-destructive hover:text-destructive"
+                                onClick={() => {
+                                  if (confirm(`Remove ${member.displayName} from this project?`)) {
+                                    removeMemberMutation.mutate(member.userId)
+                                  }
+                                }}
+                                disabled={removeMemberMutation.isPending}
+                              >
+                                <Trash2 className="h-4 w-4" />
+                                <span className="sr-only">Remove</span>
+                              </Button>
+                            </TableCell>
+                          )}
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
+        </Tabs>
       </div>
 
       <Dialog open={addMemberDialogOpen} onOpenChange={setAddMemberDialogOpen}>
