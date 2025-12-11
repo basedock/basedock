@@ -9,6 +9,10 @@ import {
 } from 'react';
 import { authStore, type User } from '@/lib/auth-store';
 import { client } from '@/api/client.gen';
+import {
+  createTokenRefreshInterceptor,
+  resetRefreshState,
+} from '@/lib/token-refresh-interceptor';
 
 interface AuthContextType {
   user: User | null;
@@ -26,13 +30,12 @@ client.setConfig({
   credentials: 'include',
 });
 
-// Refresh timer interval (4 minutes, before 5-min expiry)
-const REFRESH_INTERVAL_MS = 4 * 60 * 1000;
-
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(authStore.getUser());
   const [isLoading, setIsLoading] = useState(true);
   const refreshTimerRef = useRef<number | null>(null);
+  // Dynamic refresh interval (half of token lifetime)
+  const refreshIntervalRef = useRef<number>(4 * 60 * 1000); // Default 4 minutes
   // Prevent concurrent refresh attempts (React StrictMode can trigger double calls)
   const isRefreshingRef = useRef(false);
   // Ensure initialization only runs once, even with StrictMode double-mounting
@@ -81,6 +84,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       authStore.setUser(data.user);
       setUser(data.user);
 
+      // Calculate dynamic refresh interval (half of token lifetime)
+      const tokenLifetime = authStore.getTimeUntilExpiry();
+      refreshIntervalRef.current = Math.max(tokenLifetime / 2, 60000); // At least 1 minute
+
       return true;
     } catch {
       authStore.clear();
@@ -105,7 +112,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         if (success) {
           scheduleRefresh();
         }
-      }, Math.min(refreshDelay, REFRESH_INTERVAL_MS));
+      }, Math.min(refreshDelay, refreshIntervalRef.current));
     }
   }, [clearRefreshTimer, refresh]);
 
@@ -138,6 +145,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       authStore.setUser(data.user);
       setUser(data.user);
 
+      // Calculate dynamic refresh interval (half of token lifetime)
+      const tokenLifetime = authStore.getTimeUntilExpiry();
+      refreshIntervalRef.current = Math.max(tokenLifetime / 2, 60000); // At least 1 minute
+
       // Schedule token refresh
       scheduleRefresh();
     },
@@ -161,6 +172,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       authStore.clear();
       setUser(null);
       clearRefreshTimer();
+      resetRefreshState(); // Clear any pending 401 retry requests
     }
   }, [clearRefreshTimer]);
 
@@ -239,6 +251,39 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       client.interceptors.request.eject(requestInterceptor);
     };
   }, []);
+
+  // Add 401 response interceptor for automatic token refresh
+  useEffect(() => {
+    const responseInterceptor = createTokenRefreshInterceptor(refresh);
+    client.interceptors.response.use(responseInterceptor);
+
+    return () => {
+      client.interceptors.response.eject(responseInterceptor);
+    };
+  }, [refresh]);
+
+  // Add visibility change detection to refresh token after browser sleep
+  useEffect(() => {
+    if (!isAuthenticated) {
+      return;
+    }
+
+    const handleVisibilityChange = async () => {
+      if (!document.hidden) {
+        // Tab became visible, check if token is expiring soon
+        if (authStore.isTokenExpiringSoon(60000)) {
+          // Token expiring within 1 minute, refresh now
+          await refresh();
+        }
+      }
+    };
+
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+
+    return () => {
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+    };
+  }, [isAuthenticated, refresh]);
 
   const value: AuthContextType = {
     user,

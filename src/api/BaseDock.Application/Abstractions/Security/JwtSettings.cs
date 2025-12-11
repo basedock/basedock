@@ -7,7 +7,7 @@ public sealed class JwtSettings
     public required string Secret { get; init; }
     public required string Issuer { get; init; }
     public required string Audience { get; init; }
-    public int AccessTokenExpirationMinutes { get; init; } = 5;
+    public int AccessTokenExpirationMinutes { get; init; } = 1440;
     public int RefreshTokenExpirationDays { get; init; } = 7;
     public CookieSecuritySettings CookieSecurity { get; init; } = new();
 }
