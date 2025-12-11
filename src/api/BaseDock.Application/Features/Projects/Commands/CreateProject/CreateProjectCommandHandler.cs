@@ -59,7 +59,7 @@ public sealed partial class CreateProjectCommandHandler(IApplicationDbContext db
 
         db.Projects.Add(project);
 
-        // Create default environments
+        // Create default environment
         var productionEnv = Environment.Create(
             "Production",
             "production",
@@ -68,16 +68,7 @@ public sealed partial class CreateProjectCommandHandler(IApplicationDbContext db
             now,
             isDefault: true);
 
-        var developmentEnv = Environment.Create(
-            "Development",
-            "development",
-            "Development environment",
-            project.Id,
-            now,
-            isDefault: false);
-
         db.Environments.Add(productionEnv);
-        db.Environments.Add(developmentEnv);
 
         await db.SaveChangesAsync(cancellationToken);
 
