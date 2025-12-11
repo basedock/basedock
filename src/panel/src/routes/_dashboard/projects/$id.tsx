@@ -272,7 +272,6 @@ function ProjectDetailPage() {
             <ProjectStatsGrid
               project={project}
               dockerStatus={dockerStatus}
-              isConnected={isConnected}
             />
 
             {/* Quick Actions */}

@@ -5,14 +5,12 @@ import {
   ItemTitle,
   ItemDescription,
 } from '@/components/ui/item'
-import { formatRelativeTime, calculateUptime } from '@/lib/date-utils'
+import { calculateUptime } from '@/lib/date-utils'
 import type { DeploymentStatusDto, ProjectDto } from '@/api/types.gen'
 import {
   Activity,
   Container,
   CheckCircle2,
-  Users,
-  Clock,
   TrendingUp,
   type LucideIcon,
 } from 'lucide-react'
@@ -20,12 +18,11 @@ import {
 interface StatCardProps {
   title: string
   value: string | number
-  description?: string
   icon: LucideIcon
   variant?: 'default' | 'success' | 'warning' | 'destructive' | 'info'
 }
 
-function StatCard({ title, value, description, icon: Icon, variant = 'default' }: StatCardProps) {
+function StatCard({ title, value, icon: Icon, variant = 'default' }: StatCardProps) {
   const iconStyles = {
     default: 'bg-zinc-100 text-zinc-600 dark:bg-zinc-800 dark:text-zinc-400 border-zinc-200 dark:border-zinc-700',
     success: 'bg-green-100 text-green-600 dark:bg-green-900/50 dark:text-green-400 border-green-200 dark:border-green-800',
@@ -43,13 +40,10 @@ function StatCard({ title, value, description, icon: Icon, variant = 'default' }
         <Icon className="h-4 w-4" />
       </ItemMedia>
       <ItemContent>
-        <ItemTitle>{value}</ItemTitle>
-        <ItemDescription className="uppercase">
+        <ItemDescription>
           {title}
         </ItemDescription>
-        {description && (
-          <ItemDescription className="truncate">{description}</ItemDescription>
-        )}
+        <ItemTitle>{value}</ItemTitle>
       </ItemContent>
     </Item>
   )
@@ -58,10 +52,9 @@ function StatCard({ title, value, description, icon: Icon, variant = 'default' }
 interface ProjectStatsGridProps {
   project: ProjectDto
   dockerStatus: DeploymentStatusDto | null | undefined
-  isConnected: boolean
 }
 
-export function ProjectStatsGrid({ project, dockerStatus, isConnected }: ProjectStatsGridProps) {
+export function ProjectStatsGrid({ project, dockerStatus }: ProjectStatsGridProps) {
   const containers = dockerStatus?.containers ?? []
   const runningContainers = containers.filter(c => c.state?.toLowerCase() === 'running')
 
@@ -93,23 +86,18 @@ export function ProjectStatsGrid({ project, dockerStatus, isConnected }: Project
     {
       title: 'Status',
       value: statusDisplay.text,
-      description: isConnected ? 'Connected' : 'Connecting...',
       icon: Activity,
       variant: statusDisplay.variant,
     },
     {
       title: 'Containers',
       value: containers.length,
-      description: containers.length === 1 ? '1 service' : `${containers.length} services`,
       icon: Container,
       variant: 'default',
     },
     {
       title: 'Active',
-      value: runningContainers.length,
-      description: runningContainers.length === containers.length && containers.length > 0
-        ? 'All healthy'
-        : `${runningContainers.length} of ${containers.length} running`,
+      value: `${runningContainers.length}/${containers.length} Running`,
       icon: CheckCircle2,
       variant: runningContainers.length === containers.length && containers.length > 0
         ? 'success'
@@ -118,30 +106,15 @@ export function ProjectStatsGrid({ project, dockerStatus, isConnected }: Project
           : 'default',
     },
     {
-      title: 'Members',
-      value: project.members?.length ?? 0,
-      description: project.members?.length === 1 ? '1 collaborator' : `${project.members?.length ?? 0} collaborators`,
-      icon: Users,
-      variant: 'default',
-    },
-    {
-      title: 'Last Deployed',
-      value: formatRelativeTime(lastDeployedAt),
-      description: lastDeployedAt ? new Date(lastDeployedAt).toLocaleDateString() : undefined,
-      icon: Clock,
-      variant: 'default',
-    },
-    {
       title: 'Uptime',
       value: calculateUptime(lastDeployedAt),
-      description: dockerStatus?.status === 2 ? 'Currently running' : 'Not running',
       icon: TrendingUp,
       variant: dockerStatus?.status === 2 ? 'success' : 'default',
     },
   ]
 
   return (
-    <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6">
+    <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
       {stats.map((stat, index) => (
         <StatCard key={index} {...stat} />
       ))}
