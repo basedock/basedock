@@ -41,6 +41,7 @@ function AuthenticatedLayout() {
     .map((match) => ({
       label: (match.loaderData as { name?: string })?.name ?? (match.context as { getTitle: () => string }).getTitle(),
       href: match.pathname,
+      routeId: match.routeId,
     }))
 
   // Dedupe consecutive breadcrumbs with the same label (e.g., layout + index both showing "Projects")
@@ -51,8 +52,35 @@ function AuthenticatedLayout() {
     ),
   ]
 
-  // Remove href from last breadcrumb (current page)
-  if (breadcrumbs.length > 0) {
+  // Add environment dropdown if on project environment page
+  const slugMatch = matches.find(m => m.routeId === '/_dashboard/projects/$slug')
+  const envMatch = matches.find(m => m.routeId === '/_dashboard/projects/$slug/$env')
+
+  if (slugMatch && envMatch) {
+    const loaderData = slugMatch.loaderData as {
+      environments?: { name: string; slug: string }[]
+      project?: { slug: string }
+    } | undefined
+
+    if (loaderData?.environments && loaderData?.project && loaderData.environments.length > 1) {
+      // Find the last breadcrumb (environment) and add dropdown
+      const lastIndex = breadcrumbs.length - 1
+      if (lastIndex > 0) {
+        breadcrumbs[lastIndex] = {
+          ...breadcrumbs[lastIndex],
+          dropdown: {
+            items: loaderData.environments.map(env => ({
+              label: env.name,
+              href: `/projects/${loaderData.project!.slug}/${env.slug}`
+            }))
+          }
+        }
+      }
+    }
+  }
+
+  // Remove href from last breadcrumb (current page) if no dropdown
+  if (breadcrumbs.length > 0 && !breadcrumbs[breadcrumbs.length - 1].dropdown) {
     breadcrumbs[breadcrumbs.length - 1] = {
       label: breadcrumbs[breadcrumbs.length - 1].label,
     }

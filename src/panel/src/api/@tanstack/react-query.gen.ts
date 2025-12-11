@@ -10,15 +10,15 @@ import { client } from "../client.gen";
 import {
   addProjectMembers,
   checkSlugAvailability,
+  createEnvironment,
   createProject,
   createUser,
   deleteProject,
   deleteUser,
-  deployProject,
+  getEnvironmentBySlug,
+  getEnvironments,
   getProjectById,
   getProjectBySlug,
-  getProjectDockerStatus,
-  getProjectLogs,
   getProjects,
   getUserById,
   getUsers,
@@ -26,11 +26,7 @@ import {
   logout,
   type Options,
   refreshToken,
-  removeProjectContainers,
   removeProjectMembers,
-  restartProject,
-  stopProject,
-  updateComposeFile,
   updateProject,
   updateUser,
 } from "../sdk.gen";
@@ -40,6 +36,9 @@ import type {
   AddProjectMembersResponse,
   CheckSlugAvailabilityData,
   CheckSlugAvailabilityResponse,
+  CreateEnvironmentData,
+  CreateEnvironmentError,
+  CreateEnvironmentResponse,
   CreateProjectData,
   CreateProjectError,
   CreateProjectResponse,
@@ -50,21 +49,18 @@ import type {
   DeleteProjectError,
   DeleteUserData,
   DeleteUserError,
-  DeployProjectData,
-  DeployProjectError,
-  DeployProjectResponse,
+  GetEnvironmentBySlugData,
+  GetEnvironmentBySlugError,
+  GetEnvironmentBySlugResponse,
+  GetEnvironmentsData,
+  GetEnvironmentsError,
+  GetEnvironmentsResponse,
   GetProjectByIdData,
   GetProjectByIdError,
   GetProjectByIdResponse,
   GetProjectBySlugData,
   GetProjectBySlugError,
   GetProjectBySlugResponse,
-  GetProjectDockerStatusData,
-  GetProjectDockerStatusError,
-  GetProjectDockerStatusResponse,
-  GetProjectLogsData,
-  GetProjectLogsError,
-  GetProjectLogsResponse,
   GetProjectsData,
   GetProjectsResponse,
   GetUserByIdData,
@@ -82,21 +78,9 @@ import type {
   RefreshTokenData,
   RefreshTokenError,
   RefreshTokenResponse,
-  RemoveProjectContainersData,
-  RemoveProjectContainersError,
-  RemoveProjectContainersResponse,
   RemoveProjectMembersData,
   RemoveProjectMembersError,
   RemoveProjectMembersResponse,
-  RestartProjectData,
-  RestartProjectError,
-  RestartProjectResponse,
-  StopProjectData,
-  StopProjectError,
-  StopProjectResponse,
-  UpdateComposeFileData,
-  UpdateComposeFileError,
-  UpdateComposeFileResponse,
   UpdateProjectData,
   UpdateProjectError,
   UpdateProjectResponse,
@@ -513,159 +497,22 @@ export const removeProjectMembersMutation = (
   return mutationOptions;
 };
 
-/**
- * Update project compose file (Admin only)
- */
-export const updateComposeFileMutation = (
-  options?: Partial<Options<UpdateComposeFileData>>,
-): UseMutationOptions<
-  UpdateComposeFileResponse,
-  UpdateComposeFileError,
-  Options<UpdateComposeFileData>
-> => {
-  const mutationOptions: UseMutationOptions<
-    UpdateComposeFileResponse,
-    UpdateComposeFileError,
-    Options<UpdateComposeFileData>
-  > = {
-    mutationFn: async (fnOptions) => {
-      const { data } = await updateComposeFile({
-        ...options,
-        ...fnOptions,
-        throwOnError: true,
-      });
-      return data;
-    },
-  };
-  return mutationOptions;
-};
+export const getEnvironmentsQueryKey = (
+  options: Options<GetEnvironmentsData>,
+) => createQueryKey("getEnvironments", options);
 
 /**
- * Deploy project containers (Admin only)
+ * Get all environments for a project
  */
-export const deployProjectMutation = (
-  options?: Partial<Options<DeployProjectData>>,
-): UseMutationOptions<
-  DeployProjectResponse,
-  DeployProjectError,
-  Options<DeployProjectData>
-> => {
-  const mutationOptions: UseMutationOptions<
-    DeployProjectResponse,
-    DeployProjectError,
-    Options<DeployProjectData>
-  > = {
-    mutationFn: async (fnOptions) => {
-      const { data } = await deployProject({
-        ...options,
-        ...fnOptions,
-        throwOnError: true,
-      });
-      return data;
-    },
-  };
-  return mutationOptions;
-};
-
-/**
- * Stop project containers (Admin only)
- */
-export const stopProjectMutation = (
-  options?: Partial<Options<StopProjectData>>,
-): UseMutationOptions<
-  StopProjectResponse,
-  StopProjectError,
-  Options<StopProjectData>
-> => {
-  const mutationOptions: UseMutationOptions<
-    StopProjectResponse,
-    StopProjectError,
-    Options<StopProjectData>
-  > = {
-    mutationFn: async (fnOptions) => {
-      const { data } = await stopProject({
-        ...options,
-        ...fnOptions,
-        throwOnError: true,
-      });
-      return data;
-    },
-  };
-  return mutationOptions;
-};
-
-/**
- * Restart project containers (Admin only)
- */
-export const restartProjectMutation = (
-  options?: Partial<Options<RestartProjectData>>,
-): UseMutationOptions<
-  RestartProjectResponse,
-  RestartProjectError,
-  Options<RestartProjectData>
-> => {
-  const mutationOptions: UseMutationOptions<
-    RestartProjectResponse,
-    RestartProjectError,
-    Options<RestartProjectData>
-  > = {
-    mutationFn: async (fnOptions) => {
-      const { data } = await restartProject({
-        ...options,
-        ...fnOptions,
-        throwOnError: true,
-      });
-      return data;
-    },
-  };
-  return mutationOptions;
-};
-
-/**
- * Remove project containers and deployment files (Admin only)
- */
-export const removeProjectContainersMutation = (
-  options?: Partial<Options<RemoveProjectContainersData>>,
-): UseMutationOptions<
-  RemoveProjectContainersResponse,
-  RemoveProjectContainersError,
-  Options<RemoveProjectContainersData>
-> => {
-  const mutationOptions: UseMutationOptions<
-    RemoveProjectContainersResponse,
-    RemoveProjectContainersError,
-    Options<RemoveProjectContainersData>
-  > = {
-    mutationFn: async (fnOptions) => {
-      const { data } = await removeProjectContainers({
-        ...options,
-        ...fnOptions,
-        throwOnError: true,
-      });
-      return data;
-    },
-  };
-  return mutationOptions;
-};
-
-export const getProjectDockerStatusQueryKey = (
-  options: Options<GetProjectDockerStatusData>,
-) => createQueryKey("getProjectDockerStatus", options);
-
-/**
- * Get project deployment status
- */
-export const getProjectDockerStatusOptions = (
-  options: Options<GetProjectDockerStatusData>,
-) =>
+export const getEnvironmentsOptions = (options: Options<GetEnvironmentsData>) =>
   queryOptions<
-    GetProjectDockerStatusResponse,
-    GetProjectDockerStatusError,
-    GetProjectDockerStatusResponse,
-    ReturnType<typeof getProjectDockerStatusQueryKey>
+    GetEnvironmentsResponse,
+    GetEnvironmentsError,
+    GetEnvironmentsResponse,
+    ReturnType<typeof getEnvironmentsQueryKey>
   >({
     queryFn: async ({ queryKey, signal }) => {
-      const { data } = await getProjectDockerStatus({
+      const { data } = await getEnvironments({
         ...options,
         ...queryKey[0],
         signal,
@@ -673,24 +520,54 @@ export const getProjectDockerStatusOptions = (
       });
       return data;
     },
-    queryKey: getProjectDockerStatusQueryKey(options),
+    queryKey: getEnvironmentsQueryKey(options),
   });
 
-export const getProjectLogsQueryKey = (options: Options<GetProjectLogsData>) =>
-  createQueryKey("getProjectLogs", options);
+/**
+ * Create a new environment (Admin only)
+ */
+export const createEnvironmentMutation = (
+  options?: Partial<Options<CreateEnvironmentData>>,
+): UseMutationOptions<
+  CreateEnvironmentResponse,
+  CreateEnvironmentError,
+  Options<CreateEnvironmentData>
+> => {
+  const mutationOptions: UseMutationOptions<
+    CreateEnvironmentResponse,
+    CreateEnvironmentError,
+    Options<CreateEnvironmentData>
+  > = {
+    mutationFn: async (fnOptions) => {
+      const { data } = await createEnvironment({
+        ...options,
+        ...fnOptions,
+        throwOnError: true,
+      });
+      return data;
+    },
+  };
+  return mutationOptions;
+};
+
+export const getEnvironmentBySlugQueryKey = (
+  options: Options<GetEnvironmentBySlugData>,
+) => createQueryKey("getEnvironmentBySlug", options);
 
 /**
- * Get project container logs
+ * Get environment details by slug
  */
-export const getProjectLogsOptions = (options: Options<GetProjectLogsData>) =>
+export const getEnvironmentBySlugOptions = (
+  options: Options<GetEnvironmentBySlugData>,
+) =>
   queryOptions<
-    GetProjectLogsResponse,
-    GetProjectLogsError,
-    GetProjectLogsResponse,
-    ReturnType<typeof getProjectLogsQueryKey>
+    GetEnvironmentBySlugResponse,
+    GetEnvironmentBySlugError,
+    GetEnvironmentBySlugResponse,
+    ReturnType<typeof getEnvironmentBySlugQueryKey>
   >({
     queryFn: async ({ queryKey, signal }) => {
-      const { data } = await getProjectLogs({
+      const { data } = await getEnvironmentBySlug({
         ...options,
         ...queryKey[0],
         signal,
@@ -698,7 +575,7 @@ export const getProjectLogsOptions = (options: Options<GetProjectLogsData>) =>
       });
       return data;
     },
-    queryKey: getProjectLogsQueryKey(options),
+    queryKey: getEnvironmentBySlugQueryKey(options),
   });
 
 /**

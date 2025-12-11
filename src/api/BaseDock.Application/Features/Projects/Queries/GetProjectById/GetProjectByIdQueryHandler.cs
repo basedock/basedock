@@ -18,6 +18,7 @@ public sealed class GetProjectByIdQueryHandler(IApplicationDbContext db)
             .AsNoTracking()
             .Include(p => p.Members)
             .ThenInclude(m => m.User)
+            .Include(p => p.Environments)
             .FirstOrDefaultAsync(p => p.Id == query.ProjectId, cancellationToken);
 
         if (project is null)

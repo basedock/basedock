@@ -1,7 +1,6 @@
 namespace BaseDock.Domain.Entities;
 
 using BaseDock.Domain.Common;
-using BaseDock.Domain.Enums;
 
 public sealed class Project : Entity
 {
@@ -11,30 +10,18 @@ public sealed class Project : Entity
 
     public string? Description { get; private set; }
 
-    public ProjectType ProjectType { get; private set; }
-
     public Guid CreatedByUserId { get; private set; }
 
     public DateTime CreatedAt { get; private set; }
 
     public DateTime? UpdatedAt { get; private set; }
 
-    // Docker Compose configuration
-    public string? ComposeFileContent { get; private set; }
-
-    // Docker Image configuration (stored as JSON)
-    public string? DockerImageConfig { get; private set; }
-
-    public DeploymentStatus DeploymentStatus { get; private set; } = DeploymentStatus.NotDeployed;
-
-    public DateTime? LastDeployedAt { get; private set; }
-
-    public string? LastDeploymentError { get; private set; }
-
     // Navigation properties
     public User CreatedBy { get; private set; } = null!;
 
     public ICollection<ProjectMember> Members { get; private set; } = new List<ProjectMember>();
+
+    public ICollection<Environment> Environments { get; private set; } = new List<Environment>();
 
     private Project()
     {
@@ -44,7 +31,6 @@ public sealed class Project : Entity
         string name,
         string slug,
         string? description,
-        ProjectType projectType,
         Guid createdByUserId)
     {
         return new Project
@@ -52,7 +38,6 @@ public sealed class Project : Entity
             Name = name,
             Slug = slug,
             Description = description,
-            ProjectType = projectType,
             CreatedByUserId = createdByUserId,
             CreatedAt = DateTime.UtcNow
         };
@@ -71,12 +56,6 @@ public sealed class Project : Entity
         UpdatedAt = DateTime.UtcNow;
     }
 
-    public void SetDockerImageConfig(string? config)
-    {
-        DockerImageConfig = config;
-        UpdatedAt = DateTime.UtcNow;
-    }
-
     public ProjectMember AddMember(Guid userId)
     {
         var member = ProjectMember.Create(Id, userId);
@@ -88,35 +67,6 @@ public sealed class Project : Entity
     public void RemoveMember(ProjectMember member)
     {
         Members.Remove(member);
-        UpdatedAt = DateTime.UtcNow;
-    }
-
-    public void SetComposeFile(string? content)
-    {
-        ComposeFileContent = content;
-        UpdatedAt = DateTime.UtcNow;
-    }
-
-    public void SetDeploymentStatus(DeploymentStatus status, DateTime? deployedAt = null)
-    {
-        DeploymentStatus = status;
-        if (deployedAt.HasValue)
-        {
-            LastDeployedAt = deployedAt;
-        }
-
-        if (status != DeploymentStatus.Error)
-        {
-            LastDeploymentError = null;
-        }
-
-        UpdatedAt = DateTime.UtcNow;
-    }
-
-    public void SetDeploymentError(string error)
-    {
-        DeploymentStatus = DeploymentStatus.Error;
-        LastDeploymentError = error;
         UpdatedAt = DateTime.UtcNow;
     }
 }

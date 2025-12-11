@@ -8,6 +8,9 @@ import type {
   AddProjectMembersResponses,
   CheckSlugAvailabilityData,
   CheckSlugAvailabilityResponses,
+  CreateEnvironmentData,
+  CreateEnvironmentErrors,
+  CreateEnvironmentResponses,
   CreateProjectData,
   CreateProjectErrors,
   CreateProjectResponses,
@@ -20,21 +23,18 @@ import type {
   DeleteUserData,
   DeleteUserErrors,
   DeleteUserResponses,
-  DeployProjectData,
-  DeployProjectErrors,
-  DeployProjectResponses,
+  GetEnvironmentBySlugData,
+  GetEnvironmentBySlugErrors,
+  GetEnvironmentBySlugResponses,
+  GetEnvironmentsData,
+  GetEnvironmentsErrors,
+  GetEnvironmentsResponses,
   GetProjectByIdData,
   GetProjectByIdErrors,
   GetProjectByIdResponses,
   GetProjectBySlugData,
   GetProjectBySlugErrors,
   GetProjectBySlugResponses,
-  GetProjectDockerStatusData,
-  GetProjectDockerStatusErrors,
-  GetProjectDockerStatusResponses,
-  GetProjectLogsData,
-  GetProjectLogsErrors,
-  GetProjectLogsResponses,
   GetProjectsData,
   GetProjectsResponses,
   GetUserByIdData,
@@ -52,21 +52,9 @@ import type {
   RefreshTokenData,
   RefreshTokenErrors,
   RefreshTokenResponses,
-  RemoveProjectContainersData,
-  RemoveProjectContainersErrors,
-  RemoveProjectContainersResponses,
   RemoveProjectMembersData,
   RemoveProjectMembersErrors,
   RemoveProjectMembersResponses,
-  RestartProjectData,
-  RestartProjectErrors,
-  RestartProjectResponses,
-  StopProjectData,
-  StopProjectErrors,
-  StopProjectResponses,
-  UpdateComposeFileData,
-  UpdateComposeFileErrors,
-  UpdateComposeFileResponses,
   UpdateProjectData,
   UpdateProjectErrors,
   UpdateProjectResponses,
@@ -302,17 +290,29 @@ export const removeProjectMembers = <ThrowOnError extends boolean = false>(
   });
 
 /**
- * Update project compose file (Admin only)
+ * Get all environments for a project
  */
-export const updateComposeFile = <ThrowOnError extends boolean = false>(
-  options: Options<UpdateComposeFileData, ThrowOnError>,
+export const getEnvironments = <ThrowOnError extends boolean = false>(
+  options: Options<GetEnvironmentsData, ThrowOnError>,
 ) =>
-  (options.client ?? client).put<
-    UpdateComposeFileResponses,
-    UpdateComposeFileErrors,
+  (options.client ?? client).get<
+    GetEnvironmentsResponses,
+    GetEnvironmentsErrors,
+    ThrowOnError
+  >({ url: "/api/projects/{projectSlug}/environments", ...options });
+
+/**
+ * Create a new environment (Admin only)
+ */
+export const createEnvironment = <ThrowOnError extends boolean = false>(
+  options: Options<CreateEnvironmentData, ThrowOnError>,
+) =>
+  (options.client ?? client).post<
+    CreateEnvironmentResponses,
+    CreateEnvironmentErrors,
     ThrowOnError
   >({
-    url: "/api/projects/{projectId}/docker/compose",
+    url: "/api/projects/{projectSlug}/environments",
     ...options,
     headers: {
       "Content-Type": "application/json",
@@ -321,76 +321,16 @@ export const updateComposeFile = <ThrowOnError extends boolean = false>(
   });
 
 /**
- * Deploy project containers (Admin only)
+ * Get environment details by slug
  */
-export const deployProject = <ThrowOnError extends boolean = false>(
-  options: Options<DeployProjectData, ThrowOnError>,
-) =>
-  (options.client ?? client).post<
-    DeployProjectResponses,
-    DeployProjectErrors,
-    ThrowOnError
-  >({ url: "/api/projects/{projectId}/docker/deploy", ...options });
-
-/**
- * Stop project containers (Admin only)
- */
-export const stopProject = <ThrowOnError extends boolean = false>(
-  options: Options<StopProjectData, ThrowOnError>,
-) =>
-  (options.client ?? client).post<
-    StopProjectResponses,
-    StopProjectErrors,
-    ThrowOnError
-  >({ url: "/api/projects/{projectId}/docker/stop", ...options });
-
-/**
- * Restart project containers (Admin only)
- */
-export const restartProject = <ThrowOnError extends boolean = false>(
-  options: Options<RestartProjectData, ThrowOnError>,
-) =>
-  (options.client ?? client).post<
-    RestartProjectResponses,
-    RestartProjectErrors,
-    ThrowOnError
-  >({ url: "/api/projects/{projectId}/docker/restart", ...options });
-
-/**
- * Remove project containers and deployment files (Admin only)
- */
-export const removeProjectContainers = <ThrowOnError extends boolean = false>(
-  options: Options<RemoveProjectContainersData, ThrowOnError>,
-) =>
-  (options.client ?? client).delete<
-    RemoveProjectContainersResponses,
-    RemoveProjectContainersErrors,
-    ThrowOnError
-  >({ url: "/api/projects/{projectId}/docker", ...options });
-
-/**
- * Get project deployment status
- */
-export const getProjectDockerStatus = <ThrowOnError extends boolean = false>(
-  options: Options<GetProjectDockerStatusData, ThrowOnError>,
+export const getEnvironmentBySlug = <ThrowOnError extends boolean = false>(
+  options: Options<GetEnvironmentBySlugData, ThrowOnError>,
 ) =>
   (options.client ?? client).get<
-    GetProjectDockerStatusResponses,
-    GetProjectDockerStatusErrors,
+    GetEnvironmentBySlugResponses,
+    GetEnvironmentBySlugErrors,
     ThrowOnError
-  >({ url: "/api/projects/{projectId}/docker/status", ...options });
-
-/**
- * Get project container logs
- */
-export const getProjectLogs = <ThrowOnError extends boolean = false>(
-  options: Options<GetProjectLogsData, ThrowOnError>,
-) =>
-  (options.client ?? client).get<
-    GetProjectLogsResponses,
-    GetProjectLogsErrors,
-    ThrowOnError
-  >({ url: "/api/projects/{projectId}/docker/logs", ...options });
+  >({ url: "/api/projects/{projectSlug}/environments/{envSlug}", ...options });
 
 /**
  * Authenticate user and return access token

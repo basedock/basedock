@@ -6,7 +6,6 @@ using BaseDock.Application.Abstractions.Messaging;
 using BaseDock.Application.Features.Projects.DTOs;
 using BaseDock.Application.Features.Projects.Mappers;
 using BaseDock.Domain.Entities;
-using BaseDock.Domain.Enums;
 using BaseDock.Domain.Primitives;
 using Microsoft.EntityFrameworkCore;
 
@@ -34,18 +33,7 @@ public sealed partial class CreateProjectCommandHandler(IApplicationDbContext db
             command.Name,
             slug,
             command.Description,
-            command.ProjectType,
             command.CreatedByUserId);
-
-        // Set type-specific configuration
-        if (command.ProjectType == ProjectType.ComposeFile && !string.IsNullOrWhiteSpace(command.ComposeFileContent))
-        {
-            project.SetComposeFile(command.ComposeFileContent);
-        }
-        else if (command.ProjectType == ProjectType.DockerImage && !string.IsNullOrWhiteSpace(command.DockerImageConfig))
-        {
-            project.SetDockerImageConfig(command.DockerImageConfig);
-        }
 
         // Add the creator as a member
         project.AddMember(command.CreatedByUserId);
@@ -66,12 +54,32 @@ public sealed partial class CreateProjectCommandHandler(IApplicationDbContext db
         }
 
         db.Projects.Add(project);
+
+        // Create default environments
+        var productionEnv = Environment.Create(
+            "Production",
+            "production",
+            "Production environment",
+            project.Id,
+            isDefault: true);
+
+        var developmentEnv = Environment.Create(
+            "Development",
+            "development",
+            "Development environment",
+            project.Id,
+            isDefault: false);
+
+        db.Environments.Add(productionEnv);
+        db.Environments.Add(developmentEnv);
+
         await db.SaveChangesAsync(cancellationToken);
 
-        // Reload with members and user info
+        // Reload with members, user info, and environments
         var createdProject = await db.Projects
             .Include(p => p.Members)
             .ThenInclude(m => m.User)
+            .Include(p => p.Environments)
             .FirstAsync(p => p.Id == project.Id, cancellationToken);
 
         return Result.Success(createdProject.ToDto());

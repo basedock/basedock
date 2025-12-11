@@ -19,6 +19,7 @@ public sealed class GetProjectsQueryHandler(IApplicationDbContext db)
             .AsNoTracking()
             .Include(p => p.Members)
             .ThenInclude(m => m.User)
+            .Include(p => p.Environments)
             .Where(p => p.Members.Any(m => m.UserId == query.UserId))
             .OrderByDescending(p => p.CreatedAt);
 

@@ -18,6 +18,7 @@ public sealed class GetProjectBySlugQueryHandler(IApplicationDbContext db)
             .AsNoTracking()
             .Include(p => p.Members)
             .ThenInclude(m => m.User)
+            .Include(p => p.Environments)
             .FirstOrDefaultAsync(p => p.Slug == query.Slug, cancellationToken);
 
         if (project is null)

@@ -17,8 +17,9 @@ import { Route as DashboardProjectsRouteImport } from './routes/_dashboard/proje
 import { Route as DashboardUsersIndexRouteImport } from './routes/_dashboard/users/index'
 import { Route as DashboardProjectsIndexRouteImport } from './routes/_dashboard/projects/index'
 import { Route as DashboardUsersIdRouteImport } from './routes/_dashboard/users/$id'
-import { Route as DashboardProjectsNewRouteImport } from './routes/_dashboard/projects/new'
 import { Route as DashboardProjectsSlugRouteImport } from './routes/_dashboard/projects/$slug'
+import { Route as DashboardProjectsSlugSettingsRouteImport } from './routes/_dashboard/projects/$slug/settings'
+import { Route as DashboardProjectsSlugEnvRouteImport } from './routes/_dashboard/projects/$slug/$env'
 
 const LoginRoute = LoginRouteImport.update({
   id: '/login',
@@ -59,36 +60,45 @@ const DashboardUsersIdRoute = DashboardUsersIdRouteImport.update({
   path: '/$id',
   getParentRoute: () => DashboardUsersRoute,
 } as any)
-const DashboardProjectsNewRoute = DashboardProjectsNewRouteImport.update({
-  id: '/new',
-  path: '/new',
-  getParentRoute: () => DashboardProjectsRoute,
-} as any)
 const DashboardProjectsSlugRoute = DashboardProjectsSlugRouteImport.update({
   id: '/$slug',
   path: '/$slug',
   getParentRoute: () => DashboardProjectsRoute,
 } as any)
+const DashboardProjectsSlugSettingsRoute =
+  DashboardProjectsSlugSettingsRouteImport.update({
+    id: '/settings',
+    path: '/settings',
+    getParentRoute: () => DashboardProjectsSlugRoute,
+  } as any)
+const DashboardProjectsSlugEnvRoute =
+  DashboardProjectsSlugEnvRouteImport.update({
+    id: '/$env',
+    path: '/$env',
+    getParentRoute: () => DashboardProjectsSlugRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/login': typeof LoginRoute
   '/projects': typeof DashboardProjectsRouteWithChildren
   '/users': typeof DashboardUsersRouteWithChildren
   '/': typeof DashboardIndexRoute
-  '/projects/$slug': typeof DashboardProjectsSlugRoute
-  '/projects/new': typeof DashboardProjectsNewRoute
+  '/projects/$slug': typeof DashboardProjectsSlugRouteWithChildren
   '/users/$id': typeof DashboardUsersIdRoute
   '/projects/': typeof DashboardProjectsIndexRoute
   '/users/': typeof DashboardUsersIndexRoute
+  '/projects/$slug/$env': typeof DashboardProjectsSlugEnvRoute
+  '/projects/$slug/settings': typeof DashboardProjectsSlugSettingsRoute
 }
 export interface FileRoutesByTo {
   '/login': typeof LoginRoute
   '/': typeof DashboardIndexRoute
-  '/projects/$slug': typeof DashboardProjectsSlugRoute
-  '/projects/new': typeof DashboardProjectsNewRoute
+  '/projects/$slug': typeof DashboardProjectsSlugRouteWithChildren
   '/users/$id': typeof DashboardUsersIdRoute
   '/projects': typeof DashboardProjectsIndexRoute
   '/users': typeof DashboardUsersIndexRoute
+  '/projects/$slug/$env': typeof DashboardProjectsSlugEnvRoute
+  '/projects/$slug/settings': typeof DashboardProjectsSlugSettingsRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -97,11 +107,12 @@ export interface FileRoutesById {
   '/_dashboard/projects': typeof DashboardProjectsRouteWithChildren
   '/_dashboard/users': typeof DashboardUsersRouteWithChildren
   '/_dashboard/': typeof DashboardIndexRoute
-  '/_dashboard/projects/$slug': typeof DashboardProjectsSlugRoute
-  '/_dashboard/projects/new': typeof DashboardProjectsNewRoute
+  '/_dashboard/projects/$slug': typeof DashboardProjectsSlugRouteWithChildren
   '/_dashboard/users/$id': typeof DashboardUsersIdRoute
   '/_dashboard/projects/': typeof DashboardProjectsIndexRoute
   '/_dashboard/users/': typeof DashboardUsersIndexRoute
+  '/_dashboard/projects/$slug/$env': typeof DashboardProjectsSlugEnvRoute
+  '/_dashboard/projects/$slug/settings': typeof DashboardProjectsSlugSettingsRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -111,19 +122,21 @@ export interface FileRouteTypes {
     | '/users'
     | '/'
     | '/projects/$slug'
-    | '/projects/new'
     | '/users/$id'
     | '/projects/'
     | '/users/'
+    | '/projects/$slug/$env'
+    | '/projects/$slug/settings'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/login'
     | '/'
     | '/projects/$slug'
-    | '/projects/new'
     | '/users/$id'
     | '/projects'
     | '/users'
+    | '/projects/$slug/$env'
+    | '/projects/$slug/settings'
   id:
     | '__root__'
     | '/_dashboard'
@@ -132,10 +145,11 @@ export interface FileRouteTypes {
     | '/_dashboard/users'
     | '/_dashboard/'
     | '/_dashboard/projects/$slug'
-    | '/_dashboard/projects/new'
     | '/_dashboard/users/$id'
     | '/_dashboard/projects/'
     | '/_dashboard/users/'
+    | '/_dashboard/projects/$slug/$env'
+    | '/_dashboard/projects/$slug/settings'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -201,13 +215,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DashboardUsersIdRouteImport
       parentRoute: typeof DashboardUsersRoute
     }
-    '/_dashboard/projects/new': {
-      id: '/_dashboard/projects/new'
-      path: '/new'
-      fullPath: '/projects/new'
-      preLoaderRoute: typeof DashboardProjectsNewRouteImport
-      parentRoute: typeof DashboardProjectsRoute
-    }
     '/_dashboard/projects/$slug': {
       id: '/_dashboard/projects/$slug'
       path: '/$slug'
@@ -215,18 +222,45 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DashboardProjectsSlugRouteImport
       parentRoute: typeof DashboardProjectsRoute
     }
+    '/_dashboard/projects/$slug/settings': {
+      id: '/_dashboard/projects/$slug/settings'
+      path: '/settings'
+      fullPath: '/projects/$slug/settings'
+      preLoaderRoute: typeof DashboardProjectsSlugSettingsRouteImport
+      parentRoute: typeof DashboardProjectsSlugRoute
+    }
+    '/_dashboard/projects/$slug/$env': {
+      id: '/_dashboard/projects/$slug/$env'
+      path: '/$env'
+      fullPath: '/projects/$slug/$env'
+      preLoaderRoute: typeof DashboardProjectsSlugEnvRouteImport
+      parentRoute: typeof DashboardProjectsSlugRoute
+    }
   }
 }
 
+interface DashboardProjectsSlugRouteChildren {
+  DashboardProjectsSlugEnvRoute: typeof DashboardProjectsSlugEnvRoute
+  DashboardProjectsSlugSettingsRoute: typeof DashboardProjectsSlugSettingsRoute
+}
+
+const DashboardProjectsSlugRouteChildren: DashboardProjectsSlugRouteChildren = {
+  DashboardProjectsSlugEnvRoute: DashboardProjectsSlugEnvRoute,
+  DashboardProjectsSlugSettingsRoute: DashboardProjectsSlugSettingsRoute,
+}
+
+const DashboardProjectsSlugRouteWithChildren =
+  DashboardProjectsSlugRoute._addFileChildren(
+    DashboardProjectsSlugRouteChildren,
+  )
+
 interface DashboardProjectsRouteChildren {
-  DashboardProjectsSlugRoute: typeof DashboardProjectsSlugRoute
-  DashboardProjectsNewRoute: typeof DashboardProjectsNewRoute
+  DashboardProjectsSlugRoute: typeof DashboardProjectsSlugRouteWithChildren
   DashboardProjectsIndexRoute: typeof DashboardProjectsIndexRoute
 }
 
 const DashboardProjectsRouteChildren: DashboardProjectsRouteChildren = {
-  DashboardProjectsSlugRoute: DashboardProjectsSlugRoute,
-  DashboardProjectsNewRoute: DashboardProjectsNewRoute,
+  DashboardProjectsSlugRoute: DashboardProjectsSlugRouteWithChildren,
   DashboardProjectsIndexRoute: DashboardProjectsIndexRoute,
 }
 

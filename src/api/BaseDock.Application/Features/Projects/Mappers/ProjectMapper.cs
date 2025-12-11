@@ -2,15 +2,27 @@ namespace BaseDock.Application.Features.Projects.Mappers;
 
 using BaseDock.Application.Features.Projects.DTOs;
 using BaseDock.Domain.Entities;
-using Riok.Mapperly.Abstractions;
 
-[Mapper]
-public static partial class ProjectMapper
+public static class ProjectMapper
 {
-    [MapperIgnoreSource(nameof(Project.CreatedBy))]
-    public static partial ProjectDto ToDto(this Project entity);
+    public static ProjectDto ToDto(this Project entity)
+    {
+        return new ProjectDto(
+            entity.Id,
+            entity.Name,
+            entity.Slug,
+            entity.Description,
+            entity.CreatedByUserId,
+            entity.CreatedAt,
+            entity.UpdatedAt,
+            entity.Environments.Count,
+            entity.Members.ToDtos());
+    }
 
-    public static partial IEnumerable<ProjectDto> ToDtos(this IEnumerable<Project> entities);
+    public static IEnumerable<ProjectDto> ToDtos(this IEnumerable<Project> entities)
+    {
+        return entities.Select(e => e.ToDto());
+    }
 
     public static ProjectMemberDto ToDto(this ProjectMember member)
     {

@@ -1,4 +1,5 @@
-import { createFileRoute, Link, useNavigate } from "@tanstack/react-router"
+import { useState } from "react"
+import { createFileRoute, Link } from "@tanstack/react-router"
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query"
 import { useAuth } from "@/contexts/auth-context"
 import {
@@ -25,30 +26,27 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import { Button } from "@/components/ui/button"
-import { Folder, MoreHorizontal, Pencil, Trash2, Users } from "lucide-react"
+import { Folder, MoreHorizontal, Pencil, Trash2, Users, Layers } from "lucide-react"
 import { getProjects, deleteProject } from "@/api/sdk.gen"
 import type { ProjectDto } from "@/api/types.gen"
+import { CreateProjectDialog } from "@/components/create-project-dialog"
 
-function CreateProjectButton() {
-  const navigate = useNavigate()
+function CreateProjectButton({ onClick }: { onClick: () => void }) {
   return (
-    <Button onClick={() => navigate({ to: "/projects/new" })}>
+    <Button onClick={onClick}>
       Create Project
     </Button>
   )
 }
 
 export const Route = createFileRoute("/_dashboard/projects/")({
-  beforeLoad: () => ({
-    getActions: ({ isAdmin }: { isAdmin: boolean }) =>
-      isAdmin ? <CreateProjectButton /> : null,
-  }),
   component: ProjectsPage,
 })
 
 function ProjectsPage() {
   const { user, isAuthenticated } = useAuth()
   const queryClient = useQueryClient()
+  const [createDialogOpen, setCreateDialogOpen] = useState(false)
 
   const isAdmin = user?.isAdmin ?? false
 
@@ -84,6 +82,11 @@ function ProjectsPage() {
   return (
     <>
       <div className="flex flex-1 flex-col gap-4 p-4 pt-0">
+        {isAdmin && (
+          <div className="flex justify-end">
+            <CreateProjectButton onClick={() => setCreateDialogOpen(true)} />
+          </div>
+        )}
         {error ? (
           <div className="text-destructive">Failed to load projects</div>
         ) : !projects || projects.length === 0 ? (
@@ -99,7 +102,7 @@ function ProjectsPage() {
             </EmptyHeader>
             {isAdmin && (
               <EmptyContent>
-                <CreateProjectButton />
+                <CreateProjectButton onClick={() => setCreateDialogOpen(true)} />
               </EmptyContent>
             )}
           </Empty>
@@ -154,9 +157,15 @@ function ProjectsPage() {
                   )}
                 </CardHeader>
                 <CardContent>
-                  <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                    <Users className="h-4 w-4" />
-                    <span>{project.members.length} member{project.members.length !== 1 ? "s" : ""}</span>
+                  <div className="flex items-center gap-4 text-sm text-muted-foreground">
+                    <div className="flex items-center gap-2">
+                      <Layers className="h-4 w-4" />
+                      <span>{project.environmentCount} environment{project.environmentCount !== 1 ? "s" : ""}</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <Users className="h-4 w-4" />
+                      <span>{project.members.length} member{project.members.length !== 1 ? "s" : ""}</span>
+                    </div>
                   </div>
                 </CardContent>
               </Card>
@@ -164,6 +173,10 @@ function ProjectsPage() {
           </div>
         )}
       </div>
+      <CreateProjectDialog
+        open={createDialogOpen}
+        onOpenChange={setCreateDialogOpen}
+      />
     </>
   )
 }

@@ -160,9 +160,6 @@ public class ProjectModule : ICarterModule
         var command = new CreateProjectCommand(
             request.Name,
             request.Description,
-            request.ProjectType,
-            request.ComposeFileContent,
-            request.DockerImageConfig,
             request.MemberIds,
             userId);
         var result = await dispatcher.SendAsync(command, cancellationToken);

@@ -7,12 +7,23 @@ import {
   BreadcrumbPage,
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb"
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
 import { Separator } from "@/components/ui/separator"
 import { SidebarTrigger } from "@/components/ui/sidebar"
+import { Link } from "@tanstack/react-router"
+import { ChevronDown } from "lucide-react"
 
 export interface BreadcrumbItem {
   label: string
   href?: string
+  dropdown?: {
+    items: { label: string; href: string }[]
+  }
 }
 
 interface DashboardHeaderProps {
@@ -37,7 +48,21 @@ export function DashboardHeader({ breadcrumbs, actions }: DashboardHeaderProps) 
               return (
                 <span key={item.label} className="contents">
                   <BreadcrumbItemUI className={isLast ? undefined : "hidden md:block"}>
-                    {isLast || !item.href ? (
+                    {item.dropdown ? (
+                      <DropdownMenu>
+                        <DropdownMenuTrigger className="flex items-center gap-1 text-sm font-medium">
+                          {item.label}
+                          <ChevronDown className="h-3 w-3" />
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="start">
+                          {item.dropdown.items.map((dropdownItem) => (
+                            <DropdownMenuItem key={dropdownItem.href} asChild>
+                              <Link to={dropdownItem.href}>{dropdownItem.label}</Link>
+                            </DropdownMenuItem>
+                          ))}
+                        </DropdownMenuContent>
+                      </DropdownMenu>
+                    ) : isLast || !item.href ? (
                       <BreadcrumbPage>{item.label}</BreadcrumbPage>
                     ) : (
                       <BreadcrumbLink href={item.href}>{item.label}</BreadcrumbLink>

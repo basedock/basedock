@@ -1,7 +1,6 @@
 namespace BaseDock.Infrastructure.Persistence.Configurations;
 
 using BaseDock.Domain.Entities;
-using BaseDock.Domain.Enums;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
@@ -36,12 +35,6 @@ public class ProjectConfiguration : IEntityTypeConfiguration<Project>
             .HasColumnName("description")
             .HasMaxLength(500);
 
-        builder.Property(p => p.ProjectType)
-            .HasColumnName("project_type")
-            .HasConversion<string>()
-            .HasMaxLength(20)
-            .HasDefaultValue(ProjectType.ComposeFile);
-
         builder.Property(p => p.CreatedByUserId)
             .HasColumnName("created_by_user_id")
             .IsRequired();
@@ -53,29 +46,6 @@ public class ProjectConfiguration : IEntityTypeConfiguration<Project>
         builder.Property(p => p.UpdatedAt)
             .HasColumnName("updated_at");
 
-        // Docker Compose configuration
-        builder.Property(p => p.ComposeFileContent)
-            .HasColumnName("compose_file_content")
-            .HasColumnType("text");
-
-        // Docker Image configuration (JSON)
-        builder.Property(p => p.DockerImageConfig)
-            .HasColumnName("docker_image_config")
-            .HasColumnType("jsonb");
-
-        builder.Property(p => p.DeploymentStatus)
-            .HasColumnName("deployment_status")
-            .HasConversion<string>()
-            .HasMaxLength(50)
-            .HasDefaultValue(DeploymentStatus.NotDeployed);
-
-        builder.Property(p => p.LastDeployedAt)
-            .HasColumnName("last_deployed_at");
-
-        builder.Property(p => p.LastDeploymentError)
-            .HasColumnName("last_deployment_error")
-            .HasMaxLength(2000);
-
         // Relationships
         builder.HasOne(p => p.CreatedBy)
             .WithMany()
@@ -85,6 +55,11 @@ public class ProjectConfiguration : IEntityTypeConfiguration<Project>
         builder.HasMany(p => p.Members)
             .WithOne(pm => pm.Project)
             .HasForeignKey(pm => pm.ProjectId)
+            .OnDelete(DeleteBehavior.Cascade);
+
+        builder.HasMany(p => p.Environments)
+            .WithOne(e => e.Project)
+            .HasForeignKey(e => e.ProjectId)
             .OnDelete(DeleteBehavior.Cascade);
     }
 }
