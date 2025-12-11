@@ -63,7 +63,7 @@ export function NavProjects() {
             {projects.slice(0, 5).map((project) => (
               <SidebarMenuItem key={project.id}>
                 <SidebarMenuButton asChild>
-                  <Link to="/projects/$id" params={{ id: project.id }}>
+                  <Link to="/projects/$slug" params={{ slug: project.slug }}>
                     <Folder />
                     <span>{project.name}</span>
                   </Link>
@@ -82,7 +82,7 @@ export function NavProjects() {
                       align={isMobile ? "end" : "start"}
                     >
                       <DropdownMenuItem asChild>
-                        <Link to="/projects/$id" params={{ id: project.id }}>
+                        <Link to="/projects/$slug" params={{ slug: project.slug }}>
                           <Pencil className="text-muted-foreground" />
                           <span>Edit Project</span>
                         </Link>

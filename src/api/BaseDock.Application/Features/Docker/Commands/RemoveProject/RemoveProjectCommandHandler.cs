@@ -29,12 +29,12 @@ public sealed class RemoveProjectCommandHandler(
             return Result.Failure<DeploymentStatusDto>(Error.NotFound("Project", command.ProjectId));
         }
 
-        var composeFilePath = fileService.GetComposeFilePath(project.Name);
+        var composeFilePath = fileService.GetComposeFilePath(project.Slug);
 
         // Remove containers if compose file exists
         if (File.Exists(composeFilePath))
         {
-            var removeResult = await dockerService.RemoveAsync(project.Name, composeFilePath, cancellationToken);
+            var removeResult = await dockerService.RemoveAsync(project.Slug, composeFilePath, cancellationToken);
 
             if (removeResult.IsFailure)
             {
@@ -43,7 +43,7 @@ public sealed class RemoveProjectCommandHandler(
         }
 
         // Delete project directory
-        await fileService.DeleteProjectDirectoryAsync(project.Name, cancellationToken);
+        await fileService.DeleteProjectDirectoryAsync(project.Slug, cancellationToken);
 
         project.SetDeploymentStatus(DeploymentStatus.NotDeployed);
         await db.SaveChangesAsync(cancellationToken);

@@ -9,7 +9,9 @@ using BaseDock.Application.Features.Projects.Commands.DeleteProject;
 using BaseDock.Application.Features.Projects.Commands.RemoveProjectMembers;
 using BaseDock.Application.Features.Projects.Commands.UpdateProject;
 using BaseDock.Application.Features.Projects.DTOs;
+using BaseDock.Application.Features.Projects.Queries.CheckSlugAvailability;
 using BaseDock.Application.Features.Projects.Queries.GetProjectById;
+using BaseDock.Application.Features.Projects.Queries.GetProjectBySlug;
 using BaseDock.Application.Features.Projects.Queries.GetProjects;
 using Carter;
 
@@ -31,6 +33,18 @@ public class ProjectModule : ICarterModule
             .Produces<ProjectDto>()
             .ProducesProblem(StatusCodes.Status404NotFound)
             .ProducesProblem(StatusCodes.Status403Forbidden);
+
+        group.MapGet("/slug/{slug}", GetProjectBySlug)
+            .WithName("GetProjectBySlug")
+            .WithSummary("Get project by slug")
+            .Produces<ProjectDto>()
+            .ProducesProblem(StatusCodes.Status404NotFound)
+            .ProducesProblem(StatusCodes.Status403Forbidden);
+
+        group.MapGet("/check-slug", CheckSlugAvailability)
+            .WithName("CheckSlugAvailability")
+            .WithSummary("Check if a slug is available")
+            .Produces<SlugAvailabilityResponse>();
 
         group.MapPost("/", CreateProject)
             .WithName("CreateProject")
@@ -106,6 +120,28 @@ public class ProjectModule : ICarterModule
         return result.ToHttpResult();
     }
 
+    private static async Task<IResult> GetProjectBySlug(
+        string slug,
+        ClaimsPrincipal user,
+        IDispatcher dispatcher,
+        CancellationToken cancellationToken = default)
+    {
+        var userId = GetUserId(user);
+        var query = new GetProjectBySlugQuery(slug, userId);
+        var result = await dispatcher.QueryAsync(query, cancellationToken);
+        return result.ToHttpResult();
+    }
+
+    private static async Task<IResult> CheckSlugAvailability(
+        [AsParameters] CheckSlugRequest request,
+        IDispatcher dispatcher,
+        CancellationToken cancellationToken = default)
+    {
+        var query = new CheckSlugAvailabilityQuery(request.Slug);
+        var result = await dispatcher.QueryAsync(query, cancellationToken);
+        return result.ToHttpResult();
+    }
+
     private static async Task<IResult> CreateProject(
         CreateProjectRequest request,
         ClaimsPrincipal user,
@@ -123,11 +159,15 @@ public class ProjectModule : ICarterModule
         var userId = GetUserId(user);
         var command = new CreateProjectCommand(
             request.Name,
+            request.Slug,
             request.Description,
+            request.ProjectType,
+            request.ComposeFileContent,
+            request.DockerImageConfig,
             request.MemberIds,
             userId);
         var result = await dispatcher.SendAsync(command, cancellationToken);
-        return result.ToCreatedResult($"/api/projects/{result.Value?.Id}");
+        return result.ToCreatedResult($"/api/projects/{result.Value?.Slug}");
     }
 
     private static async Task<IResult> UpdateProject(

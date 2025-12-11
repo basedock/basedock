@@ -7,7 +7,11 @@ public sealed class Project : Entity
 {
     public string Name { get; private set; } = null!;
 
+    public string Slug { get; private set; } = null!;
+
     public string? Description { get; private set; }
+
+    public ProjectType ProjectType { get; private set; }
 
     public Guid CreatedByUserId { get; private set; }
 
@@ -17,6 +21,9 @@ public sealed class Project : Entity
 
     // Docker Compose configuration
     public string? ComposeFileContent { get; private set; }
+
+    // Docker Image configuration (stored as JSON)
+    public string? DockerImageConfig { get; private set; }
 
     public DeploymentStatus DeploymentStatus { get; private set; } = DeploymentStatus.NotDeployed;
 
@@ -33,12 +40,19 @@ public sealed class Project : Entity
     {
     }
 
-    public static Project Create(string name, string? description, Guid createdByUserId)
+    public static Project Create(
+        string name,
+        string slug,
+        string? description,
+        ProjectType projectType,
+        Guid createdByUserId)
     {
         return new Project
         {
             Name = name,
+            Slug = slug,
             Description = description,
+            ProjectType = projectType,
             CreatedByUserId = createdByUserId,
             CreatedAt = DateTime.UtcNow
         };
@@ -48,6 +62,18 @@ public sealed class Project : Entity
     {
         Name = name;
         Description = description;
+        UpdatedAt = DateTime.UtcNow;
+    }
+
+    public void UpdateSlug(string slug)
+    {
+        Slug = slug;
+        UpdatedAt = DateTime.UtcNow;
+    }
+
+    public void SetDockerImageConfig(string? config)
+    {
+        DockerImageConfig = config;
         UpdatedAt = DateTime.UtcNow;
     }
 

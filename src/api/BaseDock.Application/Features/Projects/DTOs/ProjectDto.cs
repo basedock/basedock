@@ -5,11 +5,14 @@ using BaseDock.Domain.Enums;
 public sealed record ProjectDto(
     Guid Id,
     string Name,
+    string Slug,
     string? Description,
+    ProjectType ProjectType,
     Guid CreatedByUserId,
     DateTime CreatedAt,
     DateTime? UpdatedAt,
     string? ComposeFileContent,
+    string? DockerImageConfig,
     DeploymentStatus DeploymentStatus,
     DateTime? LastDeployedAt,
     string? LastDeploymentError,
@@ -23,7 +26,11 @@ public sealed record ProjectMemberDto(
 
 public sealed record CreateProjectRequest(
     string Name,
+    string Slug,
     string? Description,
+    ProjectType ProjectType,
+    string? ComposeFileContent,
+    string? DockerImageConfig,
     IEnumerable<Guid>? MemberIds);
 
 public sealed record UpdateProjectRequest(
@@ -38,3 +45,10 @@ public sealed record RemoveMembersRequest(
 
 public sealed record UpdateComposeFileRequest(
     string ComposeFileContent);
+
+public sealed record CheckSlugRequest(
+    string Slug);
+
+public sealed record SlugAvailabilityResponse(
+    bool IsAvailable,
+    string? SuggestedSlug);

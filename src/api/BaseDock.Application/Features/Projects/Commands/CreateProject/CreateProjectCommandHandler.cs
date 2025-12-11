@@ -5,6 +5,7 @@ using BaseDock.Application.Abstractions.Messaging;
 using BaseDock.Application.Features.Projects.DTOs;
 using BaseDock.Application.Features.Projects.Mappers;
 using BaseDock.Domain.Entities;
+using BaseDock.Domain.Enums;
 using BaseDock.Domain.Primitives;
 using Microsoft.EntityFrameworkCore;
 
@@ -15,6 +16,7 @@ public sealed class CreateProjectCommandHandler(IApplicationDbContext db)
         CreateProjectCommand command,
         CancellationToken cancellationToken = default)
     {
+        // Check name uniqueness
         var nameExists = await db.Projects
             .AnyAsync(p => p.Name == command.Name, cancellationToken);
 
@@ -24,10 +26,32 @@ public sealed class CreateProjectCommandHandler(IApplicationDbContext db)
                 Error.Conflict("Project.NameExists", $"A project with name '{command.Name}' already exists."));
         }
 
+        // Check slug uniqueness
+        var slugExists = await db.Projects
+            .AnyAsync(p => p.Slug == command.Slug, cancellationToken);
+
+        if (slugExists)
+        {
+            return Result.Failure<ProjectDto>(
+                Error.Conflict("Project.SlugExists", $"A project with slug '{command.Slug}' already exists."));
+        }
+
         var project = Project.Create(
             command.Name,
+            command.Slug,
             command.Description,
+            command.ProjectType,
             command.CreatedByUserId);
+
+        // Set type-specific configuration
+        if (command.ProjectType == ProjectType.ComposeFile && !string.IsNullOrWhiteSpace(command.ComposeFileContent))
+        {
+            project.SetComposeFile(command.ComposeFileContent);
+        }
+        else if (command.ProjectType == ProjectType.DockerImage && !string.IsNullOrWhiteSpace(command.DockerImageConfig))
+        {
+            project.SetDockerImageConfig(command.DockerImageConfig);
+        }
 
         // Add the creator as a member
         project.AddMember(command.CreatedByUserId);

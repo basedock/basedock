@@ -29,7 +29,7 @@ public sealed class RestartProjectCommandHandler(
             return Result.Failure<DeploymentStatusDto>(Error.NotFound("Project", command.ProjectId));
         }
 
-        var composeFilePath = fileService.GetComposeFilePath(project.Name);
+        var composeFilePath = fileService.GetComposeFilePath(project.Slug);
 
         if (!File.Exists(composeFilePath))
         {
@@ -48,7 +48,7 @@ public sealed class RestartProjectCommandHandler(
             []);
         await notificationService.NotifyStatusChangedAsync(project.Id, deployingStatus, cancellationToken);
 
-        var restartResult = await dockerService.RestartAsync(project.Name, composeFilePath, cancellationToken);
+        var restartResult = await dockerService.RestartAsync(project.Slug, composeFilePath, cancellationToken);
 
         if (restartResult.IsFailure)
         {
@@ -58,7 +58,7 @@ public sealed class RestartProjectCommandHandler(
         }
 
         // Get container status
-        var statusResult = await dockerService.GetStatusAsync(project.Name, cancellationToken);
+        var statusResult = await dockerService.GetStatusAsync(project.Slug, cancellationToken);
         var containers = statusResult.IsSuccess ? statusResult.Value : [];
         var finalStatus = DetermineOverallStatus(containers);
 

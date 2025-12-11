@@ -24,9 +24,23 @@ public class ProjectConfiguration : IEntityTypeConfiguration<Project>
         builder.HasIndex(p => p.Name)
             .IsUnique();
 
+        builder.Property(p => p.Slug)
+            .HasColumnName("slug")
+            .HasMaxLength(120)
+            .IsRequired();
+
+        builder.HasIndex(p => p.Slug)
+            .IsUnique();
+
         builder.Property(p => p.Description)
             .HasColumnName("description")
             .HasMaxLength(500);
+
+        builder.Property(p => p.ProjectType)
+            .HasColumnName("project_type")
+            .HasConversion<string>()
+            .HasMaxLength(20)
+            .HasDefaultValue(ProjectType.ComposeFile);
 
         builder.Property(p => p.CreatedByUserId)
             .HasColumnName("created_by_user_id")
@@ -43,6 +57,11 @@ public class ProjectConfiguration : IEntityTypeConfiguration<Project>
         builder.Property(p => p.ComposeFileContent)
             .HasColumnName("compose_file_content")
             .HasColumnType("text");
+
+        // Docker Image configuration (JSON)
+        builder.Property(p => p.DockerImageConfig)
+            .HasColumnName("docker_image_config")
+            .HasColumnType("jsonb");
 
         builder.Property(p => p.DeploymentStatus)
             .HasColumnName("deployment_status")

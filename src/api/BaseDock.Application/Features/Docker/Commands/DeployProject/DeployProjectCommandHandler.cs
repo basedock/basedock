@@ -49,7 +49,7 @@ public sealed class DeployProjectCommandHandler(
 
         // Write compose file to disk
         var writeResult = await fileService.WriteComposeFileAsync(
-            project.Name,
+            project.Slug,
             project.ComposeFileContent,
             cancellationToken);
 
@@ -61,8 +61,8 @@ public sealed class DeployProjectCommandHandler(
         }
 
         // Deploy using docker compose
-        var composeFilePath = fileService.GetComposeFilePath(project.Name);
-        var deployResult = await dockerService.DeployAsync(project.Name, composeFilePath, cancellationToken);
+        var composeFilePath = fileService.GetComposeFilePath(project.Slug);
+        var deployResult = await dockerService.DeployAsync(project.Slug, composeFilePath, cancellationToken);
 
         if (deployResult.IsFailure)
         {
@@ -80,7 +80,7 @@ public sealed class DeployProjectCommandHandler(
         }
 
         // Get container status
-        var statusResult = await dockerService.GetStatusAsync(project.Name, cancellationToken);
+        var statusResult = await dockerService.GetStatusAsync(project.Slug, cancellationToken);
         var containers = statusResult.IsSuccess ? statusResult.Value : [];
         var finalStatus = DetermineOverallStatus(containers);
 

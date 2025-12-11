@@ -1,4 +1,4 @@
-import { createFileRoute, Link } from "@tanstack/react-router"
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router"
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query"
 import { useAuth } from "@/contexts/auth-context"
 import {
@@ -28,16 +28,13 @@ import { Button } from "@/components/ui/button"
 import { Folder, MoreHorizontal, Pencil, Trash2, Users } from "lucide-react"
 import { getProjects, deleteProject } from "@/api/sdk.gen"
 import type { ProjectDto } from "@/api/types.gen"
-import { CreateProjectDialog } from "@/components/create-project-dialog"
-import { useState } from "react"
 
 function CreateProjectButton() {
-  const [open, setOpen] = useState(false)
+  const navigate = useNavigate()
   return (
-    <>
-      <Button onClick={() => setOpen(true)}>Create Project</Button>
-      <CreateProjectDialog open={open} onOpenChange={setOpen} />
-    </>
+    <Button onClick={() => navigate({ to: "/projects/new" })}>
+      Create Project
+    </Button>
   )
 }
 
@@ -113,8 +110,8 @@ function ProjectsPage() {
                 <CardHeader>
                   <CardTitle>
                     <Link
-                      to="/projects/$id"
-                      params={{ id: project.id }}
+                      to="/projects/$slug"
+                      params={{ slug: project.slug }}
                       className="hover:underline"
                     >
                       {project.name}
@@ -134,7 +131,7 @@ function ProjectsPage() {
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end">
                           <DropdownMenuItem asChild>
-                            <Link to="/projects/$id" params={{ id: project.id }}>
+                            <Link to="/projects/$slug" params={{ slug: project.slug }}>
                               <Pencil className="mr-2 h-4 w-4" />
                               Edit
                             </Link>

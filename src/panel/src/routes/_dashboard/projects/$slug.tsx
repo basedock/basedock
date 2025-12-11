@@ -20,7 +20,7 @@ import {
   TableRow,
 } from "@/components/ui/table"
 import { Trash2, UserPlus, Wifi, WifiOff, MoreHorizontal } from "lucide-react"
-import { getProjectById, updateProject, removeProjectMembers, addProjectMembers, getUsers, getProjectDockerStatus, deployProject } from "@/api/sdk.gen"
+import { getProjectById, getProjectBySlug, updateProject, removeProjectMembers, addProjectMembers, getUsers, getProjectDockerStatus, deployProject } from "@/api/sdk.gen"
 import type { ProjectDto, UserDto } from "@/api/types.gen"
 import { useForm } from "@tanstack/react-form"
 import { z } from "zod"
@@ -62,9 +62,15 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 
-export const Route = createFileRoute("/_dashboard/projects/$id")({
+export const Route = createFileRoute("/_dashboard/projects/$slug")({
   loader: async ({ params }) => {
-    const response = await getProjectById({ path: { id: params.id } })
+    // Check if it's a GUID (backwards compatibility) or a slug
+    const isGuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(params.slug)
+
+    const response = isGuid
+      ? await getProjectById({ path: { id: params.slug } })
+      : await getProjectBySlug({ path: { slug: params.slug } })
+
     if (response.error) throw new Error("Project not found")
     return response.data as ProjectDto
   },
@@ -83,8 +89,8 @@ const projectSchema = z.object({
 })
 
 function ProjectDetailPage() {
-  const { id } = Route.useParams()
   const project = Route.useLoaderData()
+  const projectId = project.id // Use project ID from loaded data for API calls
   const router = useRouter()
   const { user, isAuthenticated } = useAuth()
   const queryClient = useQueryClient()
@@ -93,13 +99,13 @@ function ProjectDetailPage() {
   const [activeTab, setActiveTab] = useState("overview")
 
   // SignalR connection for real-time updates
-  const { isConnected } = useDeploymentHub({ projectId: id })
+  const { isConnected } = useDeploymentHub({ projectId })
 
   // Query for live Docker status
   const { data: dockerStatus } = useQuery({
-    queryKey: ["project-status", id],
+    queryKey: ["project-status", projectId],
     queryFn: async () => {
-      const response = await getProjectDockerStatus({ path: { projectId: id } })
+      const response = await getProjectDockerStatus({ path: { projectId } })
       if (response.error) return null
       return response.data
     },
@@ -119,7 +125,7 @@ function ProjectDetailPage() {
   const updateMutation = useMutation({
     mutationFn: async (data: { name: string; description?: string }) => {
       const response = await updateProject({
-        path: { id },
+        path: { id: projectId },
         body: { name: data.name, description: data.description ?? null },
       })
       if (response.error) throw new Error("Failed to update project")
@@ -134,7 +140,7 @@ function ProjectDetailPage() {
   const removeMemberMutation = useMutation({
     mutationFn: async (userId: string) => {
       const response = await removeProjectMembers({
-        path: { id },
+        path: { id: projectId },
         body: { userIds: [userId] },
       })
       if (response.error) throw new Error("Failed to remove member")
@@ -148,7 +154,7 @@ function ProjectDetailPage() {
   const addMemberMutation = useMutation({
     mutationFn: async (userId: string) => {
       const response = await addProjectMembers({
-        path: { id },
+        path: { id: projectId },
         body: { userIds: [userId] },
       })
       if (response.error) throw new Error("Failed to add member")
@@ -163,12 +169,12 @@ function ProjectDetailPage() {
 
   const deployMutation = useMutation({
     mutationFn: async () => {
-      const response = await deployProject({ path: { projectId: id } })
+      const response = await deployProject({ path: { projectId } })
       if (response.error) throw new Error("Failed to deploy project")
       return response.data
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["project-status", id] })
+      queryClient.invalidateQueries({ queryKey: ["project-status", projectId] })
     },
   })
 
@@ -300,7 +306,7 @@ function ProjectDetailPage() {
                 </CardHeader>
                 <CardContent>
                   <ComposeEditor
-                    projectId={id}
+                    projectId={projectId}
                     initialContent={project.composeFileContent}
                   />
                 </CardContent>
@@ -323,7 +329,7 @@ function ProjectDetailPage() {
                 <CardDescription>View real-time container logs</CardDescription>
               </CardHeader>
               <CardContent>
-                <LogsViewer projectId={id} autoRefresh={isConnected} />
+                <LogsViewer projectId={projectId} autoRefresh={isConnected} />
               </CardContent>
             </Card>
           </TabsContent>

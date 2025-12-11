@@ -25,7 +25,7 @@ public sealed class GetProjectLogsQueryHandler(
         }
 
         return await dockerService.GetLogsAsync(
-            project.Name,
+            project.Slug,
             query.ServiceName,
             query.TailLines,
             cancellationToken);

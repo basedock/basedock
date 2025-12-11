@@ -554,6 +554,88 @@
         }
       }
     },
+    "/api/projects/slug/{slug}": {
+      "get": {
+        "tags": [
+          "Projects"
+        ],
+        "summary": "Get project by slug",
+        "operationId": "GetProjectBySlug",
+        "parameters": [
+          {
+            "name": "slug",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProjectDto"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/projects/check-slug": {
+      "get": {
+        "tags": [
+          "Projects"
+        ],
+        "summary": "Check if a slug is available",
+        "operationId": "CheckSlugAvailability",
+        "parameters": [
+          {
+            "name": "Slug",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SlugAvailabilityResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/projects/{id}/members": {
       "post": {
         "tags": [
@@ -1223,7 +1305,11 @@
       "CreateProjectRequest": {
         "required": [
           "name",
+          "slug",
           "description",
+          "projectType",
+          "composeFileContent",
+          "dockerImageConfig",
           "memberIds"
         ],
         "type": "object",
@@ -1231,7 +1317,25 @@
           "name": {
             "type": "string"
           },
+          "slug": {
+            "type": "string"
+          },
           "description": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "projectType": {
+            "$ref": "#/components/schemas/ProjectType"
+          },
+          "composeFileContent": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "dockerImageConfig": {
             "type": [
               "null",
               "string"
@@ -1458,11 +1562,14 @@
         "required": [
           "id",
           "name",
+          "slug",
           "description",
+          "projectType",
           "createdByUserId",
           "createdAt",
           "updatedAt",
           "composeFileContent",
+          "dockerImageConfig",
           "deploymentStatus",
           "lastDeployedAt",
           "lastDeploymentError",
@@ -1477,11 +1584,17 @@
           "name": {
             "type": "string"
           },
+          "slug": {
+            "type": "string"
+          },
           "description": {
             "type": [
               "null",
               "string"
             ]
+          },
+          "projectType": {
+            "$ref": "#/components/schemas/ProjectType"
           },
           "createdByUserId": {
             "type": "string",
@@ -1499,6 +1612,12 @@
             "format": "date-time"
           },
           "composeFileContent": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "dockerImageConfig": {
             "type": [
               "null",
               "string"
@@ -1553,6 +1672,9 @@
           }
         }
       },
+      "ProjectType": {
+        "type": "integer"
+      },
       "RefreshApiResponse": {
         "required": [
           "accessToken",
@@ -1585,6 +1707,24 @@
               "type": "string",
               "format": "uuid"
             }
+          }
+        }
+      },
+      "SlugAvailabilityResponse": {
+        "required": [
+          "isAvailable",
+          "suggestedSlug"
+        ],
+        "type": "object",
+        "properties": {
+          "isAvailable": {
+            "type": "boolean"
+          },
+          "suggestedSlug": {
+            "type": [
+              "null",
+              "string"
+            ]
           }
         }
       },

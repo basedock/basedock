@@ -27,7 +27,7 @@ public sealed class GetProjectStatusQueryHandler(
         }
 
         // Get live container status from Docker
-        var statusResult = await dockerService.GetStatusAsync(project.Name, cancellationToken);
+        var statusResult = await dockerService.GetStatusAsync(project.Slug, cancellationToken);
         var containers = statusResult.IsSuccess ? statusResult.Value : [];
 
         // Determine live status from containers

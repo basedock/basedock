@@ -29,7 +29,7 @@ public sealed class StopProjectCommandHandler(
             return Result.Failure<DeploymentStatusDto>(Error.NotFound("Project", command.ProjectId));
         }
 
-        var composeFilePath = fileService.GetComposeFilePath(project.Name);
+        var composeFilePath = fileService.GetComposeFilePath(project.Slug);
 
         if (!File.Exists(composeFilePath))
         {
@@ -37,7 +37,7 @@ public sealed class StopProjectCommandHandler(
                 Error.Validation("Project.NotDeployed", "Project has not been deployed yet."));
         }
 
-        var stopResult = await dockerService.StopAsync(project.Name, composeFilePath, cancellationToken);
+        var stopResult = await dockerService.StopAsync(project.Slug, composeFilePath, cancellationToken);
 
         if (stopResult.IsFailure)
         {
@@ -48,7 +48,7 @@ public sealed class StopProjectCommandHandler(
         await db.SaveChangesAsync(cancellationToken);
 
         // Get container status
-        var statusResult = await dockerService.GetStatusAsync(project.Name, cancellationToken);
+        var statusResult = await dockerService.GetStatusAsync(project.Slug, cancellationToken);
         var containers = statusResult.IsSuccess ? statusResult.Value : [];
 
         var result = new DeploymentStatusDto(
