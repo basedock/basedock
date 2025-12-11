@@ -50,6 +50,7 @@ public static class DependencyInjection
         // Docker Services
         services.AddSingleton<IProjectFileService, ProjectFileService>();
         services.AddSingleton<IDockerComposeService, DockerComposeService>();
+        services.AddSingleton<IDockerContainerService, DockerContainerService>();
 
         return services;
     }

@@ -4,13 +4,15 @@ using BaseDock.Application.Abstractions.Data;
 using BaseDock.Application.Abstractions.Docker;
 using BaseDock.Application.Abstractions.Messaging;
 using BaseDock.Application.Features.Docker.DTOs;
+using BaseDock.Domain.Entities;
 using BaseDock.Domain.Enums;
 using BaseDock.Domain.Primitives;
 using Microsoft.EntityFrameworkCore;
 
 public sealed class GetProjectStatusQueryHandler(
     IApplicationDbContext db,
-    IDockerComposeService dockerService)
+    IDockerComposeService dockerComposeService,
+    IDockerContainerService dockerContainerService)
     : IQueryHandler<GetProjectStatusQuery, Result<DeploymentStatusDto>>
 {
     public async Task<Result<DeploymentStatusDto>> HandleAsync(
@@ -26,8 +28,21 @@ public sealed class GetProjectStatusQueryHandler(
             return Result.Failure<DeploymentStatusDto>(Error.NotFound("Project", query.ProjectId));
         }
 
+        return project.ProjectType switch
+        {
+            ProjectType.ComposeFile => await GetComposeProjectStatusAsync(project, cancellationToken),
+            ProjectType.DockerImage => await GetDockerImageProjectStatusAsync(project, cancellationToken),
+            _ => Result.Failure<DeploymentStatusDto>(
+                Error.Validation("Project.InvalidType", "Unknown project type."))
+        };
+    }
+
+    private async Task<Result<DeploymentStatusDto>> GetComposeProjectStatusAsync(
+        Project project,
+        CancellationToken cancellationToken)
+    {
         // Get live container status from Docker
-        var statusResult = await dockerService.GetStatusAsync(project.Slug, cancellationToken);
+        var statusResult = await dockerComposeService.GetStatusAsync(project.Slug, cancellationToken);
         var containers = statusResult.IsSuccess ? statusResult.Value : [];
 
         // Determine live status from containers
@@ -45,6 +60,34 @@ public sealed class GetProjectStatusQueryHandler(
             project.LastDeploymentError,
             containers));
     }
+
+    private async Task<Result<DeploymentStatusDto>> GetDockerImageProjectStatusAsync(
+        Project project,
+        CancellationToken cancellationToken)
+    {
+        var containerName = GetContainerName(project.Slug);
+
+        // Get live container status from Docker
+        var statusResult = await dockerContainerService.GetStatusAsync(containerName, cancellationToken);
+        var containers = statusResult.IsSuccess ? new[] { statusResult.Value } : Array.Empty<ContainerInfo>();
+
+        // Determine live status from containers
+        var liveStatus = DetermineOverallStatus(containers);
+
+        // If live status differs from stored status and project was deployed,
+        // return the live status (containers might have been stopped externally)
+        var effectiveStatus = project.DeploymentStatus == DeploymentStatus.NotDeployed
+            ? project.DeploymentStatus
+            : liveStatus;
+
+        return Result.Success(new DeploymentStatusDto(
+            effectiveStatus,
+            project.LastDeployedAt,
+            project.LastDeploymentError,
+            containers));
+    }
+
+    private static string GetContainerName(string projectSlug) => $"basedock-{projectSlug}";
 
     private static DeploymentStatus DetermineOverallStatus(IEnumerable<ContainerInfo> containers)
     {

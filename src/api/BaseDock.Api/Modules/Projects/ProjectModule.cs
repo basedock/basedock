@@ -159,7 +159,6 @@ public class ProjectModule : ICarterModule
         var userId = GetUserId(user);
         var command = new CreateProjectCommand(
             request.Name,
-            request.Slug,
             request.Description,
             request.ProjectType,
             request.ComposeFileContent,

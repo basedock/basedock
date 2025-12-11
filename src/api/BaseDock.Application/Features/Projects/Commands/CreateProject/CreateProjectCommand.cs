@@ -7,7 +7,6 @@ using BaseDock.Domain.Primitives;
 
 public sealed record CreateProjectCommand(
     string Name,
-    string Slug,
     string? Description,
     ProjectType ProjectType,
     string? ComposeFileContent,

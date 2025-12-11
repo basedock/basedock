@@ -8,7 +8,6 @@ import {
   CardTitle,
   CardDescription,
 } from "@/components/ui/card"
-import { Progress } from "@/components/ui/progress"
 import { WizardStepIndicator } from "./wizard-step-indicator"
 import { StepProjectType } from "./steps/step-project-type"
 import { StepProjectDetails } from "./steps/step-project-details"
@@ -26,7 +25,6 @@ const STEPS = [
 const initialFormData: CreateProjectFormData = {
   projectType: null,
   name: "",
-  slug: "",
   description: "",
   // Docker Image fields
   image: "",
@@ -53,7 +51,6 @@ export function CreateProjectWizard() {
       const response = await createProject({
         body: {
           name: data.name,
-          slug: data.slug,
           description: data.description || null,
           projectType: data.projectType!,
           composeFileContent:
@@ -99,8 +96,6 @@ export function CreateProjectWizard() {
     createMutation.mutate(formData)
   }
 
-  const progress = ((currentStep + 1) / STEPS.length) * 100
-
   return (
     <div className="mx-auto w-full max-w-3xl space-y-6">
       {/* Header */}
@@ -111,15 +106,12 @@ export function CreateProjectWizard() {
         </p>
       </div>
 
-      {/* Progress */}
-      <div className="space-y-4">
-        <Progress value={progress} className="h-2" />
-        <WizardStepIndicator
-          steps={STEPS}
-          currentStep={currentStep}
-          onStepClick={setCurrentStep}
-        />
-      </div>
+      {/* Step Indicator */}
+      <WizardStepIndicator
+        steps={STEPS}
+        currentStep={currentStep}
+        onStepClick={setCurrentStep}
+      />
 
       {/* Step Content */}
       <Card>

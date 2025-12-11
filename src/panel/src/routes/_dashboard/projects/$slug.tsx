@@ -54,6 +54,8 @@ import { useDeploymentHub } from "@/hooks/use-deployment-hub"
 import { ProjectStatsGrid } from "@/components/project/project-stats-grid"
 import { ProjectQuickActions } from "@/components/project/project-quick-actions"
 import { EnhancedContainerList } from "@/components/project/enhanced-container-list"
+import { DockerImageConfigEditor } from "@/components/docker-image/docker-image-config-editor"
+import { PROJECT_TYPE } from "@/components/create-project/types"
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -201,6 +203,8 @@ function ProjectDetailPage() {
   }
 
   const isAdmin = user?.isAdmin ?? false
+  const isComposeProject = project.projectType === PROJECT_TYPE.ComposeFile
+  const isDockerImageProject = project.projectType === PROJECT_TYPE.DockerImage
   const memberIds = new Set(project.members.map((m) => m.userId))
   const availableUsers = users?.filter((u) => !memberIds.has(u.id)) ?? []
 
@@ -246,9 +250,16 @@ function ProjectDetailPage() {
                   Deploy
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
-                <DropdownMenuItem onClick={() => setActiveTab('compose')}>
-                  Edit Compose File
-                </DropdownMenuItem>
+                {isComposeProject && (
+                  <DropdownMenuItem onClick={() => setActiveTab('compose')}>
+                    Edit Compose File
+                  </DropdownMenuItem>
+                )}
+                {isDockerImageProject && (
+                  <DropdownMenuItem onClick={() => setActiveTab('image-config')}>
+                    Edit Image Config
+                  </DropdownMenuItem>
+                )}
                 <DropdownMenuItem onClick={() => setActiveTab('settings')}>
                   Project Settings
                 </DropdownMenuItem>
@@ -268,7 +279,8 @@ function ProjectDetailPage() {
         <Tabs value={activeTab} onValueChange={setActiveTab} className="flex-1">
           <TabsList className="grid w-full grid-cols-4">
             <TabsTrigger value="overview">Overview</TabsTrigger>
-            <TabsTrigger value="compose">Compose</TabsTrigger>
+            {isComposeProject && <TabsTrigger value="compose">Compose</TabsTrigger>}
+            {isDockerImageProject && <TabsTrigger value="image-config">Image Config</TabsTrigger>}
             <TabsTrigger value="logs">Logs</TabsTrigger>
             <TabsTrigger value="settings">Settings</TabsTrigger>
           </TabsList>
@@ -283,6 +295,7 @@ function ProjectDetailPage() {
             {/* Quick Actions */}
             <ProjectQuickActions
               isAdmin={isAdmin}
+              projectType={project.projectType}
               onNavigateToTab={setActiveTab}
               onDeploy={() => deployMutation.mutate()}
               isDeploying={deployMutation.isPending}
@@ -295,32 +308,63 @@ function ProjectDetailPage() {
             />
           </TabsContent>
 
-          <TabsContent value="compose" className="space-y-4">
-            {isAdmin ? (
-              <Card>
-                <CardHeader>
-                  <CardTitle>Docker Compose</CardTitle>
-                  <CardDescription>
-                    Define your project's services using Docker Compose
-                  </CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <ComposeEditor
-                    projectId={projectId}
-                    initialContent={project.composeFileContent}
-                  />
-                </CardContent>
-              </Card>
-            ) : (
-              <Card>
-                <CardContent className="pt-6">
-                  <div className="text-center text-muted-foreground">
-                    You don't have permission to edit the Docker Compose file.
-                  </div>
-                </CardContent>
-              </Card>
-            )}
-          </TabsContent>
+          {isComposeProject && (
+            <TabsContent value="compose" className="space-y-4">
+              {isAdmin ? (
+                <Card>
+                  <CardHeader>
+                    <CardTitle>Docker Compose</CardTitle>
+                    <CardDescription>
+                      Define your project's services using Docker Compose
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <ComposeEditor
+                      projectId={projectId}
+                      initialContent={project.composeFileContent}
+                    />
+                  </CardContent>
+                </Card>
+              ) : (
+                <Card>
+                  <CardContent className="pt-6">
+                    <div className="text-center text-muted-foreground">
+                      You don't have permission to edit the Docker Compose file.
+                    </div>
+                  </CardContent>
+                </Card>
+              )}
+            </TabsContent>
+          )}
+
+          {isDockerImageProject && (
+            <TabsContent value="image-config" className="space-y-4">
+              {isAdmin ? (
+                <Card>
+                  <CardHeader>
+                    <CardTitle>Docker Image Configuration</CardTitle>
+                    <CardDescription>
+                      Configure container settings for this Docker image project
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <DockerImageConfigEditor
+                      projectId={projectId}
+                      initialConfig={project.dockerImageConfig}
+                    />
+                  </CardContent>
+                </Card>
+              ) : (
+                <Card>
+                  <CardContent className="pt-6">
+                    <div className="text-center text-muted-foreground">
+                      You don't have permission to edit Docker image configuration.
+                    </div>
+                  </CardContent>
+                </Card>
+              )}
+            </TabsContent>
+          )}
 
           <TabsContent value="logs" className="space-y-4">
             <Card>

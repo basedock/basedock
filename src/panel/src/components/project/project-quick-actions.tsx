@@ -1,6 +1,8 @@
 import { Card, CardContent } from '@/components/ui/card'
 import { cn } from '@/lib/utils'
-import { Play, FileCode, ScrollText, Settings, type LucideIcon } from 'lucide-react'
+import { Play, FileCode, ScrollText, Settings, Container, type LucideIcon } from 'lucide-react'
+import { PROJECT_TYPE } from '@/components/create-project/types'
+import type { ProjectType } from '@/api/types.gen'
 
 interface QuickActionProps {
   icon: LucideIcon
@@ -37,6 +39,7 @@ function QuickAction({ icon: Icon, label, onClick, disabled, primary }: QuickAct
 
 interface ProjectQuickActionsProps {
   isAdmin: boolean
+  projectType: ProjectType
   onNavigateToTab: (tab: string) => void
   onDeploy?: () => void
   isDeploying?: boolean
@@ -44,10 +47,14 @@ interface ProjectQuickActionsProps {
 
 export function ProjectQuickActions({
   isAdmin,
+  projectType,
   onNavigateToTab,
   onDeploy,
   isDeploying = false,
 }: ProjectQuickActionsProps) {
+  const isComposeProject = projectType === PROJECT_TYPE.ComposeFile
+  const isDockerImageProject = projectType === PROJECT_TYPE.DockerImage
+
   return (
     <div className="space-y-3">
       <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide">
@@ -63,11 +70,20 @@ export function ProjectQuickActions({
               disabled={isDeploying}
               primary
             />
-            <QuickAction
-              icon={FileCode}
-              label="Edit Compose"
-              onClick={() => onNavigateToTab('compose')}
-            />
+            {isComposeProject && (
+              <QuickAction
+                icon={FileCode}
+                label="Edit Compose"
+                onClick={() => onNavigateToTab('compose')}
+              />
+            )}
+            {isDockerImageProject && (
+              <QuickAction
+                icon={Container}
+                label="Edit Config"
+                onClick={() => onNavigateToTab('image-config')}
+              />
+            )}
           </>
         )}
         <QuickAction

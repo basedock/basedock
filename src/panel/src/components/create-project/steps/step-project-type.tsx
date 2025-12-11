@@ -85,7 +85,7 @@ export function StepProjectType({
       </div>
 
       <div className="flex justify-end">
-        <Button onClick={onNext} disabled={!selectedType}>
+        <Button onClick={onNext} disabled={selectedType === null}>
           Continue
         </Button>
       </div>

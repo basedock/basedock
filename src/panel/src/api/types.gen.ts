@@ -19,7 +19,6 @@ export type ContainerInfo = {
 
 export type CreateProjectRequest = {
   name: string;
-  slug: string;
   description: null | string;
   projectType: ProjectType;
   composeFileContent: null | string;

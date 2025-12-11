@@ -26,7 +26,6 @@ public sealed record ProjectMemberDto(
 
 public sealed record CreateProjectRequest(
     string Name,
-    string Slug,
     string? Description,
     ProjectType ProjectType,
     string? ComposeFileContent,

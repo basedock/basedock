@@ -1,5 +1,6 @@
 namespace BaseDock.Application.Features.Projects.Commands.CreateProject;
 
+using System.Text.RegularExpressions;
 using BaseDock.Application.Abstractions.Data;
 using BaseDock.Application.Abstractions.Messaging;
 using BaseDock.Application.Features.Projects.DTOs;
@@ -9,7 +10,7 @@ using BaseDock.Domain.Enums;
 using BaseDock.Domain.Primitives;
 using Microsoft.EntityFrameworkCore;
 
-public sealed class CreateProjectCommandHandler(IApplicationDbContext db)
+public sealed partial class CreateProjectCommandHandler(IApplicationDbContext db)
     : ICommandHandler<CreateProjectCommand, Result<ProjectDto>>
 {
     public async Task<Result<ProjectDto>> HandleAsync(
@@ -26,19 +27,12 @@ public sealed class CreateProjectCommandHandler(IApplicationDbContext db)
                 Error.Conflict("Project.NameExists", $"A project with name '{command.Name}' already exists."));
         }
 
-        // Check slug uniqueness
-        var slugExists = await db.Projects
-            .AnyAsync(p => p.Slug == command.Slug, cancellationToken);
-
-        if (slugExists)
-        {
-            return Result.Failure<ProjectDto>(
-                Error.Conflict("Project.SlugExists", $"A project with slug '{command.Slug}' already exists."));
-        }
+        // Generate unique slug from name
+        var slug = await GenerateUniqueSlugAsync(command.Name, cancellationToken);
 
         var project = Project.Create(
             command.Name,
-            command.Slug,
+            slug,
             command.Description,
             command.ProjectType,
             command.CreatedByUserId);
@@ -82,4 +76,52 @@ public sealed class CreateProjectCommandHandler(IApplicationDbContext db)
 
         return Result.Success(createdProject.ToDto());
     }
+
+    private async Task<string> GenerateUniqueSlugAsync(string name, CancellationToken cancellationToken)
+    {
+        var baseSlug = GenerateSlug(name);
+        var slug = baseSlug;
+        var counter = 1;
+
+        while (await db.Projects.AnyAsync(p => p.Slug == slug, cancellationToken))
+        {
+            slug = $"{baseSlug}-{counter}";
+            counter++;
+
+            // Safety limit - use random suffix
+            if (counter > 100)
+            {
+                slug = $"{baseSlug}-{Guid.NewGuid().ToString()[..8]}";
+                break;
+            }
+        }
+
+        return slug;
+    }
+
+    private static string GenerateSlug(string text)
+    {
+        // Convert to lowercase
+        var slug = text.ToLowerInvariant();
+
+        // Replace spaces with hyphens
+        slug = slug.Replace(' ', '-');
+
+        // Remove invalid characters (keep only letters, numbers, and hyphens)
+        slug = SlugRegex().Replace(slug, "");
+
+        // Remove multiple consecutive hyphens
+        slug = MultipleHyphensRegex().Replace(slug, "-");
+
+        // Trim hyphens from start and end
+        slug = slug.Trim('-');
+
+        return slug;
+    }
+
+    [GeneratedRegex("[^a-z0-9-]")]
+    private static partial Regex SlugRegex();
+
+    [GeneratedRegex("-+")]
+    private static partial Regex MultipleHyphensRegex();
 }

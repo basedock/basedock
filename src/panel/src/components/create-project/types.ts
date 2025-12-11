@@ -29,7 +29,6 @@ export interface CreateProjectFormData {
 
   // Step 2
   name: string
-  slug: string
   description: string
 
   // Docker Image config
