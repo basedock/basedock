@@ -19,8 +19,8 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table"
-import { Trash2, UserPlus, Wifi, WifiOff } from "lucide-react"
-import { getProjectById, updateProject, removeProjectMembers, addProjectMembers, getUsers, getProjectDockerStatus } from "@/api/sdk.gen"
+import { Trash2, UserPlus, Wifi, WifiOff, MoreHorizontal } from "lucide-react"
+import { getProjectById, updateProject, removeProjectMembers, addProjectMembers, getUsers, getProjectDockerStatus, deployProject } from "@/api/sdk.gen"
 import type { ProjectDto, UserDto } from "@/api/types.gen"
 import { useForm } from "@tanstack/react-form"
 import { z } from "zod"
@@ -46,12 +46,21 @@ import {
   TabsList,
   TabsTrigger,
 } from "@/components/ui/tabs"
-import { DeploymentStatusBadge } from "@/components/deployment-status-badge"
-import { DeploymentControls } from "@/components/deployment-controls"
-import { ComposeEditor } from "@/components/compose-editor"
-import { ContainerList } from "@/components/container-list"
-import { LogsViewer } from "@/components/logs-viewer"
+import { Alert, AlertDescription } from "@/components/ui/alert"
+import { DeploymentStatusBadge } from "@/components/deployment/deployment-status-badge"
+import { ComposeEditor } from "@/components/compose/compose-editor"
+import { LogsViewer } from "@/components/deployment/logs-viewer"
 import { useDeploymentHub } from "@/hooks/use-deployment-hub"
+import { ProjectStatsGrid } from "@/components/project/project-stats-grid"
+import { ProjectQuickActions } from "@/components/project/project-quick-actions"
+import { EnhancedContainerList } from "@/components/project/enhanced-container-list"
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
 
 export const Route = createFileRoute("/_dashboard/projects/$id")({
   loader: async ({ params }) => {
@@ -81,6 +90,7 @@ function ProjectDetailPage() {
   const queryClient = useQueryClient()
   const [addMemberDialogOpen, setAddMemberDialogOpen] = useState(false)
   const [selectedUserId, setSelectedUserId] = useState<string>("")
+  const [activeTab, setActiveTab] = useState("overview")
 
   // SignalR connection for real-time updates
   const { isConnected } = useDeploymentHub({ projectId: id })
@@ -151,6 +161,17 @@ function ProjectDetailPage() {
     },
   })
 
+  const deployMutation = useMutation({
+    mutationFn: async () => {
+      const response = await deployProject({ path: { projectId: id } })
+      if (response.error) throw new Error("Failed to deploy project")
+      return response.data
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["project-status", id] })
+    },
+  })
+
   const form = useForm({
     defaultValues: {
       name: project?.name ?? "",
@@ -179,56 +200,66 @@ function ProjectDetailPage() {
 
   return (
     <>
-      <div className="flex flex-1 flex-col gap-6 p-4 pt-0">
-        {/* Header Card - Always visible, compact */}
-        <Card>
-          <CardHeader>
-            <div className="flex items-start justify-between gap-4">
-              <div className="flex-1 min-w-0">
-                <CardTitle className="text-2xl">{project.name}</CardTitle>
-                {project.description && (
-                  <CardDescription className="mt-1.5 text-base">
-                    {project.description}
-                  </CardDescription>
+      <div className="flex flex-1 flex-col space-y-6 p-6 pt-0">
+        {/* Modern Header - No card wrapper */}
+        <div className="flex items-start justify-between">
+          <div className="space-y-1">
+            <div className="flex items-center gap-3">
+              <h1 className="text-3xl font-bold tracking-tight">{project.name}</h1>
+              <DeploymentStatusBadge status={dockerStatus?.status ?? project.deploymentStatus} />
+              <div className="flex items-center gap-2 text-sm">
+                {isConnected ? (
+                  <>
+                    <Wifi className="h-3.5 w-3.5 text-green-500" />
+                    <span className="text-green-600 dark:text-green-400">Live</span>
+                  </>
+                ) : (
+                  <>
+                    <WifiOff className="h-3.5 w-3.5 text-muted-foreground" />
+                    <span className="text-muted-foreground">Connecting...</span>
+                  </>
                 )}
               </div>
-              <div className="flex flex-col items-end gap-3 flex-shrink-0">
-                <DeploymentStatusBadge status={dockerStatus?.status ?? project.deploymentStatus} />
-                <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                  {isConnected ? (
-                    <>
-                      <Wifi className="h-3.5 w-3.5 text-green-500" />
-                      <span className="text-green-600 dark:text-green-400">Live</span>
-                    </>
-                  ) : (
-                    <>
-                      <WifiOff className="h-3.5 w-3.5" />
-                      <span>Connecting...</span>
-                    </>
-                  )}
-                </div>
-              </div>
             </div>
-            {dockerStatus?.lastError && (
-              <div className="mt-4 p-3 bg-destructive/10 text-destructive text-sm rounded-md flex items-start gap-2">
-                <span className="font-medium">Error:</span>
-                <span className="flex-1">{dockerStatus.lastError}</span>
-              </div>
+            {project.description && (
+              <p className="text-muted-foreground text-base">{project.description}</p>
             )}
-            {isAdmin && (
-              <div className="mt-4 pt-4 border-t">
-                <DeploymentControls
-                  projectId={id}
-                  status={dockerStatus?.status ?? project.deploymentStatus}
-                  hasComposeFile={!!project.composeFileContent}
-                />
-              </div>
-            )}
-          </CardHeader>
-        </Card>
+          </div>
+
+          {/* Admin controls in dropdown */}
+          {isAdmin && (
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="outline" size="icon">
+                  <MoreHorizontal className="h-4 w-4" />
+                  <span className="sr-only">Project actions</span>
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end">
+                <DropdownMenuItem onClick={() => deployMutation.mutate()}>
+                  Deploy
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem onClick={() => setActiveTab('compose')}>
+                  Edit Compose File
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => setActiveTab('settings')}>
+                  Project Settings
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          )}
+        </div>
+
+        {/* Error banner */}
+        {dockerStatus?.lastError && (
+          <Alert variant="destructive">
+            <AlertDescription>{dockerStatus.lastError}</AlertDescription>
+          </Alert>
+        )}
 
         {/* Tabs for content organization */}
-        <Tabs defaultValue="overview" className="flex-1">
+        <Tabs value={activeTab} onValueChange={setActiveTab} className="flex-1">
           <TabsList className="grid w-full grid-cols-4">
             <TabsTrigger value="overview">Overview</TabsTrigger>
             <TabsTrigger value="compose">Compose</TabsTrigger>
@@ -236,36 +267,27 @@ function ProjectDetailPage() {
             <TabsTrigger value="settings">Settings</TabsTrigger>
           </TabsList>
 
-          <TabsContent value="overview" className="space-y-4">
-            <Card>
-              <CardHeader>
-                <CardTitle>Containers</CardTitle>
-                <CardDescription>
-                  Running containers and their status
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <ContainerList containers={dockerStatus?.containers ?? []} />
-              </CardContent>
-            </Card>
+          <TabsContent value="overview" className="space-y-6">
+            {/* Stats Grid */}
+            <ProjectStatsGrid
+              project={project}
+              dockerStatus={dockerStatus}
+              isConnected={isConnected}
+            />
 
-            <Card>
-              <CardHeader>
-                <CardTitle>Project Info</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="grid gap-4 sm:grid-cols-2">
-                  <div>
-                    <div className="text-sm font-medium text-muted-foreground">Members</div>
-                    <div className="text-2xl font-bold">{project.members.length}</div>
-                  </div>
-                  <div>
-                    <div className="text-sm font-medium text-muted-foreground">Containers</div>
-                    <div className="text-2xl font-bold">{dockerStatus?.containers?.length ?? 0}</div>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
+            {/* Quick Actions */}
+            <ProjectQuickActions
+              isAdmin={isAdmin}
+              onNavigateToTab={setActiveTab}
+              onDeploy={() => deployMutation.mutate()}
+              isDeploying={deployMutation.isPending}
+            />
+
+            {/* Enhanced Container Display */}
+            <EnhancedContainerList
+              containers={dockerStatus?.containers ?? []}
+              isAdmin={isAdmin}
+            />
           </TabsContent>
 
           <TabsContent value="compose" className="space-y-4">
