@@ -17,6 +17,9 @@ builder.Services
     .AddApplication()
     .AddInfrastructure(builder.Configuration);
 
+// Time provider for testable time handling
+builder.Services.AddSingleton(TimeProvider.System);
+
 // Add Carter for modular endpoints
 builder.Services.AddCarter();
 

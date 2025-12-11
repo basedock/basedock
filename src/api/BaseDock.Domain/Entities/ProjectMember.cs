@@ -8,7 +8,7 @@ public sealed class ProjectMember : Entity
 
     public Guid UserId { get; private set; }
 
-    public DateTime JoinedAt { get; private set; }
+    public DateTimeOffset JoinedAt { get; private set; }
 
     // Navigation properties
     public Project Project { get; private set; } = null!;
@@ -19,13 +19,13 @@ public sealed class ProjectMember : Entity
     {
     }
 
-    public static ProjectMember Create(Guid projectId, Guid userId)
+    public static ProjectMember Create(Guid projectId, Guid userId, DateTimeOffset joinedAt)
     {
         return new ProjectMember
         {
             ProjectId = projectId,
             UserId = userId,
-            JoinedAt = DateTime.UtcNow
+            JoinedAt = joinedAt
         };
     }
 }

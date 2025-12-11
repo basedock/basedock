@@ -7,7 +7,7 @@ public sealed record EnvironmentDto(
     string? Description,
     Guid ProjectId,
     bool IsDefault,
-    DateTime CreatedAt,
+    DateTimeOffset CreatedAt,
     int VariableCount,
     int ResourceCount);
 
@@ -18,7 +18,7 @@ public sealed record EnvironmentDetailDto(
     string? Description,
     Guid ProjectId,
     bool IsDefault,
-    DateTime CreatedAt,
+    DateTimeOffset CreatedAt,
     IEnumerable<EnvironmentVariableDto> Variables,
     IEnumerable<ResourceSummaryDto> Resources);
 
@@ -27,7 +27,7 @@ public sealed record EnvironmentVariableDto(
     string Key,
     string Value,
     bool IsSecret,
-    DateTime CreatedAt);
+    DateTimeOffset CreatedAt);
 
 public sealed record ResourceSummaryDto(
     Guid Id,

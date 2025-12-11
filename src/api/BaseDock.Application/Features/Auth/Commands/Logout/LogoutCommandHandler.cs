@@ -7,9 +7,12 @@ using BaseDock.Domain.Primitives;
 public sealed class LogoutCommandHandler(
     IJwtService jwtService,
     IRefreshTokenService refreshTokenService,
-    ITokenBlacklistService blacklistService)
+    ITokenBlacklistService blacklistService,
+    TimeProvider dateTime)
     : ICommandHandler<LogoutCommand, Result>
 {
+    private readonly TimeProvider _dateTime = dateTime;
+
     public async Task<Result> HandleAsync(
         LogoutCommand command,
         CancellationToken cancellationToken = default)
@@ -21,7 +24,7 @@ public sealed class LogoutCommandHandler(
             if (!string.IsNullOrEmpty(jti))
             {
                 var expiration = jwtService.GetTokenExpiration(command.AccessToken);
-                var remainingTime = expiration - DateTime.UtcNow;
+                var remainingTime = expiration - _dateTime.GetUtcNow();
 
                 if (remainingTime > TimeSpan.Zero)
                 {

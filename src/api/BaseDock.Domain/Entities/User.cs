@@ -12,15 +12,15 @@ public sealed class User : Entity
 
     public bool IsAdmin { get; private set; }
 
-    public DateTime CreatedAt { get; private set; }
+    public DateTimeOffset CreatedAt { get; private set; }
 
-    public DateTime? UpdatedAt { get; private set; }
+    public DateTimeOffset? UpdatedAt { get; private set; }
 
     private User()
     {
     }
 
-    public static User Create(string email, string displayName, string? passwordHash = null, bool isAdmin = false)
+    public static User Create(string email, string displayName, DateTimeOffset createdAt, string? passwordHash = null, bool isAdmin = false)
     {
         return new User
         {
@@ -28,11 +28,11 @@ public sealed class User : Entity
             DisplayName = displayName,
             PasswordHash = passwordHash,
             IsAdmin = isAdmin,
-            CreatedAt = DateTime.UtcNow
+            CreatedAt = createdAt
         };
     }
 
-    public void Update(string displayName, string? email = null)
+    public void Update(string displayName, DateTimeOffset updatedAt, string? email = null)
     {
         DisplayName = displayName;
 
@@ -41,18 +41,18 @@ public sealed class User : Entity
             Email = email.ToLowerInvariant();
         }
 
-        UpdatedAt = DateTime.UtcNow;
+        UpdatedAt = updatedAt;
     }
 
-    public void SetPasswordHash(string passwordHash)
+    public void SetPasswordHash(string passwordHash, DateTimeOffset updatedAt)
     {
         PasswordHash = passwordHash;
-        UpdatedAt = DateTime.UtcNow;
+        UpdatedAt = updatedAt;
     }
 
-    public void SetAdmin(bool isAdmin)
+    public void SetAdmin(bool isAdmin, DateTimeOffset updatedAt)
     {
         IsAdmin = isAdmin;
-        UpdatedAt = DateTime.UtcNow;
+        UpdatedAt = updatedAt;
     }
 }

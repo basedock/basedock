@@ -9,9 +9,14 @@ using BaseDock.Domain.Entities;
 using BaseDock.Domain.Primitives;
 using Microsoft.EntityFrameworkCore;
 
-public sealed class CreateUserCommandHandler(IApplicationDbContext db, IPasswordHasher passwordHasher)
+public sealed class CreateUserCommandHandler(
+    IApplicationDbContext db,
+    IPasswordHasher passwordHasher,
+    TimeProvider dateTime)
     : ICommandHandler<CreateUserCommand, Result<UserDto>>
 {
+    private readonly TimeProvider _dateTime = dateTime;
+
     public async Task<Result<UserDto>> HandleAsync(
         CreateUserCommand command,
         CancellationToken cancellationToken = default)
@@ -30,6 +35,7 @@ public sealed class CreateUserCommandHandler(IApplicationDbContext db, IPassword
         var user = User.Create(
             command.Email,
             command.DisplayName,
+            _dateTime.GetUtcNow(),
             passwordHash);
 
         db.Users.Add(user);

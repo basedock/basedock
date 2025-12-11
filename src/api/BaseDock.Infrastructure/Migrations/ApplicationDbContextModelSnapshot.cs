@@ -3,20 +3,17 @@ using System;
 using BaseDock.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
-using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 #nullable disable
 
-namespace BaseDock.Infrastructure.Persistence.Migrations
+namespace BaseDock.Infrastructure.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20251211150018_RestructureProjectSystem")]
-    partial class RestructureProjectSystem
+    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
     {
-        /// <inheritdoc />
-        protected override void BuildTargetModel(ModelBuilder modelBuilder)
+        protected override void BuildModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -32,7 +29,7 @@ namespace BaseDock.Infrastructure.Persistence.Migrations
                         .HasColumnType("uuid")
                         .HasColumnName("id");
 
-                    b.Property<DateTime>("CreatedAt")
+                    b.Property<DateTimeOffset>("CreatedAt")
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("created_at");
 
@@ -78,7 +75,7 @@ namespace BaseDock.Infrastructure.Persistence.Migrations
                         .HasColumnType("uuid")
                         .HasColumnName("id");
 
-                    b.Property<DateTime>("CreatedAt")
+                    b.Property<DateTimeOffset>("CreatedAt")
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("created_at");
 
@@ -118,7 +115,7 @@ namespace BaseDock.Infrastructure.Persistence.Migrations
                         .HasColumnType("uuid")
                         .HasColumnName("id");
 
-                    b.Property<DateTime>("CreatedAt")
+                    b.Property<DateTimeOffset>("CreatedAt")
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("created_at");
 
@@ -143,7 +140,7 @@ namespace BaseDock.Infrastructure.Persistence.Migrations
                         .HasColumnType("character varying(120)")
                         .HasColumnName("slug");
 
-                    b.Property<DateTime?>("UpdatedAt")
+                    b.Property<DateTimeOffset?>("UpdatedAt")
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("updated_at");
 
@@ -167,7 +164,7 @@ namespace BaseDock.Infrastructure.Persistence.Migrations
                         .HasColumnType("uuid")
                         .HasColumnName("id");
 
-                    b.Property<DateTime>("JoinedAt")
+                    b.Property<DateTimeOffset>("JoinedAt")
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("joined_at");
 
@@ -201,7 +198,7 @@ namespace BaseDock.Infrastructure.Persistence.Migrations
                         .HasColumnType("text")
                         .HasColumnName("compose_file_content");
 
-                    b.Property<DateTime>("CreatedAt")
+                    b.Property<DateTimeOffset>("CreatedAt")
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("created_at");
 
@@ -222,7 +219,7 @@ namespace BaseDock.Infrastructure.Persistence.Migrations
                         .HasColumnType("uuid")
                         .HasColumnName("environment_id");
 
-                    b.Property<DateTime?>("LastDeployedAt")
+                    b.Property<DateTimeOffset?>("LastDeployedAt")
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("last_deployed_at");
 
@@ -263,7 +260,7 @@ namespace BaseDock.Infrastructure.Persistence.Migrations
                         .HasColumnType("character varying(20)")
                         .HasColumnName("cpu_limit");
 
-                    b.Property<DateTime>("CreatedAt")
+                    b.Property<DateTimeOffset>("CreatedAt")
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("created_at");
 
@@ -294,7 +291,7 @@ namespace BaseDock.Infrastructure.Persistence.Migrations
                         .HasColumnType("character varying(255)")
                         .HasColumnName("image");
 
-                    b.Property<DateTime?>("LastDeployedAt")
+                    b.Property<DateTimeOffset?>("LastDeployedAt")
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("last_deployed_at");
 
@@ -377,7 +374,7 @@ namespace BaseDock.Infrastructure.Persistence.Migrations
                         .HasColumnType("character varying(20)")
                         .HasColumnName("cpu_limit");
 
-                    b.Property<DateTime>("CreatedAt")
+                    b.Property<DateTimeOffset>("CreatedAt")
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("created_at");
 
@@ -407,7 +404,7 @@ namespace BaseDock.Infrastructure.Persistence.Migrations
                         .HasColumnType("jsonb")
                         .HasColumnName("environment_variables");
 
-                    b.Property<DateTime?>("LastDeployedAt")
+                    b.Property<DateTimeOffset?>("LastDeployedAt")
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("last_deployed_at");
 
@@ -468,7 +465,7 @@ namespace BaseDock.Infrastructure.Persistence.Migrations
                         .HasColumnType("uuid")
                         .HasColumnName("id");
 
-                    b.Property<DateTime>("CreatedAt")
+                    b.Property<DateTimeOffset>("CreatedAt")
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("created_at");
 
@@ -495,7 +492,7 @@ namespace BaseDock.Infrastructure.Persistence.Migrations
                         .HasColumnType("uuid")
                         .HasColumnName("environment_id");
 
-                    b.Property<DateTime?>("LastDeployedAt")
+                    b.Property<DateTimeOffset?>("LastDeployedAt")
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("last_deployed_at");
 
@@ -559,7 +556,7 @@ namespace BaseDock.Infrastructure.Persistence.Migrations
                         .HasColumnType("uuid")
                         .HasColumnName("id");
 
-                    b.Property<DateTime>("CreatedAt")
+                    b.Property<DateTimeOffset>("CreatedAt")
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("created_at");
 
@@ -580,7 +577,7 @@ namespace BaseDock.Infrastructure.Persistence.Migrations
                         .HasColumnType("uuid")
                         .HasColumnName("environment_id");
 
-                    b.Property<DateTime?>("LastDeployedAt")
+                    b.Property<DateTimeOffset?>("LastDeployedAt")
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("last_deployed_at");
 
@@ -641,11 +638,11 @@ namespace BaseDock.Infrastructure.Persistence.Migrations
                         .HasColumnType("uuid")
                         .HasColumnName("id");
 
-                    b.Property<DateTime>("CreatedAt")
+                    b.Property<DateTimeOffset>("CreatedAt")
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("created_at");
 
-                    b.Property<DateTime>("ExpiresAt")
+                    b.Property<DateTimeOffset>("ExpiresAt")
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("expires_at");
 
@@ -669,7 +666,7 @@ namespace BaseDock.Infrastructure.Persistence.Migrations
                         .HasColumnType("uuid")
                         .HasColumnName("id");
 
-                    b.Property<DateTime>("CreatedAt")
+                    b.Property<DateTimeOffset>("CreatedAt")
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("created_at");
 
@@ -696,7 +693,7 @@ namespace BaseDock.Infrastructure.Persistence.Migrations
                         .HasColumnType("character varying(256)")
                         .HasColumnName("password_hash");
 
-                    b.Property<DateTime?>("UpdatedAt")
+                    b.Property<DateTimeOffset?>("UpdatedAt")
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("updated_at");
 

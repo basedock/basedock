@@ -21,13 +21,13 @@ public sealed class RedisResource : Entity
 
     public DeploymentStatus DeploymentStatus { get; private set; } = DeploymentStatus.NotDeployed;
 
-    public DateTime? LastDeployedAt { get; private set; }
+    public DateTimeOffset? LastDeployedAt { get; private set; }
 
     public string? LastDeploymentError { get; private set; }
 
     public Guid EnvironmentId { get; private set; }
 
-    public DateTime CreatedAt { get; private set; }
+    public DateTimeOffset CreatedAt { get; private set; }
 
     // Navigation properties
     public Environment Environment { get; private set; } = null!;
@@ -41,6 +41,7 @@ public sealed class RedisResource : Entity
         string slug,
         string? description,
         Guid environmentId,
+        DateTimeOffset createdAt,
         string version = "7",
         int port = 6379,
         bool persistenceEnabled = true,
@@ -56,7 +57,7 @@ public sealed class RedisResource : Entity
             PersistenceEnabled = persistenceEnabled,
             Password = password,
             EnvironmentId = environmentId,
-            CreatedAt = DateTime.UtcNow
+            CreatedAt = createdAt
         };
     }
 
@@ -83,7 +84,7 @@ public sealed class RedisResource : Entity
         Password = password;
     }
 
-    public void SetDeploymentStatus(DeploymentStatus status, DateTime? deployedAt = null)
+    public void SetDeploymentStatus(DeploymentStatus status, DateTimeOffset? deployedAt = null)
     {
         DeploymentStatus = status;
         if (deployedAt.HasValue)

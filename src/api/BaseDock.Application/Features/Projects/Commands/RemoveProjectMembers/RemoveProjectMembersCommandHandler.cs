@@ -7,9 +7,11 @@ using BaseDock.Application.Features.Projects.Mappers;
 using BaseDock.Domain.Primitives;
 using Microsoft.EntityFrameworkCore;
 
-public sealed class RemoveProjectMembersCommandHandler(IApplicationDbContext db)
+public sealed class RemoveProjectMembersCommandHandler(IApplicationDbContext db, TimeProvider dateTime)
     : ICommandHandler<RemoveProjectMembersCommand, Result<ProjectDto>>
 {
+    private readonly TimeProvider _dateTime = dateTime;
+
     public async Task<Result<ProjectDto>> HandleAsync(
         RemoveProjectMembersCommand command,
         CancellationToken cancellationToken = default)
@@ -30,9 +32,10 @@ public sealed class RemoveProjectMembersCommandHandler(IApplicationDbContext db)
             .Where(m => userIdsToRemove.Contains(m.UserId))
             .ToList();
 
+        var now = _dateTime.GetUtcNow();
         foreach (var member in membersToRemove)
         {
-            project.RemoveMember(member);
+            project.RemoveMember(member, now);
         }
 
         await db.SaveChangesAsync(cancellationToken);

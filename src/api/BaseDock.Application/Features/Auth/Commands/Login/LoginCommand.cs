@@ -8,7 +8,7 @@ public sealed record LoginCommand(string Email, string Password) : ICommand<Resu
 
 public sealed record LoginResponse(
     string AccessToken,
-    DateTime AccessTokenExpiresAt,
+    DateTimeOffset AccessTokenExpiresAt,
     string RefreshToken,
     UserDto User);
 

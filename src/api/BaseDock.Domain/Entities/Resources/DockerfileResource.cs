@@ -38,13 +38,13 @@ public sealed class DockerfileResource : Entity
 
     public DeploymentStatus DeploymentStatus { get; private set; } = DeploymentStatus.NotDeployed;
 
-    public DateTime? LastDeployedAt { get; private set; }
+    public DateTimeOffset? LastDeployedAt { get; private set; }
 
     public string? LastDeploymentError { get; private set; }
 
     public Guid EnvironmentId { get; private set; }
 
-    public DateTime CreatedAt { get; private set; }
+    public DateTimeOffset CreatedAt { get; private set; }
 
     // Navigation properties
     public Environment Environment { get; private set; } = null!;
@@ -58,7 +58,8 @@ public sealed class DockerfileResource : Entity
         string slug,
         string? description,
         string dockerfileContent,
-        Guid environmentId)
+        Guid environmentId,
+        DateTimeOffset createdAt)
     {
         return new DockerfileResource
         {
@@ -67,7 +68,7 @@ public sealed class DockerfileResource : Entity
             Description = description,
             DockerfileContent = dockerfileContent,
             EnvironmentId = environmentId,
-            CreatedAt = DateTime.UtcNow
+            CreatedAt = createdAt
         };
     }
 
@@ -106,7 +107,7 @@ public sealed class DockerfileResource : Entity
         MemoryLimit = memoryLimit;
     }
 
-    public void SetDeploymentStatus(DeploymentStatus status, DateTime? deployedAt = null)
+    public void SetDeploymentStatus(DeploymentStatus status, DateTimeOffset? deployedAt = null)
     {
         DeploymentStatus = status;
         if (deployedAt.HasValue)

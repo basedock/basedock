@@ -6,8 +6,8 @@ public sealed record ProjectDto(
     string Slug,
     string? Description,
     Guid CreatedByUserId,
-    DateTime CreatedAt,
-    DateTime? UpdatedAt,
+    DateTimeOffset CreatedAt,
+    DateTimeOffset? UpdatedAt,
     int EnvironmentCount,
     IEnumerable<ProjectMemberDto> Members,
     IEnumerable<ProjectEnvironmentDto> Environments);
@@ -22,7 +22,7 @@ public sealed record ProjectMemberDto(
     Guid UserId,
     string Email,
     string DisplayName,
-    DateTime JoinedAt);
+    DateTimeOffset JoinedAt);
 
 public sealed record CreateProjectRequest(
     string Name,

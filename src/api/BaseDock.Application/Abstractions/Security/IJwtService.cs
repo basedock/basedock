@@ -8,5 +8,5 @@ public interface IJwtService
     string GenerateAccessToken(User user);
     ClaimsPrincipal? ValidateAccessToken(string token);
     string? GetTokenId(string token);
-    DateTime GetTokenExpiration(string token);
+    DateTimeOffset GetTokenExpiration(string token);
 }

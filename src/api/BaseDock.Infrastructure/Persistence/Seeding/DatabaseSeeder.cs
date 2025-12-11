@@ -10,8 +10,11 @@ public class DatabaseSeeder(
     ApplicationDbContext db,
     IConfiguration configuration,
     ILogger<DatabaseSeeder> logger,
-    IPasswordHasher passwordHasher)
+    IPasswordHasher passwordHasher,
+    TimeProvider dateTime)
 {
+    private readonly TimeProvider _dateTime = dateTime;
+
     public async Task SeedAsync(CancellationToken cancellationToken = default)
     {
         await SeedAdminUserAsync(cancellationToken);
@@ -37,7 +40,7 @@ public class DatabaseSeeder(
         }
 
         var passwordHash = passwordHasher.HashPassword(adminPassword);
-        var admin = User.Create(adminEmail, "Admin", passwordHash, isAdmin: true);
+        var admin = User.Create(adminEmail, "Admin", _dateTime.GetUtcNow(), passwordHash, isAdmin: true);
 
         db.Users.Add(admin);
         await db.SaveChangesAsync(cancellationToken);

@@ -10,19 +10,21 @@ public sealed class RefreshTokenService : IRefreshTokenService
 {
     private readonly RedisConnectionFactory _redisFactory;
     private readonly JwtSettings _settings;
+    private readonly TimeProvider _dateTime;
     private const string RefreshTokenPrefix = "refresh:";
     private const string UserTokensPrefix = "user_tokens:";
 
-    public RefreshTokenService(RedisConnectionFactory redisFactory, IOptions<JwtSettings> settings)
+    public RefreshTokenService(RedisConnectionFactory redisFactory, IOptions<JwtSettings> settings, TimeProvider dateTime)
     {
         _redisFactory = redisFactory;
         _settings = settings.Value;
+        _dateTime = dateTime;
     }
 
     public async Task<string> GenerateRefreshTokenAsync(Guid userId, CancellationToken cancellationToken = default)
     {
         var token = GenerateSecureToken();
-        var now = DateTime.UtcNow;
+        var now = _dateTime.GetUtcNow();
         var expiresAt = now.AddDays(_settings.RefreshTokenExpirationDays);
 
         var tokenData = new RefreshTokenData(userId, now, expiresAt);
@@ -52,7 +54,7 @@ public sealed class RefreshTokenService : IRefreshTokenService
 
         var tokenData = JsonSerializer.Deserialize<RefreshTokenData>(json.ToString());
 
-        if (tokenData is null || tokenData.ExpiresAt < DateTime.UtcNow)
+        if (tokenData is null || tokenData.ExpiresAt < _dateTime.GetUtcNow())
         {
             await RevokeRefreshTokenAsync(token, cancellationToken);
             return null;

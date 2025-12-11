@@ -7,9 +7,11 @@ using BaseDock.Application.Features.Users.Mappers;
 using BaseDock.Domain.Primitives;
 using Microsoft.EntityFrameworkCore;
 
-public sealed class UpdateUserCommandHandler(IApplicationDbContext db)
+public sealed class UpdateUserCommandHandler(IApplicationDbContext db, TimeProvider dateTime)
     : ICommandHandler<UpdateUserCommand, Result<UserDto>>
 {
+    private readonly TimeProvider _dateTime = dateTime;
+
     public async Task<Result<UserDto>> HandleAsync(
         UpdateUserCommand command,
         CancellationToken cancellationToken = default)
@@ -35,7 +37,7 @@ public sealed class UpdateUserCommandHandler(IApplicationDbContext db)
             }
         }
 
-        user.Update(command.DisplayName, command.Email);
+        user.Update(command.DisplayName, _dateTime.GetUtcNow(), command.Email);
         await db.SaveChangesAsync(cancellationToken);
 
         return Result.Success(user.ToDto());

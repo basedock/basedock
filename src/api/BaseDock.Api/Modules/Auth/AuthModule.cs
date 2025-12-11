@@ -43,6 +43,7 @@ public class AuthModule : ICarterModule
         IDispatcher dispatcher,
         HttpContext httpContext,
         IOptions<JwtSettings> jwtSettings,
+        TimeProvider dateTime,
         CancellationToken cancellationToken = default)
     {
         var command = new LoginCommand(request.Email, request.Password);
@@ -56,7 +57,7 @@ public class AuthModule : ICarterModule
         var response = result.Value;
 
         // Set refresh token in HTTP-only cookie
-        SetRefreshTokenCookie(httpContext, response.RefreshToken, jwtSettings.Value);
+        SetRefreshTokenCookie(httpContext, response.RefreshToken, jwtSettings.Value, dateTime);
 
         // Return only access token and user info (not the refresh token)
         return Results.Ok(new LoginApiResponse(
@@ -69,6 +70,7 @@ public class AuthModule : ICarterModule
         IDispatcher dispatcher,
         HttpContext httpContext,
         IOptions<JwtSettings> jwtSettings,
+        TimeProvider dateTime,
         CancellationToken cancellationToken = default)
     {
         var refreshToken = httpContext.Request.Cookies[RefreshTokenCookieName];
@@ -93,7 +95,7 @@ public class AuthModule : ICarterModule
         var response = result.Value;
 
         // Set new refresh token in cookie (rotation)
-        SetRefreshTokenCookie(httpContext, response.NewRefreshToken, jwtSettings.Value);
+        SetRefreshTokenCookie(httpContext, response.NewRefreshToken, jwtSettings.Value, dateTime);
 
         return Results.Ok(new RefreshApiResponse(
             response.AccessToken,
@@ -118,7 +120,7 @@ public class AuthModule : ICarterModule
         return Results.NoContent();
     }
 
-    private static void SetRefreshTokenCookie(HttpContext httpContext, string token, JwtSettings settings)
+    private static void SetRefreshTokenCookie(HttpContext httpContext, string token, JwtSettings settings, TimeProvider dateTime)
     {
         var isDevelopment = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") == "Development";
 
@@ -128,7 +130,7 @@ public class AuthModule : ICarterModule
             Secure = true,
             SameSite = isDevelopment ? SameSiteMode.None : SameSiteMode.Strict,
             Path = "/api",
-            Expires = DateTime.UtcNow.AddDays(settings.RefreshTokenExpirationDays)
+            Expires = dateTime.GetUtcNow().AddDays(settings.RefreshTokenExpirationDays)
         });
     }
 
@@ -160,10 +162,10 @@ public class AuthModule : ICarterModule
 // Response types for the API
 public sealed record LoginApiResponse(
     string AccessToken,
-    DateTime AccessTokenExpiresAt,
+    DateTimeOffset AccessTokenExpiresAt,
     UserDto User);
 
 public sealed record RefreshApiResponse(
     string AccessToken,
-    DateTime AccessTokenExpiresAt,
+    DateTimeOffset AccessTokenExpiresAt,
     UserDto User);

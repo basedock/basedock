@@ -7,9 +7,11 @@ using BaseDock.Application.Features.Projects.Mappers;
 using BaseDock.Domain.Primitives;
 using Microsoft.EntityFrameworkCore;
 
-public sealed class UpdateProjectCommandHandler(IApplicationDbContext db)
+public sealed class UpdateProjectCommandHandler(IApplicationDbContext db, TimeProvider dateTime)
     : ICommandHandler<UpdateProjectCommand, Result<ProjectDto>>
 {
+    private readonly TimeProvider _dateTime = dateTime;
+
     public async Task<Result<ProjectDto>> HandleAsync(
         UpdateProjectCommand command,
         CancellationToken cancellationToken = default)
@@ -38,7 +40,7 @@ public sealed class UpdateProjectCommandHandler(IApplicationDbContext db)
             }
         }
 
-        project.Update(command.Name, command.Description);
+        project.Update(command.Name, command.Description, _dateTime.GetUtcNow());
         await db.SaveChangesAsync(cancellationToken);
 
         return Result.Success(project.ToDto());

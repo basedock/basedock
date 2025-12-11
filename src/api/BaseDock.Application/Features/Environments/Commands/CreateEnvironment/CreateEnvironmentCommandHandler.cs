@@ -9,9 +9,11 @@ using BaseDock.Domain.Entities;
 using BaseDock.Domain.Primitives;
 using Microsoft.EntityFrameworkCore;
 
-public sealed partial class CreateEnvironmentCommandHandler(IApplicationDbContext db)
+public sealed partial class CreateEnvironmentCommandHandler(IApplicationDbContext db, TimeProvider dateTime)
     : ICommandHandler<CreateEnvironmentCommand, Result<EnvironmentDto>>
 {
+    private readonly TimeProvider _dateTime = dateTime;
+
     public async Task<Result<EnvironmentDto>> HandleAsync(
         CreateEnvironmentCommand command,
         CancellationToken cancellationToken = default)
@@ -51,6 +53,7 @@ public sealed partial class CreateEnvironmentCommandHandler(IApplicationDbContex
             slug,
             command.Description,
             project.Id,
+            _dateTime.GetUtcNow(),
             isDefault: false);
 
         db.Environments.Add(environment);

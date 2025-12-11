@@ -8,6 +8,6 @@ public sealed record RefreshCommand(string RefreshToken) : ICommand<Result<Refre
 
 public sealed record RefreshResponse(
     string AccessToken,
-    DateTime AccessTokenExpiresAt,
+    DateTimeOffset AccessTokenExpiresAt,
     string NewRefreshToken,
     UserDto User);

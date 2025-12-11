@@ -9,9 +9,11 @@ using BaseDock.Domain.Entities;
 using BaseDock.Domain.Primitives;
 using Microsoft.EntityFrameworkCore;
 
-public sealed partial class CreateProjectCommandHandler(IApplicationDbContext db)
+public sealed partial class CreateProjectCommandHandler(IApplicationDbContext db, TimeProvider dateTime)
     : ICommandHandler<CreateProjectCommand, Result<ProjectDto>>
 {
+    private readonly TimeProvider _dateTime = dateTime;
+
     public async Task<Result<ProjectDto>> HandleAsync(
         CreateProjectCommand command,
         CancellationToken cancellationToken = default)
@@ -28,15 +30,17 @@ public sealed partial class CreateProjectCommandHandler(IApplicationDbContext db
 
         // Generate unique slug from name
         var slug = await GenerateUniqueSlugAsync(command.Name, cancellationToken);
+        var now = _dateTime.GetUtcNow();
 
         var project = Project.Create(
             command.Name,
             slug,
             command.Description,
-            command.CreatedByUserId);
+            command.CreatedByUserId,
+            now);
 
         // Add the creator as a member
-        project.AddMember(command.CreatedByUserId);
+        project.AddMember(command.CreatedByUserId, now);
 
         // Add additional members if provided
         if (command.MemberIds != null)
@@ -49,7 +53,7 @@ public sealed partial class CreateProjectCommandHandler(IApplicationDbContext db
 
             foreach (var userId in existingUserIds)
             {
-                project.AddMember(userId);
+                project.AddMember(userId, now);
             }
         }
 
@@ -61,6 +65,7 @@ public sealed partial class CreateProjectCommandHandler(IApplicationDbContext db
             "production",
             "Production environment",
             project.Id,
+            now,
             isDefault: true);
 
         var developmentEnv = Environment.Create(
@@ -68,6 +73,7 @@ public sealed partial class CreateProjectCommandHandler(IApplicationDbContext db
             "development",
             "Development environment",
             project.Id,
+            now,
             isDefault: false);
 
         db.Environments.Add(productionEnv);

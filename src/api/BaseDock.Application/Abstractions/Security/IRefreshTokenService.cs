@@ -1,6 +1,6 @@
 namespace BaseDock.Application.Abstractions.Security;
 
-public record RefreshTokenData(Guid UserId, DateTime CreatedAt, DateTime ExpiresAt);
+public record RefreshTokenData(Guid UserId, DateTimeOffset CreatedAt, DateTimeOffset ExpiresAt);
 
 public interface IRefreshTokenService
 {

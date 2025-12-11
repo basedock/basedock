@@ -7,9 +7,11 @@ using BaseDock.Application.Features.Projects.Mappers;
 using BaseDock.Domain.Primitives;
 using Microsoft.EntityFrameworkCore;
 
-public sealed class AddProjectMembersCommandHandler(IApplicationDbContext db)
+public sealed class AddProjectMembersCommandHandler(IApplicationDbContext db, TimeProvider dateTime)
     : ICommandHandler<AddProjectMembersCommand, Result<ProjectDto>>
 {
+    private readonly TimeProvider _dateTime = dateTime;
+
     public async Task<Result<ProjectDto>> HandleAsync(
         AddProjectMembersCommand command,
         CancellationToken cancellationToken = default)
@@ -39,9 +41,10 @@ public sealed class AddProjectMembersCommandHandler(IApplicationDbContext db)
             .Select(u => u.Id)
             .ToListAsync(cancellationToken);
 
+        var now = _dateTime.GetUtcNow();
         foreach (var userId in validUserIds)
         {
-            project.AddMember(userId);
+            project.AddMember(userId, now);
         }
 
         await db.SaveChangesAsync(cancellationToken);

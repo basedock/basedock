@@ -13,7 +13,7 @@ public sealed class Environment : Entity
 
     public Guid ProjectId { get; private set; }
 
-    public DateTime CreatedAt { get; private set; }
+    public DateTimeOffset CreatedAt { get; private set; }
 
     public bool IsDefault { get; private set; }
 
@@ -41,6 +41,7 @@ public sealed class Environment : Entity
         string slug,
         string? description,
         Guid projectId,
+        DateTimeOffset createdAt,
         bool isDefault = false)
     {
         return new Environment
@@ -50,7 +51,7 @@ public sealed class Environment : Entity
             Description = description,
             ProjectId = projectId,
             IsDefault = isDefault,
-            CreatedAt = DateTime.UtcNow
+            CreatedAt = createdAt
         };
     }
 

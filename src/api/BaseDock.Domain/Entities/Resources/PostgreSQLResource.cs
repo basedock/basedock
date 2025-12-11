@@ -23,13 +23,13 @@ public sealed class PostgreSQLResource : Entity
 
     public DeploymentStatus DeploymentStatus { get; private set; } = DeploymentStatus.NotDeployed;
 
-    public DateTime? LastDeployedAt { get; private set; }
+    public DateTimeOffset? LastDeployedAt { get; private set; }
 
     public string? LastDeploymentError { get; private set; }
 
     public Guid EnvironmentId { get; private set; }
 
-    public DateTime CreatedAt { get; private set; }
+    public DateTimeOffset CreatedAt { get; private set; }
 
     // Navigation properties
     public Environment Environment { get; private set; } = null!;
@@ -45,6 +45,7 @@ public sealed class PostgreSQLResource : Entity
         string databaseName,
         string password,
         Guid environmentId,
+        DateTimeOffset createdAt,
         string version = "16",
         int port = 5432,
         string username = "postgres")
@@ -60,7 +61,7 @@ public sealed class PostgreSQLResource : Entity
             Username = username,
             Password = password,
             EnvironmentId = environmentId,
-            CreatedAt = DateTime.UtcNow
+            CreatedAt = createdAt
         };
     }
 
@@ -89,7 +90,7 @@ public sealed class PostgreSQLResource : Entity
         Password = password;
     }
 
-    public void SetDeploymentStatus(DeploymentStatus status, DateTime? deployedAt = null)
+    public void SetDeploymentStatus(DeploymentStatus status, DateTimeOffset? deployedAt = null)
     {
         DeploymentStatus = status;
         if (deployedAt.HasValue)

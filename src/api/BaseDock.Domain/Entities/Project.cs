@@ -12,9 +12,9 @@ public sealed class Project : Entity
 
     public Guid CreatedByUserId { get; private set; }
 
-    public DateTime CreatedAt { get; private set; }
+    public DateTimeOffset CreatedAt { get; private set; }
 
-    public DateTime? UpdatedAt { get; private set; }
+    public DateTimeOffset? UpdatedAt { get; private set; }
 
     // Navigation properties
     public User CreatedBy { get; private set; } = null!;
@@ -31,7 +31,8 @@ public sealed class Project : Entity
         string name,
         string slug,
         string? description,
-        Guid createdByUserId)
+        Guid createdByUserId,
+        DateTimeOffset createdAt)
     {
         return new Project
         {
@@ -39,34 +40,34 @@ public sealed class Project : Entity
             Slug = slug,
             Description = description,
             CreatedByUserId = createdByUserId,
-            CreatedAt = DateTime.UtcNow
+            CreatedAt = createdAt
         };
     }
 
-    public void Update(string name, string? description)
+    public void Update(string name, string? description, DateTimeOffset updatedAt)
     {
         Name = name;
         Description = description;
-        UpdatedAt = DateTime.UtcNow;
+        UpdatedAt = updatedAt;
     }
 
-    public void UpdateSlug(string slug)
+    public void UpdateSlug(string slug, DateTimeOffset updatedAt)
     {
         Slug = slug;
-        UpdatedAt = DateTime.UtcNow;
+        UpdatedAt = updatedAt;
     }
 
-    public ProjectMember AddMember(Guid userId)
+    public ProjectMember AddMember(Guid userId, DateTimeOffset joinedAt)
     {
-        var member = ProjectMember.Create(Id, userId);
+        var member = ProjectMember.Create(Id, userId, joinedAt);
         Members.Add(member);
-        UpdatedAt = DateTime.UtcNow;
+        UpdatedAt = joinedAt;
         return member;
     }
 
-    public void RemoveMember(ProjectMember member)
+    public void RemoveMember(ProjectMember member, DateTimeOffset updatedAt)
     {
         Members.Remove(member);
-        UpdatedAt = DateTime.UtcNow;
+        UpdatedAt = updatedAt;
     }
 }

@@ -12,7 +12,7 @@ public sealed class EnvironmentVariable : Entity
 
     public Guid EnvironmentId { get; private set; }
 
-    public DateTime CreatedAt { get; private set; }
+    public DateTimeOffset CreatedAt { get; private set; }
 
     // Navigation properties
     public Environment Environment { get; private set; } = null!;
@@ -25,7 +25,8 @@ public sealed class EnvironmentVariable : Entity
         string key,
         string value,
         bool isSecret,
-        Guid environmentId)
+        Guid environmentId,
+        DateTimeOffset createdAt)
     {
         return new EnvironmentVariable
         {
@@ -33,7 +34,7 @@ public sealed class EnvironmentVariable : Entity
             Value = value,
             IsSecret = isSecret,
             EnvironmentId = environmentId,
-            CreatedAt = DateTime.UtcNow
+            CreatedAt = createdAt
         };
     }
 

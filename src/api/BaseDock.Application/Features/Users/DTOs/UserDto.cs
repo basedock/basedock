@@ -5,8 +5,8 @@ public sealed record UserDto(
     string Email,
     string DisplayName,
     bool IsAdmin,
-    DateTime CreatedAt,
-    DateTime? UpdatedAt);
+    DateTimeOffset CreatedAt,
+    DateTimeOffset? UpdatedAt);
 
 public sealed record CreateUserRequest(
     string Email,
