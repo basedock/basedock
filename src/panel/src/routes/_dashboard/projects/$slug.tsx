@@ -1,6 +1,6 @@
 import { createFileRoute, Outlet, useNavigate, Link, useLocation } from "@tanstack/react-router"
-import { getProjectById, getProjectBySlug, getEnvironments } from "@/api/sdk.gen"
-import type { ProjectDto, EnvironmentDto } from "@/api/types.gen"
+import { getProjectById, getProjectBySlug } from "@/api/sdk.gen"
+import type { ProjectDto } from "@/api/types.gen"
 import { Button } from "@/components/ui/button"
 import { Settings } from "lucide-react"
 import { useEffect } from "react"
@@ -8,7 +8,6 @@ import { useEffect } from "react"
 type LoaderData = {
   name: string
   project: ProjectDto
-  environments: EnvironmentDto[]
   defaultEnvSlug: string | null
 }
 
@@ -24,15 +23,12 @@ export const Route = createFileRoute("/_dashboard/projects/$slug")({
     if (projectResponse.error) throw new Error("Project not found")
     const project = projectResponse.data as ProjectDto
 
-    // Load environments to find default
-    const envsResponse = await getEnvironments({ path: { projectSlug: project.slug } })
-    const environments = (envsResponse.data as EnvironmentDto[]) || []
-    const defaultEnv = environments.find(e => e.isDefault) || environments[0]
+    // Find default environment from project data
+    const defaultEnv = project.environments.find(e => e.isDefault) || project.environments[0]
 
     return {
       name: project.name,
       project,
-      environments,
       defaultEnvSlug: defaultEnv?.slug || null
     }
   },

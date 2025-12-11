@@ -1405,7 +1405,8 @@
           "createdAt",
           "updatedAt",
           "environmentCount",
-          "members"
+          "members",
+          "environments"
         ],
         "type": "object",
         "properties": {
@@ -1453,6 +1454,36 @@
             "items": {
               "$ref": "#/components/schemas/ProjectMemberDto"
             }
+          },
+          "environments": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ProjectEnvironmentDto"
+            }
+          }
+        }
+      },
+      "ProjectEnvironmentDto": {
+        "required": [
+          "id",
+          "name",
+          "slug",
+          "isDefault"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "name": {
+            "type": "string"
+          },
+          "slug": {
+            "type": "string"
+          },
+          "isDefault": {
+            "type": "boolean"
           }
         }
       },

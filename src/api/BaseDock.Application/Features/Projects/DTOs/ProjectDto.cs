@@ -9,7 +9,14 @@ public sealed record ProjectDto(
     DateTime CreatedAt,
     DateTime? UpdatedAt,
     int EnvironmentCount,
-    IEnumerable<ProjectMemberDto> Members);
+    IEnumerable<ProjectMemberDto> Members,
+    IEnumerable<ProjectEnvironmentDto> Environments);
+
+public sealed record ProjectEnvironmentDto(
+    Guid Id,
+    string Name,
+    string Slug,
+    bool IsDefault);
 
 public sealed record ProjectMemberDto(
     Guid UserId,

@@ -16,7 +16,23 @@ public static class ProjectMapper
             entity.CreatedAt,
             entity.UpdatedAt,
             entity.Environments.Count,
-            entity.Members.ToDtos());
+            entity.Members.ToDtos(),
+            entity.Environments.ToProjectEnvironmentDtos());
+    }
+
+    public static ProjectEnvironmentDto ToProjectEnvironmentDto(this Domain.Entities.Environment env)
+    {
+        return new ProjectEnvironmentDto(
+            env.Id,
+            env.Name,
+            env.Slug,
+            env.IsDefault);
+    }
+
+    public static IEnumerable<ProjectEnvironmentDto> ToProjectEnvironmentDtos(
+        this IEnumerable<Domain.Entities.Environment> environments)
+    {
+        return environments.Select(e => e.ToProjectEnvironmentDto());
     }
 
     public static IEnumerable<ProjectDto> ToDtos(this IEnumerable<Project> entities)

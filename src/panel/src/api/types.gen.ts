@@ -97,6 +97,14 @@ export type ProjectDto = {
   updatedAt: null | string;
   environmentCount: number | string;
   members: Array<ProjectMemberDto>;
+  environments: Array<ProjectEnvironmentDto>;
+};
+
+export type ProjectEnvironmentDto = {
+  id: string;
+  name: string;
+  slug: string;
+  isDefault: boolean;
 };
 
 export type ProjectMemberDto = {
