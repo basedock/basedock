@@ -49,6 +49,9 @@ type SettingsLoaderData = {
 }
 
 export const Route = createFileRoute("/_dashboard/projects/$slug/settings")({
+  beforeLoad: () => ({
+    getTitle: () => "Settings",
+  }),
   loader: async ({ params }): Promise<SettingsLoaderData> => {
     const response = await getProjectBySlug({ path: { slug: params.slug } })
     if (response.error) throw new Error("Project not found")
