@@ -24,9 +24,16 @@ import {
 } from "@/components/ui/table"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
-import { Box, Key, Plus, Database, Container, FileCode } from "lucide-react"
+import { Box, Key, Plus, Database, Container, FileCode, Layers } from "lucide-react"
 import { useState } from "react"
 import { useAuth } from "@/contexts/auth-context"
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
+import { CreateResourceDialog } from "@/components/create-resource-dialog"
 
 export const Route = createFileRoute("/_dashboard/projects/$slug/$env")({
   loader: async ({ params }) => {
@@ -71,11 +78,20 @@ function getStatusVariant(status: string): "default" | "secondary" | "destructiv
   }
 }
 
+type ResourceCategory = "application" | "database" | "compose"
+
 function EnvironmentDetailPage() {
   const environment = Route.useLoaderData()
   const [activeTab, setActiveTab] = useState("resources")
+  const [dialogOpen, setDialogOpen] = useState(false)
+  const [selectedCategory, setSelectedCategory] = useState<ResourceCategory | null>(null)
   const { user } = useAuth()
   const isAdmin = user?.isAdmin ?? false
+
+  const openResourceDialog = (category: ResourceCategory) => {
+    setSelectedCategory(category)
+    setDialogOpen(true)
+  }
 
   return (
     <div className="flex flex-col gap-6 p-6">
@@ -102,10 +118,28 @@ function EnvironmentDetailPage() {
                   </CardDescription>
                 </div>
                 {isAdmin && (
-                  <Button>
-                    <Plus className="mr-2 h-4 w-4" />
-                    Add Resource
-                  </Button>
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Button>
+                        <Plus className="mr-2 h-4 w-4" />
+                        Add Resource
+                      </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end">
+                      <DropdownMenuItem onClick={() => openResourceDialog("application")}>
+                        <Container className="mr-2 h-4 w-4" />
+                        Application
+                      </DropdownMenuItem>
+                      <DropdownMenuItem onClick={() => openResourceDialog("database")}>
+                        <Database className="mr-2 h-4 w-4" />
+                        Database
+                      </DropdownMenuItem>
+                      <DropdownMenuItem onClick={() => openResourceDialog("compose")}>
+                        <Layers className="mr-2 h-4 w-4" />
+                        Compose
+                      </DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
                 )}
               </div>
             </CardHeader>
@@ -118,10 +152,28 @@ function EnvironmentDetailPage() {
                     Add applications, databases, or services to this environment.
                   </p>
                   {isAdmin && (
-                    <Button>
-                      <Plus className="mr-2 h-4 w-4" />
-                      Add First Resource
-                    </Button>
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <Button>
+                          <Plus className="mr-2 h-4 w-4" />
+                          Add First Resource
+                        </Button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent>
+                        <DropdownMenuItem onClick={() => openResourceDialog("application")}>
+                          <Container className="mr-2 h-4 w-4" />
+                          Application
+                        </DropdownMenuItem>
+                        <DropdownMenuItem onClick={() => openResourceDialog("database")}>
+                          <Database className="mr-2 h-4 w-4" />
+                          Database
+                        </DropdownMenuItem>
+                        <DropdownMenuItem onClick={() => openResourceDialog("compose")}>
+                          <Layers className="mr-2 h-4 w-4" />
+                          Compose
+                        </DropdownMenuItem>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
                   )}
                 </div>
               ) : (
@@ -248,6 +300,12 @@ function EnvironmentDetailPage() {
           </Card>
         </TabsContent>
       </Tabs>
+
+      <CreateResourceDialog
+        category={selectedCategory}
+        open={dialogOpen}
+        onOpenChange={setDialogOpen}
+      />
     </div>
   )
 }
