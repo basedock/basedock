@@ -60,10 +60,12 @@ export function NavProjects() {
           </>
         ) : projects && projects.length > 0 ? (
           <>
-            {projects.slice(0, 5).map((project) => (
+            {projects.slice(0, 5).map((project) => {
+              const defaultEnv = project.environments.find(e => e.isDefault) || project.environments[0]
+              return (
               <SidebarMenuItem key={project.id}>
                 <SidebarMenuButton asChild>
-                  <Link to="/projects/$slug" params={{ slug: project.slug }}>
+                  <Link to="/projects/$slug/$env" params={{ slug: project.slug, env: defaultEnv?.slug ?? '' }}>
                     <Folder />
                     <span>{project.name}</span>
                   </Link>
@@ -82,7 +84,7 @@ export function NavProjects() {
                       align={isMobile ? "end" : "start"}
                     >
                       <DropdownMenuItem asChild>
-                        <Link to="/projects/$slug" params={{ slug: project.slug }}>
+                        <Link to="/projects/$slug/settings" params={{ slug: project.slug }}>
                           <Pencil className="text-muted-foreground" />
                           <span>Edit Project</span>
                         </Link>
@@ -96,7 +98,7 @@ export function NavProjects() {
                   </DropdownMenu>
                 )}
               </SidebarMenuItem>
-            ))}
+            )})}
           </>
         ) : (
           <SidebarMenuItem>

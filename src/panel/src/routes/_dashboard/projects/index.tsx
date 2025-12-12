@@ -108,13 +108,15 @@ function ProjectsPage() {
           </Empty>
         ) : (
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-            {projects.map((project) => (
+            {projects.map((project) => {
+              const defaultEnv = project.environments.find(e => e.isDefault) || project.environments[0]
+              return (
               <Card key={project.id}>
                 <CardHeader>
                   <CardTitle>
                     <Link
-                      to="/projects/$slug"
-                      params={{ slug: project.slug }}
+                      to="/projects/$slug/$env"
+                      params={{ slug: project.slug, env: defaultEnv?.slug ?? '' }}
                       className="hover:underline"
                     >
                       {project.name}
@@ -134,7 +136,7 @@ function ProjectsPage() {
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end">
                           <DropdownMenuItem asChild>
-                            <Link to="/projects/$slug" params={{ slug: project.slug }}>
+                            <Link to="/projects/$slug/settings" params={{ slug: project.slug }}>
                               <Pencil className="mr-2 h-4 w-4" />
                               Edit
                             </Link>
@@ -169,7 +171,7 @@ function ProjectsPage() {
                   </div>
                 </CardContent>
               </Card>
-            ))}
+            )})}
           </div>
         )}
       </div>
