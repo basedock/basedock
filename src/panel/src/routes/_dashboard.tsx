@@ -58,18 +58,18 @@ function AuthenticatedLayout() {
 
   if (slugMatch && envMatch) {
     const loaderData = slugMatch.loaderData as {
-      environments?: { name: string; slug: string }[]
-      project?: { slug: string }
+      project?: { slug: string; environments: { name: string; slug: string }[] }
     } | undefined
 
-    if (loaderData?.environments && loaderData?.project && loaderData.environments.length > 1) {
+    const environments = loaderData?.project?.environments
+    if (environments && environments.length > 1) {
       // Find the last breadcrumb (environment) and add dropdown
       const lastIndex = breadcrumbs.length - 1
       if (lastIndex > 0) {
         breadcrumbs[lastIndex] = {
           ...breadcrumbs[lastIndex],
           dropdown: {
-            items: loaderData.environments.map(env => ({
+            items: environments.map(env => ({
               label: env.name,
               href: `/projects/${loaderData.project!.slug}/${env.slug}`
             }))
