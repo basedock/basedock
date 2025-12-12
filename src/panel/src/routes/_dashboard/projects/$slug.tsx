@@ -1,4 +1,4 @@
-import { createFileRoute, Outlet, useNavigate, Link, useLocation } from "@tanstack/react-router"
+import { createFileRoute, Outlet, useNavigate, Link, useLocation, useParams } from "@tanstack/react-router"
 import { getProjectById, getProjectBySlug } from "@/api/sdk.gen"
 import type { ProjectDto } from "@/api/types.gen"
 import { Button } from "@/components/ui/button"
@@ -45,6 +45,8 @@ function ProjectLayout() {
   const { project, defaultEnvSlug } = Route.useLoaderData()
   const navigate = useNavigate()
   const location = useLocation()
+  const { env } = useParams({ strict: false })
+  const currentEnv = project.environments.find(e => e.slug === env)
 
   // Check if we're at the base project URL (no env selected)
   const isBaseProjectUrl = location.pathname === `/projects/${project.slug}` ||
@@ -69,8 +71,16 @@ function ProjectLayout() {
   return (
     <div className="flex flex-1 flex-col">
       {/* Project Header */}
-      <div className="flex items-center justify-between gap-4 border-b px-6 py-4">
-        <span className="text-xl font-semibold">{project.name}</span>
+      <div className="flex items-center justify-between gap-4 px-6 py-4">
+        <div className="flex items-center gap-2">
+          <span className="text-xl font-semibold">{project.name}</span>
+          {currentEnv && (
+            <>
+              <span className="text-muted-foreground">/</span>
+              <span className="text-xl font-semibold">{currentEnv.name}</span>
+            </>
+          )}
+        </div>
         <Button variant="outline" size="sm" asChild>
           <Link to="/projects/$slug/settings" params={{ slug: project.slug }}>
             <Settings className="mr-2 h-4 w-4" />

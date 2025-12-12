@@ -79,15 +79,6 @@ function EnvironmentDetailPage() {
 
   return (
     <div className="flex flex-col gap-6 p-6">
-      {/* Environment Info */}
-      <div>
-        <h2 className="text-2xl font-bold">{environment.name}</h2>
-        {environment.description && (
-          <p className="text-muted-foreground">{environment.description}</p>
-        )}
-      </div>
-
-      {/* Tabs */}
       <Tabs value={activeTab} onValueChange={setActiveTab}>
         <TabsList>
           <TabsTrigger value="resources">
