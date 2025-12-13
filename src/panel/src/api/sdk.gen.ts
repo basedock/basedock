@@ -17,6 +17,9 @@ import type {
   CreateUserData,
   CreateUserErrors,
   CreateUserResponses,
+  DeleteEnvironmentData,
+  DeleteEnvironmentErrors,
+  DeleteEnvironmentResponses,
   DeleteProjectData,
   DeleteProjectErrors,
   DeleteProjectResponses,
@@ -319,6 +322,18 @@ export const createEnvironment = <ThrowOnError extends boolean = false>(
       ...options.headers,
     },
   });
+
+/**
+ * Delete an environment (Admin only)
+ */
+export const deleteEnvironment = <ThrowOnError extends boolean = false>(
+  options: Options<DeleteEnvironmentData, ThrowOnError>,
+) =>
+  (options.client ?? client).delete<
+    DeleteEnvironmentResponses,
+    DeleteEnvironmentErrors,
+    ThrowOnError
+  >({ url: "/api/projects/{projectSlug}/environments/{envSlug}", ...options });
 
 /**
  * Get environment details by slug

@@ -13,6 +13,7 @@ import {
   createEnvironment,
   createProject,
   createUser,
+  deleteEnvironment,
   deleteProject,
   deleteUser,
   getEnvironmentBySlug,
@@ -45,6 +46,9 @@ import type {
   CreateUserData,
   CreateUserError,
   CreateUserResponse,
+  DeleteEnvironmentData,
+  DeleteEnvironmentError,
+  DeleteEnvironmentResponse,
   DeleteProjectData,
   DeleteProjectError,
   DeleteUserData,
@@ -540,6 +544,33 @@ export const createEnvironmentMutation = (
   > = {
     mutationFn: async (fnOptions) => {
       const { data } = await createEnvironment({
+        ...options,
+        ...fnOptions,
+        throwOnError: true,
+      });
+      return data;
+    },
+  };
+  return mutationOptions;
+};
+
+/**
+ * Delete an environment (Admin only)
+ */
+export const deleteEnvironmentMutation = (
+  options?: Partial<Options<DeleteEnvironmentData>>,
+): UseMutationOptions<
+  DeleteEnvironmentResponse,
+  DeleteEnvironmentError,
+  Options<DeleteEnvironmentData>
+> => {
+  const mutationOptions: UseMutationOptions<
+    DeleteEnvironmentResponse,
+    DeleteEnvironmentError,
+    Options<DeleteEnvironmentData>
+  > = {
+    mutationFn: async (fnOptions) => {
+      const { data } = await deleteEnvironment({
         ...options,
         ...fnOptions,
         throwOnError: true,

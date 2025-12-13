@@ -4,6 +4,7 @@ using System.Security.Claims;
 using BaseDock.Api.Extensions;
 using BaseDock.Application.Abstractions.Messaging;
 using BaseDock.Application.Features.Environments.Commands.CreateEnvironment;
+using BaseDock.Application.Features.Environments.Commands.DeleteEnvironment;
 using BaseDock.Application.Features.Environments.DTOs;
 using BaseDock.Application.Features.Environments.Queries.GetEnvironmentBySlug;
 using BaseDock.Application.Features.Environments.Queries.GetEnvironmentsByProject;
@@ -37,6 +38,14 @@ public class EnvironmentModule : ICarterModule
             .ProducesValidationProblem()
             .ProducesProblem(StatusCodes.Status404NotFound)
             .ProducesProblem(StatusCodes.Status409Conflict)
+            .ProducesProblem(StatusCodes.Status403Forbidden);
+
+        group.MapDelete("/{envSlug}", DeleteEnvironment)
+            .WithName("DeleteEnvironment")
+            .WithSummary("Delete an environment (Admin only)")
+            .Produces(StatusCodes.Status204NoContent)
+            .ProducesProblem(StatusCodes.Status404NotFound)
+            .ProducesProblem(StatusCodes.Status400BadRequest)
             .ProducesProblem(StatusCodes.Status403Forbidden);
     }
 
@@ -100,5 +109,26 @@ public class EnvironmentModule : ICarterModule
             userId);
         var result = await dispatcher.SendAsync(command, cancellationToken);
         return result.ToCreatedResult($"/api/projects/{projectSlug}/environments/{result.Value?.Slug}");
+    }
+
+    private static async Task<IResult> DeleteEnvironment(
+        string projectSlug,
+        string envSlug,
+        ClaimsPrincipal user,
+        IDispatcher dispatcher,
+        CancellationToken cancellationToken = default)
+    {
+        if (!IsAdmin(user))
+        {
+            return Results.Problem(
+                statusCode: StatusCodes.Status403Forbidden,
+                title: "Error.Forbidden",
+                detail: "Only administrators can delete environments.");
+        }
+
+        var userId = GetUserId(user);
+        var command = new DeleteEnvironmentCommand(projectSlug, envSlug, userId);
+        var result = await dispatcher.SendAsync(command, cancellationToken);
+        return result.ToHttpResult();
     }
 }

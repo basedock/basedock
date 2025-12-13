@@ -23,12 +23,14 @@ interface CreateEnvironmentDialogProps {
   projectSlug: string
   open: boolean
   onOpenChange: (open: boolean) => void
+  onSuccess?: () => void
 }
 
 export function CreateEnvironmentDialog({
   projectSlug,
   open,
   onOpenChange,
+  onSuccess,
 }: CreateEnvironmentDialogProps) {
   const queryClient = useQueryClient()
 
@@ -51,6 +53,7 @@ export function CreateEnvironmentDialog({
       queryClient.invalidateQueries({ queryKey: ["environments", projectSlug] })
       onOpenChange(false)
       form.reset()
+      onSuccess?.()
     },
   })
 

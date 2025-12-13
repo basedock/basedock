@@ -658,6 +658,44 @@ export type CreateEnvironmentResponses = {
 export type CreateEnvironmentResponse =
   CreateEnvironmentResponses[keyof CreateEnvironmentResponses];
 
+export type DeleteEnvironmentData = {
+  body?: never;
+  path: {
+    projectSlug: string;
+    envSlug: string;
+  };
+  query?: never;
+  url: "/api/projects/{projectSlug}/environments/{envSlug}";
+};
+
+export type DeleteEnvironmentErrors = {
+  /**
+   * Bad Request
+   */
+  400: ProblemDetails;
+  /**
+   * Forbidden
+   */
+  403: ProblemDetails;
+  /**
+   * Not Found
+   */
+  404: ProblemDetails;
+};
+
+export type DeleteEnvironmentError =
+  DeleteEnvironmentErrors[keyof DeleteEnvironmentErrors];
+
+export type DeleteEnvironmentResponses = {
+  /**
+   * No Content
+   */
+  204: void;
+};
+
+export type DeleteEnvironmentResponse =
+  DeleteEnvironmentResponses[keyof DeleteEnvironmentResponses];
+
 export type GetEnvironmentBySlugData = {
   body?: never;
   path: {
