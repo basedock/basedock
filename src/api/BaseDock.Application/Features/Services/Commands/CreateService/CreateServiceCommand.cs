@@ -1,0 +1,47 @@
+namespace BaseDock.Application.Features.Services.Commands.CreateService;
+
+using BaseDock.Application.Abstractions.Messaging;
+using BaseDock.Application.Features.Services.DTOs;
+using BaseDock.Domain.Primitives;
+
+public sealed record CreateServiceCommand(
+    string ProjectSlug,
+    string EnvironmentSlug,
+    string Name,
+    string? Description,
+    string? Image,
+    string? BuildContext,
+    string? BuildDockerfile,
+    string? BuildArgs,
+    string[]? Command,
+    string[]? Entrypoint,
+    string? WorkingDir,
+    string? User,
+    string? Ports,
+    int[]? Expose,
+    string? Hostname,
+    string? Domainname,
+    string[]? Dns,
+    string? ExtraHosts,
+    string? EnvironmentVariables,
+    string[]? EnvFile,
+    string? Volumes,
+    string[]? Tmpfs,
+    string? DependsOn,
+    string[]? Links,
+    string[]? HealthcheckTest,
+    string? HealthcheckInterval,
+    string? HealthcheckTimeout,
+    int? HealthcheckRetries,
+    string? HealthcheckStartPeriod,
+    bool HealthcheckDisabled,
+    string? CpuLimit,
+    string? MemoryLimit,
+    string? CpuReservation,
+    string? MemoryReservation,
+    string? Restart,
+    string? StopGracePeriod,
+    string? StopSignal,
+    int Replicas,
+    string? Labels,
+    Guid UserId) : ICommand<Result<ServiceDto>>;

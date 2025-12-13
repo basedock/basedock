@@ -1,7 +1,6 @@
 namespace BaseDock.Domain.Entities;
 
 using BaseDock.Domain.Common;
-using BaseDock.Domain.Entities.Resources;
 
 public sealed class Environment : Entity
 {
@@ -22,19 +21,15 @@ public sealed class Environment : Entity
     // Navigation properties
     public Project Project { get; private set; } = null!;
 
-    public ICollection<EnvironmentVariable> Variables { get; private set; } = new List<EnvironmentVariable>();
+    public ICollection<Service> Services { get; private set; } = new List<Service>();
 
-    public ICollection<DockerImageResource> DockerImageResources { get; private set; } = new List<DockerImageResource>();
+    public ICollection<Volume> Volumes { get; private set; } = new List<Volume>();
 
-    public ICollection<DockerfileResource> DockerfileResources { get; private set; } = new List<DockerfileResource>();
+    public ICollection<Network> Networks { get; private set; } = new List<Network>();
 
-    public ICollection<DockerComposeResource> DockerComposeResources { get; private set; } = new List<DockerComposeResource>();
+    public ICollection<Config> Configs { get; private set; } = new List<Config>();
 
-    public ICollection<PostgreSQLResource> PostgreSQLResources { get; private set; } = new List<PostgreSQLResource>();
-
-    public ICollection<RedisResource> RedisResources { get; private set; } = new List<RedisResource>();
-
-    public ICollection<PreMadeAppResource> PreMadeAppResources { get; private set; } = new List<PreMadeAppResource>();
+    public ICollection<Secret> Secrets { get; private set; } = new List<Secret>();
 
     private Environment()
     {

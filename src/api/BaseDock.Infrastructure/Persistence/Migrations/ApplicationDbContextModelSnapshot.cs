@@ -8,7 +8,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 #nullable disable
 
-namespace BaseDock.Infrastructure.Migrations
+namespace BaseDock.Infrastructure.Persistence.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
     partial class ApplicationDbContextModelSnapshot : ModelSnapshot
@@ -21,6 +21,55 @@ namespace BaseDock.Infrastructure.Migrations
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
+
+            modelBuilder.Entity("BaseDock.Domain.Entities.Config", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid")
+                        .HasColumnName("id");
+
+                    b.Property<string>("Content")
+                        .HasColumnType("text")
+                        .HasColumnName("content");
+
+                    b.Property<DateTimeOffset>("CreatedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("created_at");
+
+                    b.Property<Guid>("EnvironmentId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("environment_id");
+
+                    b.Property<bool>("External")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("boolean")
+                        .HasDefaultValue(false)
+                        .HasColumnName("external");
+
+                    b.Property<string>("ExternalName")
+                        .HasMaxLength(255)
+                        .HasColumnType("character varying(255)")
+                        .HasColumnName("external_name");
+
+                    b.Property<string>("FilePath")
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)")
+                        .HasColumnName("file_path");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("character varying(255)")
+                        .HasColumnName("name");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("EnvironmentId", "Name")
+                        .IsUnique();
+
+                    b.ToTable("configs", (string)null);
+                });
 
             modelBuilder.Entity("BaseDock.Domain.Entities.Environment", b =>
                 {
@@ -73,44 +122,78 @@ namespace BaseDock.Infrastructure.Migrations
                     b.ToTable("environments", (string)null);
                 });
 
-            modelBuilder.Entity("BaseDock.Domain.Entities.EnvironmentVariable", b =>
+            modelBuilder.Entity("BaseDock.Domain.Entities.Network", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid")
                         .HasColumnName("id");
 
+                    b.Property<bool>("Attachable")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("boolean")
+                        .HasDefaultValue(false)
+                        .HasColumnName("attachable");
+
                     b.Property<DateTimeOffset>("CreatedAt")
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("created_at");
+
+                    b.Property<string>("Driver")
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)")
+                        .HasColumnName("driver");
+
+                    b.Property<string>("DriverOpts")
+                        .HasColumnType("jsonb")
+                        .HasColumnName("driver_opts");
 
                     b.Property<Guid>("EnvironmentId")
                         .HasColumnType("uuid")
                         .HasColumnName("environment_id");
 
-                    b.Property<bool>("IsSecret")
+                    b.Property<bool>("External")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("boolean")
                         .HasDefaultValue(false)
-                        .HasColumnName("is_secret");
+                        .HasColumnName("external");
 
-                    b.Property<string>("Key")
+                    b.Property<string>("ExternalName")
+                        .HasMaxLength(255)
+                        .HasColumnType("character varying(255)")
+                        .HasColumnName("external_name");
+
+                    b.Property<bool>("Internal")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("boolean")
+                        .HasDefaultValue(false)
+                        .HasColumnName("internal");
+
+                    b.Property<string>("IpamConfig")
+                        .HasColumnType("jsonb")
+                        .HasColumnName("ipam_config");
+
+                    b.Property<string>("IpamDriver")
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)")
+                        .HasColumnName("ipam_driver");
+
+                    b.Property<string>("Labels")
+                        .HasColumnType("jsonb")
+                        .HasColumnName("labels");
+
+                    b.Property<string>("Name")
                         .IsRequired()
                         .HasMaxLength(255)
                         .HasColumnType("character varying(255)")
-                        .HasColumnName("key");
-
-                    b.Property<string>("Value")
-                        .IsRequired()
-                        .HasColumnType("text")
-                        .HasColumnName("value");
+                        .HasColumnName("name");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("EnvironmentId", "Key")
+                    b.HasIndex("EnvironmentId", "Name")
                         .IsUnique();
 
-                    b.ToTable("environment_variables", (string)null);
+                    b.ToTable("networks", (string)null);
                 });
 
             modelBuilder.Entity("BaseDock.Domain.Entities.Project", b =>
@@ -191,174 +274,56 @@ namespace BaseDock.Infrastructure.Migrations
                     b.ToTable("project_members", (string)null);
                 });
 
-            modelBuilder.Entity("BaseDock.Domain.Entities.Resources.DockerComposeResource", b =>
+            modelBuilder.Entity("BaseDock.Domain.Entities.Secret", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid")
                         .HasColumnName("id");
 
-                    b.Property<string>("ComposeFileContent")
-                        .IsRequired()
+                    b.Property<string>("Content")
                         .HasColumnType("text")
-                        .HasColumnName("compose_file_content");
+                        .HasColumnName("content");
 
                     b.Property<DateTimeOffset>("CreatedAt")
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("created_at");
 
-                    b.Property<string>("DeploymentStatus")
-                        .IsRequired()
-                        .ValueGeneratedOnAdd()
-                        .HasMaxLength(50)
-                        .HasColumnType("character varying(50)")
-                        .HasDefaultValue("NotDeployed")
-                        .HasColumnName("deployment_status");
-
-                    b.Property<string>("Description")
-                        .HasMaxLength(500)
-                        .HasColumnType("character varying(500)")
-                        .HasColumnName("description");
-
                     b.Property<Guid>("EnvironmentId")
                         .HasColumnType("uuid")
                         .HasColumnName("environment_id");
 
-                    b.Property<DateTimeOffset?>("LastDeployedAt")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("last_deployed_at");
+                    b.Property<bool>("External")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("boolean")
+                        .HasDefaultValue(false)
+                        .HasColumnName("external");
 
-                    b.Property<string>("LastDeploymentError")
-                        .HasMaxLength(2000)
-                        .HasColumnType("character varying(2000)")
-                        .HasColumnName("last_deployment_error");
+                    b.Property<string>("ExternalName")
+                        .HasMaxLength(255)
+                        .HasColumnType("character varying(255)")
+                        .HasColumnName("external_name");
+
+                    b.Property<string>("FilePath")
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)")
+                        .HasColumnName("file_path");
 
                     b.Property<string>("Name")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("character varying(100)")
-                        .HasColumnName("name");
-
-                    b.Property<string>("Slug")
-                        .IsRequired()
-                        .HasMaxLength(120)
-                        .HasColumnType("character varying(120)")
-                        .HasColumnName("slug");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("EnvironmentId", "Slug")
-                        .IsUnique();
-
-                    b.ToTable("docker_compose_resources", (string)null);
-                });
-
-            modelBuilder.Entity("BaseDock.Domain.Entities.Resources.DockerImageResource", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid")
-                        .HasColumnName("id");
-
-                    b.Property<string>("CpuLimit")
-                        .HasMaxLength(20)
-                        .HasColumnType("character varying(20)")
-                        .HasColumnName("cpu_limit");
-
-                    b.Property<DateTimeOffset>("CreatedAt")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("created_at");
-
-                    b.Property<string>("DeploymentStatus")
-                        .IsRequired()
-                        .ValueGeneratedOnAdd()
-                        .HasMaxLength(50)
-                        .HasColumnType("character varying(50)")
-                        .HasDefaultValue("NotDeployed")
-                        .HasColumnName("deployment_status");
-
-                    b.Property<string>("Description")
-                        .HasMaxLength(500)
-                        .HasColumnType("character varying(500)")
-                        .HasColumnName("description");
-
-                    b.Property<Guid>("EnvironmentId")
-                        .HasColumnType("uuid")
-                        .HasColumnName("environment_id");
-
-                    b.Property<string>("EnvironmentVariables")
-                        .HasColumnType("jsonb")
-                        .HasColumnName("environment_variables");
-
-                    b.Property<string>("Image")
                         .IsRequired()
                         .HasMaxLength(255)
                         .HasColumnType("character varying(255)")
-                        .HasColumnName("image");
-
-                    b.Property<DateTimeOffset?>("LastDeployedAt")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("last_deployed_at");
-
-                    b.Property<string>("LastDeploymentError")
-                        .HasMaxLength(2000)
-                        .HasColumnType("character varying(2000)")
-                        .HasColumnName("last_deployment_error");
-
-                    b.Property<string>("MemoryLimit")
-                        .HasMaxLength(20)
-                        .HasColumnType("character varying(20)")
-                        .HasColumnName("memory_limit");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("character varying(100)")
                         .HasColumnName("name");
-
-                    b.Property<string>("Networks")
-                        .HasColumnType("jsonb")
-                        .HasColumnName("networks");
-
-                    b.Property<string>("Ports")
-                        .HasColumnType("jsonb")
-                        .HasColumnName("ports");
-
-                    b.Property<string>("RestartPolicy")
-                        .IsRequired()
-                        .ValueGeneratedOnAdd()
-                        .HasMaxLength(50)
-                        .HasColumnType("character varying(50)")
-                        .HasDefaultValue("unless-stopped")
-                        .HasColumnName("restart_policy");
-
-                    b.Property<string>("Slug")
-                        .IsRequired()
-                        .HasMaxLength(120)
-                        .HasColumnType("character varying(120)")
-                        .HasColumnName("slug");
-
-                    b.Property<string>("Tag")
-                        .IsRequired()
-                        .ValueGeneratedOnAdd()
-                        .HasMaxLength(128)
-                        .HasColumnType("character varying(128)")
-                        .HasDefaultValue("latest")
-                        .HasColumnName("tag");
-
-                    b.Property<string>("Volumes")
-                        .HasColumnType("jsonb")
-                        .HasColumnName("volumes");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("EnvironmentId", "Slug")
+                    b.HasIndex("EnvironmentId", "Name")
                         .IsUnique();
 
-                    b.ToTable("docker_image_resources", (string)null);
+                    b.ToTable("secrets", (string)null);
                 });
 
-            modelBuilder.Entity("BaseDock.Domain.Entities.Resources.DockerfileResource", b =>
+            modelBuilder.Entity("BaseDock.Domain.Entities.Service", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -370,36 +335,62 @@ namespace BaseDock.Infrastructure.Migrations
                         .HasColumnName("build_args");
 
                     b.Property<string>("BuildContext")
-                        .HasMaxLength(500)
-                        .HasColumnType("character varying(500)")
+                        .HasColumnType("text")
                         .HasColumnName("build_context");
 
+                    b.Property<string>("BuildDockerfile")
+                        .HasColumnType("text")
+                        .HasColumnName("build_dockerfile");
+
+                    b.PrimitiveCollection<string[]>("Command")
+                        .HasColumnType("text[]")
+                        .HasColumnName("command");
+
                     b.Property<string>("CpuLimit")
-                        .HasMaxLength(20)
-                        .HasColumnType("character varying(20)")
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)")
                         .HasColumnName("cpu_limit");
+
+                    b.Property<string>("CpuReservation")
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)")
+                        .HasColumnName("cpu_reservation");
 
                     b.Property<DateTimeOffset>("CreatedAt")
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("created_at");
 
-                    b.Property<string>("DeploymentStatus")
-                        .IsRequired()
+                    b.Property<string>("DependsOn")
+                        .HasColumnType("jsonb")
+                        .HasColumnName("depends_on");
+
+                    b.Property<int>("DeploymentStatus")
                         .ValueGeneratedOnAdd()
-                        .HasMaxLength(50)
-                        .HasColumnType("character varying(50)")
-                        .HasDefaultValue("NotDeployed")
+                        .HasColumnType("integer")
+                        .HasDefaultValue(0)
                         .HasColumnName("deployment_status");
 
                     b.Property<string>("Description")
-                        .HasMaxLength(500)
-                        .HasColumnType("character varying(500)")
+                        .HasMaxLength(1000)
+                        .HasColumnType("character varying(1000)")
                         .HasColumnName("description");
 
-                    b.Property<string>("DockerfileContent")
-                        .IsRequired()
-                        .HasColumnType("text")
-                        .HasColumnName("dockerfile_content");
+                    b.PrimitiveCollection<string[]>("Dns")
+                        .HasColumnType("text[]")
+                        .HasColumnName("dns");
+
+                    b.Property<string>("Domainname")
+                        .HasMaxLength(255)
+                        .HasColumnType("character varying(255)")
+                        .HasColumnName("domainname");
+
+                    b.PrimitiveCollection<string[]>("Entrypoint")
+                        .HasColumnType("text[]")
+                        .HasColumnName("entrypoint");
+
+                    b.PrimitiveCollection<string[]>("EnvFile")
+                        .HasColumnType("text[]")
+                        .HasColumnName("env_file");
 
                     b.Property<Guid>("EnvironmentId")
                         .HasColumnType("uuid")
@@ -409,302 +400,249 @@ namespace BaseDock.Infrastructure.Migrations
                         .HasColumnType("jsonb")
                         .HasColumnName("environment_variables");
 
+                    b.PrimitiveCollection<int[]>("Expose")
+                        .HasColumnType("integer[]")
+                        .HasColumnName("expose");
+
+                    b.Property<string>("ExtraHosts")
+                        .HasColumnType("jsonb")
+                        .HasColumnName("extra_hosts");
+
+                    b.Property<bool>("HealthcheckDisabled")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("boolean")
+                        .HasDefaultValue(false)
+                        .HasColumnName("healthcheck_disabled");
+
+                    b.Property<string>("HealthcheckInterval")
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)")
+                        .HasColumnName("healthcheck_interval");
+
+                    b.Property<int?>("HealthcheckRetries")
+                        .HasColumnType("integer")
+                        .HasColumnName("healthcheck_retries");
+
+                    b.Property<string>("HealthcheckStartPeriod")
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)")
+                        .HasColumnName("healthcheck_start_period");
+
+                    b.PrimitiveCollection<string[]>("HealthcheckTest")
+                        .HasColumnType("text[]")
+                        .HasColumnName("healthcheck_test");
+
+                    b.Property<string>("HealthcheckTimeout")
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)")
+                        .HasColumnName("healthcheck_timeout");
+
+                    b.Property<string>("Hostname")
+                        .HasMaxLength(255)
+                        .HasColumnType("character varying(255)")
+                        .HasColumnName("hostname");
+
+                    b.Property<string>("Image")
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)")
+                        .HasColumnName("image");
+
+                    b.Property<string>("Labels")
+                        .HasColumnType("jsonb")
+                        .HasColumnName("labels");
+
                     b.Property<DateTimeOffset?>("LastDeployedAt")
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("last_deployed_at");
 
-                    b.Property<string>("LastDeploymentError")
-                        .HasMaxLength(2000)
-                        .HasColumnType("character varying(2000)")
-                        .HasColumnName("last_deployment_error");
+                    b.Property<string>("LastError")
+                        .HasColumnType("text")
+                        .HasColumnName("last_error");
+
+                    b.PrimitiveCollection<string[]>("Links")
+                        .HasColumnType("text[]")
+                        .HasColumnName("links");
 
                     b.Property<string>("MemoryLimit")
-                        .HasMaxLength(20)
-                        .HasColumnType("character varying(20)")
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)")
                         .HasColumnName("memory_limit");
+
+                    b.Property<string>("MemoryReservation")
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)")
+                        .HasColumnName("memory_reservation");
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("character varying(100)")
+                        .HasMaxLength(255)
+                        .HasColumnType("character varying(255)")
                         .HasColumnName("name");
-
-                    b.Property<string>("Networks")
-                        .HasColumnType("jsonb")
-                        .HasColumnName("networks");
 
                     b.Property<string>("Ports")
                         .HasColumnType("jsonb")
                         .HasColumnName("ports");
 
-                    b.Property<string>("RestartPolicy")
-                        .IsRequired()
+                    b.Property<int>("Replicas")
                         .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .HasDefaultValue(1)
+                        .HasColumnName("replicas");
+
+                    b.Property<string>("Restart")
                         .HasMaxLength(50)
                         .HasColumnType("character varying(50)")
-                        .HasDefaultValue("unless-stopped")
-                        .HasColumnName("restart_policy");
+                        .HasColumnName("restart");
 
                     b.Property<string>("Slug")
                         .IsRequired()
-                        .HasMaxLength(120)
-                        .HasColumnType("character varying(120)")
+                        .HasMaxLength(255)
+                        .HasColumnType("character varying(255)")
                         .HasColumnName("slug");
+
+                    b.Property<string>("StopGracePeriod")
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)")
+                        .HasColumnName("stop_grace_period");
+
+                    b.Property<string>("StopSignal")
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)")
+                        .HasColumnName("stop_signal");
+
+                    b.PrimitiveCollection<string[]>("Tmpfs")
+                        .HasColumnType("text[]")
+                        .HasColumnName("tmpfs");
+
+                    b.Property<DateTimeOffset?>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("updated_at");
+
+                    b.Property<string>("User")
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)")
+                        .HasColumnName("user");
 
                     b.Property<string>("Volumes")
                         .HasColumnType("jsonb")
                         .HasColumnName("volumes");
 
-                    b.HasKey("Id");
-
-                    b.HasIndex("EnvironmentId", "Slug")
-                        .IsUnique();
-
-                    b.ToTable("dockerfile_resources", (string)null);
-                });
-
-            modelBuilder.Entity("BaseDock.Domain.Entities.Resources.PostgreSQLResource", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid")
-                        .HasColumnName("id");
-
-                    b.Property<DateTimeOffset>("CreatedAt")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("created_at");
-
-                    b.Property<string>("DatabaseName")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("character varying(100)")
-                        .HasColumnName("database_name");
-
-                    b.Property<string>("DeploymentStatus")
-                        .IsRequired()
-                        .ValueGeneratedOnAdd()
-                        .HasMaxLength(50)
-                        .HasColumnType("character varying(50)")
-                        .HasDefaultValue("NotDeployed")
-                        .HasColumnName("deployment_status");
-
-                    b.Property<string>("Description")
+                    b.Property<string>("WorkingDir")
                         .HasMaxLength(500)
                         .HasColumnType("character varying(500)")
-                        .HasColumnName("description");
-
-                    b.Property<Guid>("EnvironmentId")
-                        .HasColumnType("uuid")
-                        .HasColumnName("environment_id");
-
-                    b.Property<DateTimeOffset?>("LastDeployedAt")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("last_deployed_at");
-
-                    b.Property<string>("LastDeploymentError")
-                        .HasMaxLength(2000)
-                        .HasColumnType("character varying(2000)")
-                        .HasColumnName("last_deployment_error");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("character varying(100)")
-                        .HasColumnName("name");
-
-                    b.Property<string>("Password")
-                        .IsRequired()
-                        .HasMaxLength(255)
-                        .HasColumnType("character varying(255)")
-                        .HasColumnName("password");
-
-                    b.Property<int>("Port")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer")
-                        .HasDefaultValue(5432)
-                        .HasColumnName("port");
-
-                    b.Property<string>("Slug")
-                        .IsRequired()
-                        .HasMaxLength(120)
-                        .HasColumnType("character varying(120)")
-                        .HasColumnName("slug");
-
-                    b.Property<string>("Username")
-                        .IsRequired()
-                        .ValueGeneratedOnAdd()
-                        .HasMaxLength(100)
-                        .HasColumnType("character varying(100)")
-                        .HasDefaultValue("postgres")
-                        .HasColumnName("username");
-
-                    b.Property<string>("Version")
-                        .IsRequired()
-                        .ValueGeneratedOnAdd()
-                        .HasMaxLength(20)
-                        .HasColumnType("character varying(20)")
-                        .HasDefaultValue("16")
-                        .HasColumnName("version");
+                        .HasColumnName("working_dir");
 
                     b.HasKey("Id");
 
                     b.HasIndex("EnvironmentId", "Slug")
                         .IsUnique();
 
-                    b.ToTable("postgresql_resources", (string)null);
+                    b.ToTable("services", (string)null);
                 });
 
-            modelBuilder.Entity("BaseDock.Domain.Entities.Resources.PreMadeAppResource", b =>
+            modelBuilder.Entity("BaseDock.Domain.Entities.ServiceConfig", b =>
                 {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
+                    b.Property<Guid>("ServiceId")
                         .HasColumnType("uuid")
-                        .HasColumnName("id");
+                        .HasColumnName("service_id");
 
-                    b.Property<string>("Configuration")
-                        .HasColumnType("jsonb")
-                        .HasColumnName("configuration");
+                    b.Property<Guid>("ConfigId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("config_id");
 
-                    b.Property<DateTimeOffset>("CreatedAt")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("created_at");
+                    b.Property<string>("Gid")
+                        .HasMaxLength(10)
+                        .HasColumnType("character varying(10)")
+                        .HasColumnName("gid");
 
-                    b.Property<string>("DeploymentStatus")
-                        .IsRequired()
-                        .ValueGeneratedOnAdd()
-                        .HasMaxLength(50)
-                        .HasColumnType("character varying(50)")
-                        .HasDefaultValue("NotDeployed")
-                        .HasColumnName("deployment_status");
+                    b.Property<string>("Mode")
+                        .HasMaxLength(10)
+                        .HasColumnType("character varying(10)")
+                        .HasColumnName("mode");
 
-                    b.Property<string>("Description")
+                    b.Property<string>("Target")
                         .HasMaxLength(500)
                         .HasColumnType("character varying(500)")
-                        .HasColumnName("description");
+                        .HasColumnName("target");
 
-                    b.Property<Guid>("EnvironmentId")
-                        .HasColumnType("uuid")
-                        .HasColumnName("environment_id");
+                    b.Property<string>("Uid")
+                        .HasMaxLength(10)
+                        .HasColumnType("character varying(10)")
+                        .HasColumnName("uid");
 
-                    b.Property<DateTimeOffset?>("LastDeployedAt")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("last_deployed_at");
+                    b.HasKey("ServiceId", "ConfigId");
 
-                    b.Property<string>("LastDeploymentError")
-                        .HasMaxLength(2000)
-                        .HasColumnType("character varying(2000)")
-                        .HasColumnName("last_deployment_error");
+                    b.HasIndex("ConfigId");
 
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("character varying(100)")
-                        .HasColumnName("name");
-
-                    b.Property<string>("ServiceSlugs")
-                        .HasColumnType("jsonb")
-                        .HasColumnName("service_slugs");
-
-                    b.Property<string>("Slug")
-                        .IsRequired()
-                        .HasMaxLength(120)
-                        .HasColumnType("character varying(120)")
-                        .HasColumnName("slug");
-
-                    b.Property<string>("TemplateType")
-                        .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("character varying(50)")
-                        .HasColumnName("template_type");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("EnvironmentId", "Slug")
-                        .IsUnique();
-
-                    b.ToTable("premade_app_resources", (string)null);
+                    b.ToTable("service_configs", (string)null);
                 });
 
-            modelBuilder.Entity("BaseDock.Domain.Entities.Resources.RedisResource", b =>
+            modelBuilder.Entity("BaseDock.Domain.Entities.ServiceNetwork", b =>
                 {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
+                    b.Property<Guid>("ServiceId")
                         .HasColumnType("uuid")
-                        .HasColumnName("id");
+                        .HasColumnName("service_id");
 
-                    b.Property<DateTimeOffset>("CreatedAt")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("created_at");
+                    b.Property<Guid>("NetworkId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("network_id");
 
-                    b.Property<string>("DeploymentStatus")
-                        .IsRequired()
-                        .ValueGeneratedOnAdd()
+                    b.PrimitiveCollection<string[]>("Aliases")
+                        .HasColumnType("text[]")
+                        .HasColumnName("aliases");
+
+                    b.Property<string>("Ipv4Address")
                         .HasMaxLength(50)
                         .HasColumnType("character varying(50)")
-                        .HasDefaultValue("NotDeployed")
-                        .HasColumnName("deployment_status");
+                        .HasColumnName("ipv4_address");
 
-                    b.Property<string>("Description")
+                    b.Property<string>("Ipv6Address")
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)")
+                        .HasColumnName("ipv6_address");
+
+                    b.HasKey("ServiceId", "NetworkId");
+
+                    b.HasIndex("NetworkId");
+
+                    b.ToTable("service_networks", (string)null);
+                });
+
+            modelBuilder.Entity("BaseDock.Domain.Entities.ServiceSecret", b =>
+                {
+                    b.Property<Guid>("ServiceId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("service_id");
+
+                    b.Property<Guid>("SecretId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("secret_id");
+
+                    b.Property<string>("Gid")
+                        .HasMaxLength(10)
+                        .HasColumnType("character varying(10)")
+                        .HasColumnName("gid");
+
+                    b.Property<string>("Mode")
+                        .HasMaxLength(10)
+                        .HasColumnType("character varying(10)")
+                        .HasColumnName("mode");
+
+                    b.Property<string>("Target")
                         .HasMaxLength(500)
                         .HasColumnType("character varying(500)")
-                        .HasColumnName("description");
+                        .HasColumnName("target");
 
-                    b.Property<Guid>("EnvironmentId")
-                        .HasColumnType("uuid")
-                        .HasColumnName("environment_id");
+                    b.Property<string>("Uid")
+                        .HasMaxLength(10)
+                        .HasColumnType("character varying(10)")
+                        .HasColumnName("uid");
 
-                    b.Property<DateTimeOffset?>("LastDeployedAt")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("last_deployed_at");
+                    b.HasKey("ServiceId", "SecretId");
 
-                    b.Property<string>("LastDeploymentError")
-                        .HasMaxLength(2000)
-                        .HasColumnType("character varying(2000)")
-                        .HasColumnName("last_deployment_error");
+                    b.HasIndex("SecretId");
 
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("character varying(100)")
-                        .HasColumnName("name");
-
-                    b.Property<string>("Password")
-                        .HasMaxLength(255)
-                        .HasColumnType("character varying(255)")
-                        .HasColumnName("password");
-
-                    b.Property<bool>("PersistenceEnabled")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("boolean")
-                        .HasDefaultValue(true)
-                        .HasColumnName("persistence_enabled");
-
-                    b.Property<int>("Port")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer")
-                        .HasDefaultValue(6379)
-                        .HasColumnName("port");
-
-                    b.Property<string>("Slug")
-                        .IsRequired()
-                        .HasMaxLength(120)
-                        .HasColumnType("character varying(120)")
-                        .HasColumnName("slug");
-
-                    b.Property<string>("Version")
-                        .IsRequired()
-                        .ValueGeneratedOnAdd()
-                        .HasMaxLength(20)
-                        .HasColumnType("character varying(20)")
-                        .HasDefaultValue("7")
-                        .HasColumnName("version");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("EnvironmentId", "Slug")
-                        .IsUnique();
-
-                    b.ToTable("redis_resources", (string)null);
+                    b.ToTable("service_secrets", (string)null);
                 });
 
             modelBuilder.Entity("BaseDock.Domain.Entities.Session", b =>
@@ -781,6 +719,70 @@ namespace BaseDock.Infrastructure.Migrations
                     b.ToTable("users", (string)null);
                 });
 
+            modelBuilder.Entity("BaseDock.Domain.Entities.Volume", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid")
+                        .HasColumnName("id");
+
+                    b.Property<DateTimeOffset>("CreatedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("created_at");
+
+                    b.Property<string>("Driver")
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)")
+                        .HasColumnName("driver");
+
+                    b.Property<string>("DriverOpts")
+                        .HasColumnType("jsonb")
+                        .HasColumnName("driver_opts");
+
+                    b.Property<Guid>("EnvironmentId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("environment_id");
+
+                    b.Property<bool>("External")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("boolean")
+                        .HasDefaultValue(false)
+                        .HasColumnName("external");
+
+                    b.Property<string>("ExternalName")
+                        .HasMaxLength(255)
+                        .HasColumnType("character varying(255)")
+                        .HasColumnName("external_name");
+
+                    b.Property<string>("Labels")
+                        .HasColumnType("jsonb")
+                        .HasColumnName("labels");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("character varying(255)")
+                        .HasColumnName("name");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("EnvironmentId", "Name")
+                        .IsUnique();
+
+                    b.ToTable("volumes", (string)null);
+                });
+
+            modelBuilder.Entity("BaseDock.Domain.Entities.Config", b =>
+                {
+                    b.HasOne("BaseDock.Domain.Entities.Environment", "Environment")
+                        .WithMany("Configs")
+                        .HasForeignKey("EnvironmentId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Environment");
+                });
+
             modelBuilder.Entity("BaseDock.Domain.Entities.Environment", b =>
                 {
                     b.HasOne("BaseDock.Domain.Entities.Project", "Project")
@@ -792,10 +794,10 @@ namespace BaseDock.Infrastructure.Migrations
                     b.Navigation("Project");
                 });
 
-            modelBuilder.Entity("BaseDock.Domain.Entities.EnvironmentVariable", b =>
+            modelBuilder.Entity("BaseDock.Domain.Entities.Network", b =>
                 {
                     b.HasOne("BaseDock.Domain.Entities.Environment", "Environment")
-                        .WithMany("Variables")
+                        .WithMany("Networks")
                         .HasForeignKey("EnvironmentId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -833,10 +835,10 @@ namespace BaseDock.Infrastructure.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("BaseDock.Domain.Entities.Resources.DockerComposeResource", b =>
+            modelBuilder.Entity("BaseDock.Domain.Entities.Secret", b =>
                 {
                     b.HasOne("BaseDock.Domain.Entities.Environment", "Environment")
-                        .WithMany("DockerComposeResources")
+                        .WithMany("Secrets")
                         .HasForeignKey("EnvironmentId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -844,10 +846,78 @@ namespace BaseDock.Infrastructure.Migrations
                     b.Navigation("Environment");
                 });
 
-            modelBuilder.Entity("BaseDock.Domain.Entities.Resources.DockerImageResource", b =>
+            modelBuilder.Entity("BaseDock.Domain.Entities.Service", b =>
+                {
+                    b.HasOne("BaseDock.Domain.Entities.Environment", "ParentEnvironment")
+                        .WithMany("Services")
+                        .HasForeignKey("EnvironmentId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("ParentEnvironment");
+                });
+
+            modelBuilder.Entity("BaseDock.Domain.Entities.ServiceConfig", b =>
+                {
+                    b.HasOne("BaseDock.Domain.Entities.Config", "Config")
+                        .WithMany("ServiceConfigs")
+                        .HasForeignKey("ConfigId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("BaseDock.Domain.Entities.Service", "Service")
+                        .WithMany("ServiceConfigs")
+                        .HasForeignKey("ServiceId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Config");
+
+                    b.Navigation("Service");
+                });
+
+            modelBuilder.Entity("BaseDock.Domain.Entities.ServiceNetwork", b =>
+                {
+                    b.HasOne("BaseDock.Domain.Entities.Network", "Network")
+                        .WithMany("ServiceNetworks")
+                        .HasForeignKey("NetworkId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("BaseDock.Domain.Entities.Service", "Service")
+                        .WithMany("ServiceNetworks")
+                        .HasForeignKey("ServiceId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Network");
+
+                    b.Navigation("Service");
+                });
+
+            modelBuilder.Entity("BaseDock.Domain.Entities.ServiceSecret", b =>
+                {
+                    b.HasOne("BaseDock.Domain.Entities.Secret", "Secret")
+                        .WithMany("ServiceSecrets")
+                        .HasForeignKey("SecretId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("BaseDock.Domain.Entities.Service", "Service")
+                        .WithMany("ServiceSecrets")
+                        .HasForeignKey("ServiceId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Secret");
+
+                    b.Navigation("Service");
+                });
+
+            modelBuilder.Entity("BaseDock.Domain.Entities.Volume", b =>
                 {
                     b.HasOne("BaseDock.Domain.Entities.Environment", "Environment")
-                        .WithMany("DockerImageResources")
+                        .WithMany("Volumes")
                         .HasForeignKey("EnvironmentId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -855,65 +925,27 @@ namespace BaseDock.Infrastructure.Migrations
                     b.Navigation("Environment");
                 });
 
-            modelBuilder.Entity("BaseDock.Domain.Entities.Resources.DockerfileResource", b =>
+            modelBuilder.Entity("BaseDock.Domain.Entities.Config", b =>
                 {
-                    b.HasOne("BaseDock.Domain.Entities.Environment", "Environment")
-                        .WithMany("DockerfileResources")
-                        .HasForeignKey("EnvironmentId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Environment");
-                });
-
-            modelBuilder.Entity("BaseDock.Domain.Entities.Resources.PostgreSQLResource", b =>
-                {
-                    b.HasOne("BaseDock.Domain.Entities.Environment", "Environment")
-                        .WithMany("PostgreSQLResources")
-                        .HasForeignKey("EnvironmentId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Environment");
-                });
-
-            modelBuilder.Entity("BaseDock.Domain.Entities.Resources.PreMadeAppResource", b =>
-                {
-                    b.HasOne("BaseDock.Domain.Entities.Environment", "Environment")
-                        .WithMany("PreMadeAppResources")
-                        .HasForeignKey("EnvironmentId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Environment");
-                });
-
-            modelBuilder.Entity("BaseDock.Domain.Entities.Resources.RedisResource", b =>
-                {
-                    b.HasOne("BaseDock.Domain.Entities.Environment", "Environment")
-                        .WithMany("RedisResources")
-                        .HasForeignKey("EnvironmentId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Environment");
+                    b.Navigation("ServiceConfigs");
                 });
 
             modelBuilder.Entity("BaseDock.Domain.Entities.Environment", b =>
                 {
-                    b.Navigation("DockerComposeResources");
+                    b.Navigation("Configs");
 
-                    b.Navigation("DockerImageResources");
+                    b.Navigation("Networks");
 
-                    b.Navigation("DockerfileResources");
+                    b.Navigation("Secrets");
 
-                    b.Navigation("PostgreSQLResources");
+                    b.Navigation("Services");
 
-                    b.Navigation("PreMadeAppResources");
+                    b.Navigation("Volumes");
+                });
 
-                    b.Navigation("RedisResources");
-
-                    b.Navigation("Variables");
+            modelBuilder.Entity("BaseDock.Domain.Entities.Network", b =>
+                {
+                    b.Navigation("ServiceNetworks");
                 });
 
             modelBuilder.Entity("BaseDock.Domain.Entities.Project", b =>
@@ -921,6 +953,20 @@ namespace BaseDock.Infrastructure.Migrations
                     b.Navigation("Environments");
 
                     b.Navigation("Members");
+                });
+
+            modelBuilder.Entity("BaseDock.Domain.Entities.Secret", b =>
+                {
+                    b.Navigation("ServiceSecrets");
+                });
+
+            modelBuilder.Entity("BaseDock.Domain.Entities.Service", b =>
+                {
+                    b.Navigation("ServiceConfigs");
+
+                    b.Navigation("ServiceNetworks");
+
+                    b.Navigation("ServiceSecrets");
                 });
 #pragma warning restore 612, 618
         }

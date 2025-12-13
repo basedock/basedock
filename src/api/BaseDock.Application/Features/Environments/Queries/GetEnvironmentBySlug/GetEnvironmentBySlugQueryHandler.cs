@@ -34,13 +34,11 @@ public sealed class GetEnvironmentBySlugQueryHandler(IApplicationDbContext db)
 
         var environment = await db.Environments
             .AsNoTracking()
-            .Include(e => e.Variables)
-            .Include(e => e.DockerImageResources)
-            .Include(e => e.DockerfileResources)
-            .Include(e => e.DockerComposeResources)
-            .Include(e => e.PostgreSQLResources)
-            .Include(e => e.RedisResources)
-            .Include(e => e.PreMadeAppResources)
+            .Include(e => e.Services)
+            .Include(e => e.Volumes)
+            .Include(e => e.Networks)
+            .Include(e => e.Configs)
+            .Include(e => e.Secrets)
             .FirstOrDefaultAsync(
                 e => e.ProjectId == project.Id && e.Slug == query.EnvironmentSlug,
                 cancellationToken);

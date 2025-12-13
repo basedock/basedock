@@ -8,19 +8,62 @@ export type AddMembersRequest = {
   userIds: Array<string>;
 };
 
+export type ApplyTemplateRequest = {
+  parameters: {
+    [key: string]: string;
+  };
+};
+
+export type ApplyTemplateResult = {
+  services: Array<CreatedServiceDto>;
+};
+
+export type ConfigDto = {
+  id: string;
+  environmentId: string;
+  name: string;
+  content: null | string;
+  filePath: null | string;
+  external: boolean;
+  externalName: null | string;
+  createdAt: string;
+};
+
+export type ConfigSummaryDto = {
+  id: string;
+  name: string;
+};
+
+export type CreateConfigRequest = {
+  name: string;
+  content: null | string;
+  filePath: null | string;
+  external: boolean;
+  externalName: null | string;
+};
+
+export type CreatedServiceDto = {
+  id: string;
+  name: string;
+  slug: string;
+};
+
 export type CreateEnvironmentRequest = {
   name: string;
   description: null | string;
 };
 
-export type CreatePostgreSqlResourceRequest = {
+export type CreateNetworkRequest = {
   name: string;
-  description: null | string;
-  databaseName: string;
-  username: string;
-  password: string;
-  version?: string;
-  port?: number | string;
+  driver: null | string;
+  driverOpts: null | string;
+  ipamDriver: null | string;
+  ipamConfig: null | string;
+  internal: boolean;
+  attachable: boolean;
+  labels: null | string;
+  external: boolean;
+  externalName: null | string;
 };
 
 export type CreateProjectRequest = {
@@ -29,14 +72,67 @@ export type CreateProjectRequest = {
   memberIds: null | Array<string>;
 };
 
+export type CreateSecretRequest = {
+  name: string;
+  content: null | string;
+  filePath: null | string;
+  external: boolean;
+  externalName: null | string;
+};
+
+export type CreateServiceRequest = {
+  name: string;
+  description: null | string;
+  image: null | string;
+  buildContext: null | string;
+  buildDockerfile: null | string;
+  buildArgs: null | string;
+  command: null | Array<string>;
+  entrypoint: null | Array<string>;
+  workingDir: null | string;
+  user: null | string;
+  ports: null | string;
+  expose: null | Array<number | string>;
+  hostname: null | string;
+  domainname: null | string;
+  dns: null | Array<string>;
+  extraHosts: null | string;
+  environmentVariables: null | string;
+  envFile: null | Array<string>;
+  volumes: null | string;
+  tmpfs: null | Array<string>;
+  dependsOn: null | string;
+  links: null | Array<string>;
+  healthcheckTest: null | Array<string>;
+  healthcheckInterval: null | string;
+  healthcheckTimeout: null | string;
+  healthcheckRetries: null | number | string;
+  healthcheckStartPeriod: null | string;
+  healthcheckDisabled: boolean;
+  cpuLimit: null | string;
+  memoryLimit: null | string;
+  cpuReservation: null | string;
+  memoryReservation: null | string;
+  restart: null | string;
+  stopGracePeriod: null | string;
+  stopSignal: null | string;
+  replicas: number | string;
+  labels: null | string;
+};
+
 export type CreateUserRequest = {
   email: string;
   displayName: string;
   password: string;
 };
 
-export type DeployResourceRequest = {
-  resourceType: string;
+export type CreateVolumeRequest = {
+  name: string;
+  driver: null | string;
+  driverOpts: null | string;
+  labels: null | string;
+  external: boolean;
+  externalName: null | string;
 };
 
 export type EnvironmentDetailDto = {
@@ -47,8 +143,11 @@ export type EnvironmentDetailDto = {
   projectId: string;
   isDefault: boolean;
   createdAt: string;
-  variables: Array<EnvironmentVariableDto>;
-  resources: Array<ResourceSummaryDto>;
+  services: Array<ServiceSummaryDto>;
+  volumes: Array<VolumeSummaryDto>;
+  networks: Array<NetworkSummaryDto>;
+  configs: Array<ConfigSummaryDto>;
+  secrets: Array<SecretSummaryDto>;
 };
 
 export type EnvironmentDto = {
@@ -59,16 +158,9 @@ export type EnvironmentDto = {
   projectId: string;
   isDefault: boolean;
   createdAt: string;
-  variableCount: number | string;
-  resourceCount: number | string;
-};
-
-export type EnvironmentVariableDto = {
-  id: string;
-  key: string;
-  value: string;
-  isSecret: boolean;
-  createdAt: string;
+  serviceCount: number | string;
+  volumeCount: number | string;
+  networkCount: number | string;
 };
 
 export type HttpValidationProblemDetails = {
@@ -93,19 +185,26 @@ export type LoginRequest = {
   password: string;
 };
 
-export type PostgreSqlResourceDto = {
+export type NetworkDto = {
+  id: string;
+  environmentId: string;
+  name: string;
+  driver: null | string;
+  driverOpts: null | string;
+  ipamDriver: null | string;
+  ipamConfig: null | string;
+  internal: boolean;
+  attachable: boolean;
+  labels: null | string;
+  external: boolean;
+  externalName: null | string;
+  createdAt: string;
+};
+
+export type NetworkSummaryDto = {
   id: string;
   name: string;
-  slug: string;
-  description: null | string;
-  version: string;
-  port: number | string;
-  databaseName: string;
-  username: string;
-  status: string;
-  serviceName: string;
-  createdAt: string;
-  lastDeployedAt: null | string;
+  driver: string;
 };
 
 export type ProblemDetails = {
@@ -153,10 +252,120 @@ export type RemoveMembersRequest = {
   userIds: Array<string>;
 };
 
-export type ResourceSummaryDto = {
+export type SecretDto = {
+  id: string;
+  environmentId: string;
+  name: string;
+  hasContent: boolean;
+  filePath: null | string;
+  external: boolean;
+  externalName: null | string;
+  createdAt: string;
+};
+
+export type SecretSummaryDto = {
   id: string;
   name: string;
-  type: string;
+};
+
+export type ServiceConfigDto = {
+  configId: string;
+  configName: string;
+  target: null | string;
+  uid: null | string;
+  gid: null | string;
+  mode: null | string;
+};
+
+export type ServiceDetailDto = {
+  id: string;
+  environmentId: string;
+  name: string;
+  slug: string;
+  description: null | string;
+  image: null | string;
+  buildContext: null | string;
+  buildDockerfile: null | string;
+  buildArgs: null | string;
+  command: null | Array<string>;
+  entrypoint: null | Array<string>;
+  workingDir: null | string;
+  user: null | string;
+  ports: null | string;
+  expose: null | Array<number | string>;
+  hostname: null | string;
+  domainname: null | string;
+  dns: null | Array<string>;
+  extraHosts: null | string;
+  environmentVariables: null | string;
+  envFile: null | Array<string>;
+  volumes: null | string;
+  tmpfs: null | Array<string>;
+  dependsOn: null | string;
+  links: null | Array<string>;
+  healthcheckTest: null | Array<string>;
+  healthcheckInterval: null | string;
+  healthcheckTimeout: null | string;
+  healthcheckRetries: null | number | string;
+  healthcheckStartPeriod: null | string;
+  healthcheckDisabled: boolean;
+  cpuLimit: null | string;
+  memoryLimit: null | string;
+  cpuReservation: null | string;
+  memoryReservation: null | string;
+  restart: null | string;
+  stopGracePeriod: null | string;
+  stopSignal: null | string;
+  replicas: number | string;
+  labels: null | string;
+  deploymentStatus: string;
+  lastDeployedAt: null | string;
+  lastError: null | string;
+  createdAt: string;
+  updatedAt: null | string;
+  networks: Array<ServiceNetworkDto>;
+  configs: Array<ServiceConfigDto>;
+  secrets: Array<ServiceSecretDto>;
+};
+
+export type ServiceDto = {
+  id: string;
+  environmentId: string;
+  name: string;
+  slug: string;
+  description: null | string;
+  image: null | string;
+  buildContext: null | string;
+  buildDockerfile: null | string;
+  deploymentStatus: string;
+  lastDeployedAt: null | string;
+  lastError: null | string;
+  createdAt: string;
+  updatedAt: null | string;
+};
+
+export type ServiceNetworkDto = {
+  networkId: string;
+  networkName: string;
+  aliases: null | Array<string>;
+  ipv4Address: null | string;
+  ipv6Address: null | string;
+};
+
+export type ServiceSecretDto = {
+  secretId: string;
+  secretName: string;
+  target: null | string;
+  uid: null | string;
+  gid: null | string;
+  mode: null | string;
+};
+
+export type ServiceSummaryDto = {
+  id: string;
+  name: string;
+  slug: string;
+  image: null | string;
   status: string;
 };
 
@@ -165,13 +374,88 @@ export type SlugAvailabilityResponse = {
   suggestedSlug: null | string;
 };
 
-export type StopResourceRequest = {
-  resourceType: string;
+export type TemplateDto = {
+  id: string;
+  name: string;
+  description: string;
+  category: string;
+  icon: string;
+  services: Array<TemplateServiceDto>;
+  parameters: Array<TemplateParameterDto>;
+};
+
+export type TemplateParameterDto = {
+  name: string;
+  key: string;
+  type: string;
+  defaultValue: null | string;
+  required: boolean;
+  description: null | string;
+};
+
+export type TemplateServiceDto = {
+  name: string;
+  image: string;
+  description: null | string;
+};
+
+export type UpdateConfigRequest = {
+  content: null | string;
+  filePath: null | string;
+  external: boolean;
+  externalName: null | string;
 };
 
 export type UpdateProjectRequest = {
   name: string;
   description: null | string;
+};
+
+export type UpdateSecretRequest = {
+  content: null | string;
+  filePath: null | string;
+  external: boolean;
+  externalName: null | string;
+};
+
+export type UpdateServiceRequest = {
+  name: string;
+  description: null | string;
+  image: null | string;
+  buildContext: null | string;
+  buildDockerfile: null | string;
+  buildArgs: null | string;
+  command: null | Array<string>;
+  entrypoint: null | Array<string>;
+  workingDir: null | string;
+  user: null | string;
+  ports: null | string;
+  expose: null | Array<number | string>;
+  hostname: null | string;
+  domainname: null | string;
+  dns: null | Array<string>;
+  extraHosts: null | string;
+  environmentVariables: null | string;
+  envFile: null | Array<string>;
+  volumes: null | string;
+  tmpfs: null | Array<string>;
+  dependsOn: null | string;
+  links: null | Array<string>;
+  healthcheckTest: null | Array<string>;
+  healthcheckInterval: null | string;
+  healthcheckTimeout: null | string;
+  healthcheckRetries: null | number | string;
+  healthcheckStartPeriod: null | string;
+  healthcheckDisabled: boolean;
+  cpuLimit: null | string;
+  memoryLimit: null | string;
+  cpuReservation: null | string;
+  memoryReservation: null | string;
+  restart: null | string;
+  stopGracePeriod: null | string;
+  stopSignal: null | string;
+  replicas: number | string;
+  labels: null | string;
 };
 
 export type UpdateUserRequest = {
@@ -187,6 +471,186 @@ export type UserDto = {
   createdAt: string;
   updatedAt: null | string;
 };
+
+export type VolumeDto = {
+  id: string;
+  environmentId: string;
+  name: string;
+  driver: null | string;
+  driverOpts: null | string;
+  labels: null | string;
+  external: boolean;
+  externalName: null | string;
+  createdAt: string;
+};
+
+export type VolumeSummaryDto = {
+  id: string;
+  name: string;
+  driver: string;
+};
+
+export type GetTemplatesData = {
+  body?: never;
+  path?: never;
+  query?: never;
+  url: "/api/templates";
+};
+
+export type GetTemplatesResponses = {
+  /**
+   * OK
+   */
+  200: Array<TemplateDto>;
+};
+
+export type GetTemplatesResponse =
+  GetTemplatesResponses[keyof GetTemplatesResponses];
+
+export type ApplyTemplateData = {
+  body: ApplyTemplateRequest;
+  path: {
+    projectSlug: string;
+    envSlug: string;
+    templateId: string;
+  };
+  query?: never;
+  url: "/api/projects/{projectSlug}/environments/{envSlug}/templates/{templateId}/apply";
+};
+
+export type ApplyTemplateErrors = {
+  /**
+   * Bad Request
+   */
+  400: HttpValidationProblemDetails;
+  /**
+   * Forbidden
+   */
+  403: ProblemDetails;
+  /**
+   * Not Found
+   */
+  404: ProblemDetails;
+};
+
+export type ApplyTemplateError = ApplyTemplateErrors[keyof ApplyTemplateErrors];
+
+export type ApplyTemplateResponses = {
+  /**
+   * Created
+   */
+  201: ApplyTemplateResult;
+};
+
+export type ApplyTemplateResponse =
+  ApplyTemplateResponses[keyof ApplyTemplateResponses];
+
+export type GetVolumesData = {
+  body?: never;
+  path: {
+    projectSlug: string;
+    envSlug: string;
+  };
+  query?: never;
+  url: "/api/projects/{projectSlug}/environments/{envSlug}/volumes";
+};
+
+export type GetVolumesErrors = {
+  /**
+   * Forbidden
+   */
+  403: ProblemDetails;
+  /**
+   * Not Found
+   */
+  404: ProblemDetails;
+};
+
+export type GetVolumesError = GetVolumesErrors[keyof GetVolumesErrors];
+
+export type GetVolumesResponses = {
+  /**
+   * OK
+   */
+  200: Array<VolumeDto>;
+};
+
+export type GetVolumesResponse = GetVolumesResponses[keyof GetVolumesResponses];
+
+export type CreateVolumeData = {
+  body: CreateVolumeRequest;
+  path: {
+    projectSlug: string;
+    envSlug: string;
+  };
+  query?: never;
+  url: "/api/projects/{projectSlug}/environments/{envSlug}/volumes";
+};
+
+export type CreateVolumeErrors = {
+  /**
+   * Bad Request
+   */
+  400: HttpValidationProblemDetails;
+  /**
+   * Forbidden
+   */
+  403: ProblemDetails;
+  /**
+   * Not Found
+   */
+  404: ProblemDetails;
+  /**
+   * Conflict
+   */
+  409: ProblemDetails;
+};
+
+export type CreateVolumeError = CreateVolumeErrors[keyof CreateVolumeErrors];
+
+export type CreateVolumeResponses = {
+  /**
+   * Created
+   */
+  201: VolumeDto;
+};
+
+export type CreateVolumeResponse =
+  CreateVolumeResponses[keyof CreateVolumeResponses];
+
+export type DeleteVolumeData = {
+  body?: never;
+  path: {
+    projectSlug: string;
+    envSlug: string;
+    volumeId: string;
+  };
+  query?: never;
+  url: "/api/projects/{projectSlug}/environments/{envSlug}/volumes/{volumeId}";
+};
+
+export type DeleteVolumeErrors = {
+  /**
+   * Forbidden
+   */
+  403: ProblemDetails;
+  /**
+   * Not Found
+   */
+  404: ProblemDetails;
+};
+
+export type DeleteVolumeError = DeleteVolumeErrors[keyof DeleteVolumeErrors];
+
+export type DeleteVolumeResponses = {
+  /**
+   * No Content
+   */
+  204: void;
+};
+
+export type DeleteVolumeResponse =
+  DeleteVolumeResponses[keyof DeleteVolumeResponses];
 
 export type GetUsersData = {
   body?: never;
@@ -348,21 +812,58 @@ export type UpdateUserResponses = {
 
 export type UpdateUserResponse = UpdateUserResponses[keyof UpdateUserResponses];
 
-export type CreatePostgreSqlResourceData = {
-  body: CreatePostgreSqlResourceRequest;
+export type GetServicesData = {
+  body?: never;
   path: {
     projectSlug: string;
     envSlug: string;
   };
   query?: never;
-  url: "/api/projects/{projectSlug}/environments/{envSlug}/resources/postgresql";
+  url: "/api/projects/{projectSlug}/environments/{envSlug}/services";
 };
 
-export type CreatePostgreSqlResourceErrors = {
+export type GetServicesErrors = {
+  /**
+   * Forbidden
+   */
+  403: ProblemDetails;
+  /**
+   * Not Found
+   */
+  404: ProblemDetails;
+};
+
+export type GetServicesError = GetServicesErrors[keyof GetServicesErrors];
+
+export type GetServicesResponses = {
+  /**
+   * OK
+   */
+  200: Array<ServiceDto>;
+};
+
+export type GetServicesResponse =
+  GetServicesResponses[keyof GetServicesResponses];
+
+export type CreateServiceData = {
+  body: CreateServiceRequest;
+  path: {
+    projectSlug: string;
+    envSlug: string;
+  };
+  query?: never;
+  url: "/api/projects/{projectSlug}/environments/{envSlug}/services";
+};
+
+export type CreateServiceErrors = {
   /**
    * Bad Request
    */
   400: HttpValidationProblemDetails;
+  /**
+   * Forbidden
+   */
+  403: ProblemDetails;
   /**
    * Not Found
    */
@@ -373,81 +874,273 @@ export type CreatePostgreSqlResourceErrors = {
   409: ProblemDetails;
 };
 
-export type CreatePostgreSqlResourceError =
-  CreatePostgreSqlResourceErrors[keyof CreatePostgreSqlResourceErrors];
+export type CreateServiceError = CreateServiceErrors[keyof CreateServiceErrors];
 
-export type CreatePostgreSqlResourceResponses = {
+export type CreateServiceResponses = {
   /**
    * Created
    */
-  201: PostgreSqlResourceDto;
+  201: ServiceDto;
 };
 
-export type CreatePostgreSqlResourceResponse =
-  CreatePostgreSqlResourceResponses[keyof CreatePostgreSqlResourceResponses];
+export type CreateServiceResponse =
+  CreateServiceResponses[keyof CreateServiceResponses];
 
-export type DeployResourceData = {
-  body: DeployResourceRequest;
+export type DeleteServiceData = {
+  body?: never;
   path: {
     projectSlug: string;
     envSlug: string;
-    resourceId: string;
+    serviceId: string;
   };
   query?: never;
-  url: "/api/projects/{projectSlug}/environments/{envSlug}/resources/{resourceId}/deploy";
+  url: "/api/projects/{projectSlug}/environments/{envSlug}/services/{serviceId}";
 };
 
-export type DeployResourceErrors = {
+export type DeleteServiceErrors = {
   /**
-   * Bad Request
+   * Forbidden
    */
-  400: ProblemDetails;
+  403: ProblemDetails;
   /**
    * Not Found
    */
   404: ProblemDetails;
 };
 
-export type DeployResourceError =
-  DeployResourceErrors[keyof DeployResourceErrors];
+export type DeleteServiceError = DeleteServiceErrors[keyof DeleteServiceErrors];
 
-export type DeployResourceResponses = {
+export type DeleteServiceResponses = {
   /**
-   * OK
+   * No Content
    */
-  200: unknown;
+  204: void;
 };
 
-export type StopResourceData = {
-  body: StopResourceRequest;
+export type DeleteServiceResponse =
+  DeleteServiceResponses[keyof DeleteServiceResponses];
+
+export type GetServiceByIdData = {
+  body?: never;
   path: {
     projectSlug: string;
     envSlug: string;
-    resourceId: string;
+    serviceId: string;
   };
   query?: never;
-  url: "/api/projects/{projectSlug}/environments/{envSlug}/resources/{resourceId}/stop";
+  url: "/api/projects/{projectSlug}/environments/{envSlug}/services/{serviceId}";
 };
 
-export type StopResourceErrors = {
+export type GetServiceByIdErrors = {
   /**
-   * Bad Request
+   * Forbidden
    */
-  400: ProblemDetails;
+  403: ProblemDetails;
   /**
    * Not Found
    */
   404: ProblemDetails;
 };
 
-export type StopResourceError = StopResourceErrors[keyof StopResourceErrors];
+export type GetServiceByIdError =
+  GetServiceByIdErrors[keyof GetServiceByIdErrors];
 
-export type StopResourceResponses = {
+export type GetServiceByIdResponses = {
   /**
    * OK
    */
-  200: unknown;
+  200: ServiceDetailDto;
 };
+
+export type GetServiceByIdResponse =
+  GetServiceByIdResponses[keyof GetServiceByIdResponses];
+
+export type UpdateServiceData = {
+  body: UpdateServiceRequest;
+  path: {
+    projectSlug: string;
+    envSlug: string;
+    serviceId: string;
+  };
+  query?: never;
+  url: "/api/projects/{projectSlug}/environments/{envSlug}/services/{serviceId}";
+};
+
+export type UpdateServiceErrors = {
+  /**
+   * Bad Request
+   */
+  400: HttpValidationProblemDetails;
+  /**
+   * Forbidden
+   */
+  403: ProblemDetails;
+  /**
+   * Not Found
+   */
+  404: ProblemDetails;
+  /**
+   * Conflict
+   */
+  409: ProblemDetails;
+};
+
+export type UpdateServiceError = UpdateServiceErrors[keyof UpdateServiceErrors];
+
+export type UpdateServiceResponses = {
+  /**
+   * OK
+   */
+  200: ServiceDto;
+};
+
+export type UpdateServiceResponse =
+  UpdateServiceResponses[keyof UpdateServiceResponses];
+
+export type GetSecretsData = {
+  body?: never;
+  path: {
+    projectSlug: string;
+    envSlug: string;
+  };
+  query?: never;
+  url: "/api/projects/{projectSlug}/environments/{envSlug}/secrets";
+};
+
+export type GetSecretsErrors = {
+  /**
+   * Forbidden
+   */
+  403: ProblemDetails;
+  /**
+   * Not Found
+   */
+  404: ProblemDetails;
+};
+
+export type GetSecretsError = GetSecretsErrors[keyof GetSecretsErrors];
+
+export type GetSecretsResponses = {
+  /**
+   * OK
+   */
+  200: Array<SecretDto>;
+};
+
+export type GetSecretsResponse = GetSecretsResponses[keyof GetSecretsResponses];
+
+export type CreateSecretData = {
+  body: CreateSecretRequest;
+  path: {
+    projectSlug: string;
+    envSlug: string;
+  };
+  query?: never;
+  url: "/api/projects/{projectSlug}/environments/{envSlug}/secrets";
+};
+
+export type CreateSecretErrors = {
+  /**
+   * Bad Request
+   */
+  400: HttpValidationProblemDetails;
+  /**
+   * Forbidden
+   */
+  403: ProblemDetails;
+  /**
+   * Not Found
+   */
+  404: ProblemDetails;
+  /**
+   * Conflict
+   */
+  409: ProblemDetails;
+};
+
+export type CreateSecretError = CreateSecretErrors[keyof CreateSecretErrors];
+
+export type CreateSecretResponses = {
+  /**
+   * Created
+   */
+  201: SecretDto;
+};
+
+export type CreateSecretResponse =
+  CreateSecretResponses[keyof CreateSecretResponses];
+
+export type DeleteSecretData = {
+  body?: never;
+  path: {
+    projectSlug: string;
+    envSlug: string;
+    secretId: string;
+  };
+  query?: never;
+  url: "/api/projects/{projectSlug}/environments/{envSlug}/secrets/{secretId}";
+};
+
+export type DeleteSecretErrors = {
+  /**
+   * Forbidden
+   */
+  403: ProblemDetails;
+  /**
+   * Not Found
+   */
+  404: ProblemDetails;
+};
+
+export type DeleteSecretError = DeleteSecretErrors[keyof DeleteSecretErrors];
+
+export type DeleteSecretResponses = {
+  /**
+   * No Content
+   */
+  204: void;
+};
+
+export type DeleteSecretResponse =
+  DeleteSecretResponses[keyof DeleteSecretResponses];
+
+export type UpdateSecretData = {
+  body: UpdateSecretRequest;
+  path: {
+    projectSlug: string;
+    envSlug: string;
+    secretId: string;
+  };
+  query?: never;
+  url: "/api/projects/{projectSlug}/environments/{envSlug}/secrets/{secretId}";
+};
+
+export type UpdateSecretErrors = {
+  /**
+   * Bad Request
+   */
+  400: HttpValidationProblemDetails;
+  /**
+   * Forbidden
+   */
+  403: ProblemDetails;
+  /**
+   * Not Found
+   */
+  404: ProblemDetails;
+};
+
+export type UpdateSecretError = UpdateSecretErrors[keyof UpdateSecretErrors];
+
+export type UpdateSecretResponses = {
+  /**
+   * OK
+   */
+  200: SecretDto;
+};
+
+export type UpdateSecretResponse =
+  UpdateSecretResponses[keyof UpdateSecretResponses];
 
 export type GetProjectsData = {
   body?: never;
@@ -718,6 +1411,114 @@ export type RemoveProjectMembersResponses = {
 export type RemoveProjectMembersResponse =
   RemoveProjectMembersResponses[keyof RemoveProjectMembersResponses];
 
+export type GetNetworksData = {
+  body?: never;
+  path: {
+    projectSlug: string;
+    envSlug: string;
+  };
+  query?: never;
+  url: "/api/projects/{projectSlug}/environments/{envSlug}/networks";
+};
+
+export type GetNetworksErrors = {
+  /**
+   * Forbidden
+   */
+  403: ProblemDetails;
+  /**
+   * Not Found
+   */
+  404: ProblemDetails;
+};
+
+export type GetNetworksError = GetNetworksErrors[keyof GetNetworksErrors];
+
+export type GetNetworksResponses = {
+  /**
+   * OK
+   */
+  200: Array<NetworkDto>;
+};
+
+export type GetNetworksResponse =
+  GetNetworksResponses[keyof GetNetworksResponses];
+
+export type CreateNetworkData = {
+  body: CreateNetworkRequest;
+  path: {
+    projectSlug: string;
+    envSlug: string;
+  };
+  query?: never;
+  url: "/api/projects/{projectSlug}/environments/{envSlug}/networks";
+};
+
+export type CreateNetworkErrors = {
+  /**
+   * Bad Request
+   */
+  400: HttpValidationProblemDetails;
+  /**
+   * Forbidden
+   */
+  403: ProblemDetails;
+  /**
+   * Not Found
+   */
+  404: ProblemDetails;
+  /**
+   * Conflict
+   */
+  409: ProblemDetails;
+};
+
+export type CreateNetworkError = CreateNetworkErrors[keyof CreateNetworkErrors];
+
+export type CreateNetworkResponses = {
+  /**
+   * Created
+   */
+  201: NetworkDto;
+};
+
+export type CreateNetworkResponse =
+  CreateNetworkResponses[keyof CreateNetworkResponses];
+
+export type DeleteNetworkData = {
+  body?: never;
+  path: {
+    projectSlug: string;
+    envSlug: string;
+    networkId: string;
+  };
+  query?: never;
+  url: "/api/projects/{projectSlug}/environments/{envSlug}/networks/{networkId}";
+};
+
+export type DeleteNetworkErrors = {
+  /**
+   * Forbidden
+   */
+  403: ProblemDetails;
+  /**
+   * Not Found
+   */
+  404: ProblemDetails;
+};
+
+export type DeleteNetworkError = DeleteNetworkErrors[keyof DeleteNetworkErrors];
+
+export type DeleteNetworkResponses = {
+  /**
+   * No Content
+   */
+  204: void;
+};
+
+export type DeleteNetworkResponse =
+  DeleteNetworkResponses[keyof DeleteNetworkResponses];
+
 export type GetEnvironmentsData = {
   body?: never;
   path: {
@@ -863,6 +1664,151 @@ export type GetEnvironmentBySlugResponses = {
 
 export type GetEnvironmentBySlugResponse =
   GetEnvironmentBySlugResponses[keyof GetEnvironmentBySlugResponses];
+
+export type GetConfigsData = {
+  body?: never;
+  path: {
+    projectSlug: string;
+    envSlug: string;
+  };
+  query?: never;
+  url: "/api/projects/{projectSlug}/environments/{envSlug}/configs";
+};
+
+export type GetConfigsErrors = {
+  /**
+   * Forbidden
+   */
+  403: ProblemDetails;
+  /**
+   * Not Found
+   */
+  404: ProblemDetails;
+};
+
+export type GetConfigsError = GetConfigsErrors[keyof GetConfigsErrors];
+
+export type GetConfigsResponses = {
+  /**
+   * OK
+   */
+  200: Array<ConfigDto>;
+};
+
+export type GetConfigsResponse = GetConfigsResponses[keyof GetConfigsResponses];
+
+export type CreateConfigData = {
+  body: CreateConfigRequest;
+  path: {
+    projectSlug: string;
+    envSlug: string;
+  };
+  query?: never;
+  url: "/api/projects/{projectSlug}/environments/{envSlug}/configs";
+};
+
+export type CreateConfigErrors = {
+  /**
+   * Bad Request
+   */
+  400: HttpValidationProblemDetails;
+  /**
+   * Forbidden
+   */
+  403: ProblemDetails;
+  /**
+   * Not Found
+   */
+  404: ProblemDetails;
+  /**
+   * Conflict
+   */
+  409: ProblemDetails;
+};
+
+export type CreateConfigError = CreateConfigErrors[keyof CreateConfigErrors];
+
+export type CreateConfigResponses = {
+  /**
+   * Created
+   */
+  201: ConfigDto;
+};
+
+export type CreateConfigResponse =
+  CreateConfigResponses[keyof CreateConfigResponses];
+
+export type DeleteConfigData = {
+  body?: never;
+  path: {
+    projectSlug: string;
+    envSlug: string;
+    configId: string;
+  };
+  query?: never;
+  url: "/api/projects/{projectSlug}/environments/{envSlug}/configs/{configId}";
+};
+
+export type DeleteConfigErrors = {
+  /**
+   * Forbidden
+   */
+  403: ProblemDetails;
+  /**
+   * Not Found
+   */
+  404: ProblemDetails;
+};
+
+export type DeleteConfigError = DeleteConfigErrors[keyof DeleteConfigErrors];
+
+export type DeleteConfigResponses = {
+  /**
+   * No Content
+   */
+  204: void;
+};
+
+export type DeleteConfigResponse =
+  DeleteConfigResponses[keyof DeleteConfigResponses];
+
+export type UpdateConfigData = {
+  body: UpdateConfigRequest;
+  path: {
+    projectSlug: string;
+    envSlug: string;
+    configId: string;
+  };
+  query?: never;
+  url: "/api/projects/{projectSlug}/environments/{envSlug}/configs/{configId}";
+};
+
+export type UpdateConfigErrors = {
+  /**
+   * Bad Request
+   */
+  400: HttpValidationProblemDetails;
+  /**
+   * Forbidden
+   */
+  403: ProblemDetails;
+  /**
+   * Not Found
+   */
+  404: ProblemDetails;
+};
+
+export type UpdateConfigError = UpdateConfigErrors[keyof UpdateConfigErrors];
+
+export type UpdateConfigResponses = {
+  /**
+   * OK
+   */
+  200: ConfigDto;
+};
+
+export type UpdateConfigResponse =
+  UpdateConfigResponses[keyof UpdateConfigResponses];
 
 export type LoginData = {
   body: LoginRequest;

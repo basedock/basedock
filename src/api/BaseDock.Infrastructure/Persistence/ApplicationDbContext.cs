@@ -2,7 +2,6 @@ namespace BaseDock.Infrastructure.Persistence;
 
 using BaseDock.Application.Abstractions.Data;
 using BaseDock.Domain.Entities;
-using BaseDock.Domain.Entities.Resources;
 using Microsoft.EntityFrameworkCore;
 
 public class ApplicationDbContext : DbContext, IApplicationDbContext
@@ -21,19 +20,21 @@ public class ApplicationDbContext : DbContext, IApplicationDbContext
 
     public DbSet<Environment> Environments => Set<Environment>();
 
-    public DbSet<EnvironmentVariable> EnvironmentVariables => Set<EnvironmentVariable>();
+    public DbSet<Service> Services => Set<Service>();
 
-    public DbSet<DockerImageResource> DockerImageResources => Set<DockerImageResource>();
+    public DbSet<Volume> Volumes => Set<Volume>();
 
-    public DbSet<DockerfileResource> DockerfileResources => Set<DockerfileResource>();
+    public DbSet<Network> Networks => Set<Network>();
 
-    public DbSet<DockerComposeResource> DockerComposeResources => Set<DockerComposeResource>();
+    public DbSet<Config> Configs => Set<Config>();
 
-    public DbSet<PostgreSQLResource> PostgreSQLResources => Set<PostgreSQLResource>();
+    public DbSet<Secret> Secrets => Set<Secret>();
 
-    public DbSet<RedisResource> RedisResources => Set<RedisResource>();
+    public DbSet<ServiceNetwork> ServiceNetworks => Set<ServiceNetwork>();
 
-    public DbSet<PreMadeAppResource> PreMadeAppResources => Set<PreMadeAppResource>();
+    public DbSet<ServiceConfig> ServiceConfigs => Set<ServiceConfig>();
+
+    public DbSet<ServiceSecret> ServiceSecrets => Set<ServiceSecret>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

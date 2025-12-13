@@ -6,38 +6,71 @@ import type {
   AddProjectMembersData,
   AddProjectMembersErrors,
   AddProjectMembersResponses,
+  ApplyTemplateData,
+  ApplyTemplateErrors,
+  ApplyTemplateResponses,
   CheckSlugAvailabilityData,
   CheckSlugAvailabilityResponses,
+  CreateConfigData,
+  CreateConfigErrors,
+  CreateConfigResponses,
   CreateEnvironmentData,
   CreateEnvironmentErrors,
   CreateEnvironmentResponses,
-  CreatePostgreSqlResourceData,
-  CreatePostgreSqlResourceErrors,
-  CreatePostgreSqlResourceResponses,
+  CreateNetworkData,
+  CreateNetworkErrors,
+  CreateNetworkResponses,
   CreateProjectData,
   CreateProjectErrors,
   CreateProjectResponses,
+  CreateSecretData,
+  CreateSecretErrors,
+  CreateSecretResponses,
+  CreateServiceData,
+  CreateServiceErrors,
+  CreateServiceResponses,
   CreateUserData,
   CreateUserErrors,
   CreateUserResponses,
+  CreateVolumeData,
+  CreateVolumeErrors,
+  CreateVolumeResponses,
+  DeleteConfigData,
+  DeleteConfigErrors,
+  DeleteConfigResponses,
   DeleteEnvironmentData,
   DeleteEnvironmentErrors,
   DeleteEnvironmentResponses,
+  DeleteNetworkData,
+  DeleteNetworkErrors,
+  DeleteNetworkResponses,
   DeleteProjectData,
   DeleteProjectErrors,
   DeleteProjectResponses,
+  DeleteSecretData,
+  DeleteSecretErrors,
+  DeleteSecretResponses,
+  DeleteServiceData,
+  DeleteServiceErrors,
+  DeleteServiceResponses,
   DeleteUserData,
   DeleteUserErrors,
   DeleteUserResponses,
-  DeployResourceData,
-  DeployResourceErrors,
-  DeployResourceResponses,
+  DeleteVolumeData,
+  DeleteVolumeErrors,
+  DeleteVolumeResponses,
+  GetConfigsData,
+  GetConfigsErrors,
+  GetConfigsResponses,
   GetEnvironmentBySlugData,
   GetEnvironmentBySlugErrors,
   GetEnvironmentBySlugResponses,
   GetEnvironmentsData,
   GetEnvironmentsErrors,
   GetEnvironmentsResponses,
+  GetNetworksData,
+  GetNetworksErrors,
+  GetNetworksResponses,
   GetProjectByIdData,
   GetProjectByIdErrors,
   GetProjectByIdResponses,
@@ -46,12 +79,26 @@ import type {
   GetProjectBySlugResponses,
   GetProjectsData,
   GetProjectsResponses,
+  GetSecretsData,
+  GetSecretsErrors,
+  GetSecretsResponses,
+  GetServiceByIdData,
+  GetServiceByIdErrors,
+  GetServiceByIdResponses,
+  GetServicesData,
+  GetServicesErrors,
+  GetServicesResponses,
+  GetTemplatesData,
+  GetTemplatesResponses,
   GetUserByIdData,
   GetUserByIdErrors,
   GetUserByIdResponses,
   GetUsersData,
   GetUsersErrors,
   GetUsersResponses,
+  GetVolumesData,
+  GetVolumesErrors,
+  GetVolumesResponses,
   LoginData,
   LoginErrors,
   LoginResponses,
@@ -64,12 +111,18 @@ import type {
   RemoveProjectMembersData,
   RemoveProjectMembersErrors,
   RemoveProjectMembersResponses,
-  StopResourceData,
-  StopResourceErrors,
-  StopResourceResponses,
+  UpdateConfigData,
+  UpdateConfigErrors,
+  UpdateConfigResponses,
   UpdateProjectData,
   UpdateProjectErrors,
   UpdateProjectResponses,
+  UpdateSecretData,
+  UpdateSecretErrors,
+  UpdateSecretResponses,
+  UpdateServiceData,
+  UpdateServiceErrors,
+  UpdateServiceResponses,
   UpdateUserData,
   UpdateUserErrors,
   UpdateUserResponses,
@@ -91,6 +144,84 @@ export type Options<
    */
   meta?: Record<string, unknown>;
 };
+
+/**
+ * Get all available templates
+ */
+export const getTemplates = <ThrowOnError extends boolean = false>(
+  options?: Options<GetTemplatesData, ThrowOnError>,
+) =>
+  (options?.client ?? client).get<GetTemplatesResponses, unknown, ThrowOnError>(
+    { url: "/api/templates", ...options },
+  );
+
+/**
+ * Apply a template to create services in an environment
+ */
+export const applyTemplate = <ThrowOnError extends boolean = false>(
+  options: Options<ApplyTemplateData, ThrowOnError>,
+) =>
+  (options.client ?? client).post<
+    ApplyTemplateResponses,
+    ApplyTemplateErrors,
+    ThrowOnError
+  >({
+    url: "/api/projects/{projectSlug}/environments/{envSlug}/templates/{templateId}/apply",
+    ...options,
+    headers: {
+      "Content-Type": "application/json",
+      ...options.headers,
+    },
+  });
+
+/**
+ * Get all volumes in an environment
+ */
+export const getVolumes = <ThrowOnError extends boolean = false>(
+  options: Options<GetVolumesData, ThrowOnError>,
+) =>
+  (options.client ?? client).get<
+    GetVolumesResponses,
+    GetVolumesErrors,
+    ThrowOnError
+  >({
+    url: "/api/projects/{projectSlug}/environments/{envSlug}/volumes",
+    ...options,
+  });
+
+/**
+ * Create a new volume
+ */
+export const createVolume = <ThrowOnError extends boolean = false>(
+  options: Options<CreateVolumeData, ThrowOnError>,
+) =>
+  (options.client ?? client).post<
+    CreateVolumeResponses,
+    CreateVolumeErrors,
+    ThrowOnError
+  >({
+    url: "/api/projects/{projectSlug}/environments/{envSlug}/volumes",
+    ...options,
+    headers: {
+      "Content-Type": "application/json",
+      ...options.headers,
+    },
+  });
+
+/**
+ * Delete a volume
+ */
+export const deleteVolume = <ThrowOnError extends boolean = false>(
+  options: Options<DeleteVolumeData, ThrowOnError>,
+) =>
+  (options.client ?? client).delete<
+    DeleteVolumeResponses,
+    DeleteVolumeErrors,
+    ThrowOnError
+  >({
+    url: "/api/projects/{projectSlug}/environments/{envSlug}/volumes/{volumeId}",
+    ...options,
+  });
 
 /**
  * Get all users (Admin only)
@@ -167,17 +298,32 @@ export const updateUser = <ThrowOnError extends boolean = false>(
   });
 
 /**
- * Create a new PostgreSQL resource
+ * Get all services in an environment
  */
-export const createPostgreSqlResource = <ThrowOnError extends boolean = false>(
-  options: Options<CreatePostgreSqlResourceData, ThrowOnError>,
+export const getServices = <ThrowOnError extends boolean = false>(
+  options: Options<GetServicesData, ThrowOnError>,
 ) =>
-  (options.client ?? client).post<
-    CreatePostgreSqlResourceResponses,
-    CreatePostgreSqlResourceErrors,
+  (options.client ?? client).get<
+    GetServicesResponses,
+    GetServicesErrors,
     ThrowOnError
   >({
-    url: "/api/projects/{projectSlug}/environments/{envSlug}/resources/postgresql",
+    url: "/api/projects/{projectSlug}/environments/{envSlug}/services",
+    ...options,
+  });
+
+/**
+ * Create a new service
+ */
+export const createService = <ThrowOnError extends boolean = false>(
+  options: Options<CreateServiceData, ThrowOnError>,
+) =>
+  (options.client ?? client).post<
+    CreateServiceResponses,
+    CreateServiceErrors,
+    ThrowOnError
+  >({
+    url: "/api/projects/{projectSlug}/environments/{envSlug}/services",
     ...options,
     headers: {
       "Content-Type": "application/json",
@@ -186,17 +332,47 @@ export const createPostgreSqlResource = <ThrowOnError extends boolean = false>(
   });
 
 /**
- * Deploy a resource
+ * Delete a service
  */
-export const deployResource = <ThrowOnError extends boolean = false>(
-  options: Options<DeployResourceData, ThrowOnError>,
+export const deleteService = <ThrowOnError extends boolean = false>(
+  options: Options<DeleteServiceData, ThrowOnError>,
 ) =>
-  (options.client ?? client).post<
-    DeployResourceResponses,
-    DeployResourceErrors,
+  (options.client ?? client).delete<
+    DeleteServiceResponses,
+    DeleteServiceErrors,
     ThrowOnError
   >({
-    url: "/api/projects/{projectSlug}/environments/{envSlug}/resources/{resourceId}/deploy",
+    url: "/api/projects/{projectSlug}/environments/{envSlug}/services/{serviceId}",
+    ...options,
+  });
+
+/**
+ * Get service details by ID
+ */
+export const getServiceById = <ThrowOnError extends boolean = false>(
+  options: Options<GetServiceByIdData, ThrowOnError>,
+) =>
+  (options.client ?? client).get<
+    GetServiceByIdResponses,
+    GetServiceByIdErrors,
+    ThrowOnError
+  >({
+    url: "/api/projects/{projectSlug}/environments/{envSlug}/services/{serviceId}",
+    ...options,
+  });
+
+/**
+ * Update a service
+ */
+export const updateService = <ThrowOnError extends boolean = false>(
+  options: Options<UpdateServiceData, ThrowOnError>,
+) =>
+  (options.client ?? client).put<
+    UpdateServiceResponses,
+    UpdateServiceErrors,
+    ThrowOnError
+  >({
+    url: "/api/projects/{projectSlug}/environments/{envSlug}/services/{serviceId}",
     ...options,
     headers: {
       "Content-Type": "application/json",
@@ -205,17 +381,66 @@ export const deployResource = <ThrowOnError extends boolean = false>(
   });
 
 /**
- * Stop a resource
+ * Get all secrets in an environment
  */
-export const stopResource = <ThrowOnError extends boolean = false>(
-  options: Options<StopResourceData, ThrowOnError>,
+export const getSecrets = <ThrowOnError extends boolean = false>(
+  options: Options<GetSecretsData, ThrowOnError>,
 ) =>
-  (options.client ?? client).post<
-    StopResourceResponses,
-    StopResourceErrors,
+  (options.client ?? client).get<
+    GetSecretsResponses,
+    GetSecretsErrors,
     ThrowOnError
   >({
-    url: "/api/projects/{projectSlug}/environments/{envSlug}/resources/{resourceId}/stop",
+    url: "/api/projects/{projectSlug}/environments/{envSlug}/secrets",
+    ...options,
+  });
+
+/**
+ * Create a new secret
+ */
+export const createSecret = <ThrowOnError extends boolean = false>(
+  options: Options<CreateSecretData, ThrowOnError>,
+) =>
+  (options.client ?? client).post<
+    CreateSecretResponses,
+    CreateSecretErrors,
+    ThrowOnError
+  >({
+    url: "/api/projects/{projectSlug}/environments/{envSlug}/secrets",
+    ...options,
+    headers: {
+      "Content-Type": "application/json",
+      ...options.headers,
+    },
+  });
+
+/**
+ * Delete a secret
+ */
+export const deleteSecret = <ThrowOnError extends boolean = false>(
+  options: Options<DeleteSecretData, ThrowOnError>,
+) =>
+  (options.client ?? client).delete<
+    DeleteSecretResponses,
+    DeleteSecretErrors,
+    ThrowOnError
+  >({
+    url: "/api/projects/{projectSlug}/environments/{envSlug}/secrets/{secretId}",
+    ...options,
+  });
+
+/**
+ * Update a secret
+ */
+export const updateSecret = <ThrowOnError extends boolean = false>(
+  options: Options<UpdateSecretData, ThrowOnError>,
+) =>
+  (options.client ?? client).put<
+    UpdateSecretResponses,
+    UpdateSecretErrors,
+    ThrowOnError
+  >({
+    url: "/api/projects/{projectSlug}/environments/{envSlug}/secrets/{secretId}",
     ...options,
     headers: {
       "Content-Type": "application/json",
@@ -359,6 +584,55 @@ export const removeProjectMembers = <ThrowOnError extends boolean = false>(
   });
 
 /**
+ * Get all networks in an environment
+ */
+export const getNetworks = <ThrowOnError extends boolean = false>(
+  options: Options<GetNetworksData, ThrowOnError>,
+) =>
+  (options.client ?? client).get<
+    GetNetworksResponses,
+    GetNetworksErrors,
+    ThrowOnError
+  >({
+    url: "/api/projects/{projectSlug}/environments/{envSlug}/networks",
+    ...options,
+  });
+
+/**
+ * Create a new network
+ */
+export const createNetwork = <ThrowOnError extends boolean = false>(
+  options: Options<CreateNetworkData, ThrowOnError>,
+) =>
+  (options.client ?? client).post<
+    CreateNetworkResponses,
+    CreateNetworkErrors,
+    ThrowOnError
+  >({
+    url: "/api/projects/{projectSlug}/environments/{envSlug}/networks",
+    ...options,
+    headers: {
+      "Content-Type": "application/json",
+      ...options.headers,
+    },
+  });
+
+/**
+ * Delete a network
+ */
+export const deleteNetwork = <ThrowOnError extends boolean = false>(
+  options: Options<DeleteNetworkData, ThrowOnError>,
+) =>
+  (options.client ?? client).delete<
+    DeleteNetworkResponses,
+    DeleteNetworkErrors,
+    ThrowOnError
+  >({
+    url: "/api/projects/{projectSlug}/environments/{envSlug}/networks/{networkId}",
+    ...options,
+  });
+
+/**
  * Get all environments for a project
  */
 export const getEnvironments = <ThrowOnError extends boolean = false>(
@@ -412,6 +686,74 @@ export const getEnvironmentBySlug = <ThrowOnError extends boolean = false>(
     GetEnvironmentBySlugErrors,
     ThrowOnError
   >({ url: "/api/projects/{projectSlug}/environments/{envSlug}", ...options });
+
+/**
+ * Get all configs in an environment
+ */
+export const getConfigs = <ThrowOnError extends boolean = false>(
+  options: Options<GetConfigsData, ThrowOnError>,
+) =>
+  (options.client ?? client).get<
+    GetConfigsResponses,
+    GetConfigsErrors,
+    ThrowOnError
+  >({
+    url: "/api/projects/{projectSlug}/environments/{envSlug}/configs",
+    ...options,
+  });
+
+/**
+ * Create a new config
+ */
+export const createConfig = <ThrowOnError extends boolean = false>(
+  options: Options<CreateConfigData, ThrowOnError>,
+) =>
+  (options.client ?? client).post<
+    CreateConfigResponses,
+    CreateConfigErrors,
+    ThrowOnError
+  >({
+    url: "/api/projects/{projectSlug}/environments/{envSlug}/configs",
+    ...options,
+    headers: {
+      "Content-Type": "application/json",
+      ...options.headers,
+    },
+  });
+
+/**
+ * Delete a config
+ */
+export const deleteConfig = <ThrowOnError extends boolean = false>(
+  options: Options<DeleteConfigData, ThrowOnError>,
+) =>
+  (options.client ?? client).delete<
+    DeleteConfigResponses,
+    DeleteConfigErrors,
+    ThrowOnError
+  >({
+    url: "/api/projects/{projectSlug}/environments/{envSlug}/configs/{configId}",
+    ...options,
+  });
+
+/**
+ * Update a config
+ */
+export const updateConfig = <ThrowOnError extends boolean = false>(
+  options: Options<UpdateConfigData, ThrowOnError>,
+) =>
+  (options.client ?? client).put<
+    UpdateConfigResponses,
+    UpdateConfigErrors,
+    ThrowOnError
+  >({
+    url: "/api/projects/{projectSlug}/environments/{envSlug}/configs/{configId}",
+    ...options,
+    headers: {
+      "Content-Type": "application/json",
+      ...options.headers,
+    },
+  });
 
 /**
  * Authenticate user and return access token

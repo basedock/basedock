@@ -1,7 +1,6 @@
 namespace BaseDock.Application.Abstractions.Data;
 
 using BaseDock.Domain.Entities;
-using BaseDock.Domain.Entities.Resources;
 using Microsoft.EntityFrameworkCore;
 
 public interface IApplicationDbContext
@@ -16,19 +15,21 @@ public interface IApplicationDbContext
 
     DbSet<Environment> Environments { get; }
 
-    DbSet<EnvironmentVariable> EnvironmentVariables { get; }
+    DbSet<Service> Services { get; }
 
-    DbSet<DockerImageResource> DockerImageResources { get; }
+    DbSet<Volume> Volumes { get; }
 
-    DbSet<DockerfileResource> DockerfileResources { get; }
+    DbSet<Network> Networks { get; }
 
-    DbSet<DockerComposeResource> DockerComposeResources { get; }
+    DbSet<Config> Configs { get; }
 
-    DbSet<PostgreSQLResource> PostgreSQLResources { get; }
+    DbSet<Secret> Secrets { get; }
 
-    DbSet<RedisResource> RedisResources { get; }
+    DbSet<ServiceNetwork> ServiceNetworks { get; }
 
-    DbSet<PreMadeAppResource> PreMadeAppResources { get; }
+    DbSet<ServiceConfig> ServiceConfigs { get; }
+
+    DbSet<ServiceSecret> ServiceSecrets { get; }
 
     Task<int> SaveChangesAsync(CancellationToken cancellationToken = default);
 }

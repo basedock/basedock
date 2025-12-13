@@ -10,6 +10,327 @@
     }
   ],
   "paths": {
+    "/api/templates": {
+      "get": {
+        "tags": [
+          "Templates"
+        ],
+        "summary": "Get all available templates",
+        "operationId": "GetTemplates",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/TemplateDto"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/projects/{projectSlug}/environments/{envSlug}/templates/{templateId}/apply": {
+      "post": {
+        "tags": [
+          "Templates"
+        ],
+        "summary": "Apply a template to create services in an environment",
+        "operationId": "ApplyTemplate",
+        "parameters": [
+          {
+            "name": "projectSlug",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "envSlug",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "templateId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ApplyTemplateRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApplyTemplateResult"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HttpValidationProblemDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/projects/{projectSlug}/environments/{envSlug}/volumes": {
+      "get": {
+        "tags": [
+          "Volumes"
+        ],
+        "summary": "Get all volumes in an environment",
+        "operationId": "GetVolumes",
+        "parameters": [
+          {
+            "name": "projectSlug",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "envSlug",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/VolumeDto"
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Volumes"
+        ],
+        "summary": "Create a new volume",
+        "operationId": "CreateVolume",
+        "parameters": [
+          {
+            "name": "projectSlug",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "envSlug",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateVolumeRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/VolumeDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HttpValidationProblemDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/projects/{projectSlug}/environments/{envSlug}/volumes/{volumeId}": {
+      "delete": {
+        "tags": [
+          "Volumes"
+        ],
+        "summary": "Delete a volume",
+        "operationId": "DeleteVolume",
+        "parameters": [
+          {
+            "name": "projectSlug",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "envSlug",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "volumeId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "No Content"
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/users": {
       "get": {
         "tags": [
@@ -292,13 +613,73 @@
         }
       }
     },
-    "/api/projects/{projectSlug}/environments/{envSlug}/resources/postgresql": {
+    "/api/projects/{projectSlug}/environments/{envSlug}/services": {
+      "get": {
+        "tags": [
+          "Services"
+        ],
+        "summary": "Get all services in an environment",
+        "operationId": "GetServices",
+        "parameters": [
+          {
+            "name": "projectSlug",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "envSlug",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ServiceDto"
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      },
       "post": {
         "tags": [
-          "Resources"
+          "Services"
         ],
-        "summary": "Create a new PostgreSQL resource",
-        "operationId": "CreatePostgreSQLResource",
+        "summary": "Create a new service",
+        "operationId": "CreateService",
         "parameters": [
           {
             "name": "projectSlug",
@@ -321,7 +702,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/CreatePostgreSQLResourceRequest"
+                "$ref": "#/components/schemas/CreateServiceRequest"
               }
             }
           },
@@ -333,7 +714,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/PostgreSQLResourceDto"
+                  "$ref": "#/components/schemas/ServiceDto"
                 }
               }
             }
@@ -367,17 +748,27 @@
                 }
               }
             }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
           }
         }
       }
     },
-    "/api/projects/{projectSlug}/environments/{envSlug}/resources/{resourceId}/deploy": {
-      "post": {
+    "/api/projects/{projectSlug}/environments/{envSlug}/services/{serviceId}": {
+      "get": {
         "tags": [
-          "Resources"
+          "Services"
         ],
-        "summary": "Deploy a resource",
-        "operationId": "DeployResource",
+        "summary": "Get service details by ID",
+        "operationId": "GetServiceById",
         "parameters": [
           {
             "name": "projectSlug",
@@ -396,7 +787,7 @@
             }
           },
           {
-            "name": "resourceId",
+            "name": "serviceId",
             "in": "path",
             "required": true,
             "schema": {
@@ -405,19 +796,16 @@
             }
           }
         ],
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/DeployResourceRequest"
-              }
-            }
-          },
-          "required": true
-        },
         "responses": {
           "200": {
-            "description": "OK"
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ServiceDetailDto"
+                }
+              }
+            }
           },
           "404": {
             "description": "Not Found",
@@ -429,8 +817,8 @@
               }
             }
           },
-          "400": {
-            "description": "Bad Request",
+          "403": {
+            "description": "Forbidden",
             "content": {
               "application/problem+json": {
                 "schema": {
@@ -440,15 +828,13 @@
             }
           }
         }
-      }
-    },
-    "/api/projects/{projectSlug}/environments/{envSlug}/resources/{resourceId}/stop": {
-      "post": {
+      },
+      "put": {
         "tags": [
-          "Resources"
+          "Services"
         ],
-        "summary": "Stop a resource",
-        "operationId": "StopResource",
+        "summary": "Update a service",
+        "operationId": "UpdateService",
         "parameters": [
           {
             "name": "projectSlug",
@@ -467,7 +853,7 @@
             }
           },
           {
-            "name": "resourceId",
+            "name": "serviceId",
             "in": "path",
             "required": true,
             "schema": {
@@ -480,7 +866,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/StopResourceRequest"
+                "$ref": "#/components/schemas/UpdateServiceRequest"
               }
             }
           },
@@ -488,7 +874,24 @@
         },
         "responses": {
           "200": {
-            "description": "OK"
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ServiceDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HttpValidationProblemDetails"
+                }
+              }
+            }
           },
           "404": {
             "description": "Not Found",
@@ -500,8 +903,373 @@
               }
             }
           },
+          "409": {
+            "description": "Conflict",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Services"
+        ],
+        "summary": "Delete a service",
+        "operationId": "DeleteService",
+        "parameters": [
+          {
+            "name": "projectSlug",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "envSlug",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "serviceId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "No Content"
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/projects/{projectSlug}/environments/{envSlug}/secrets": {
+      "get": {
+        "tags": [
+          "Secrets"
+        ],
+        "summary": "Get all secrets in an environment",
+        "operationId": "GetSecrets",
+        "parameters": [
+          {
+            "name": "projectSlug",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "envSlug",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/SecretDto"
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Secrets"
+        ],
+        "summary": "Create a new secret",
+        "operationId": "CreateSecret",
+        "parameters": [
+          {
+            "name": "projectSlug",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "envSlug",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateSecretRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SecretDto"
+                }
+              }
+            }
+          },
           "400": {
             "description": "Bad Request",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HttpValidationProblemDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/projects/{projectSlug}/environments/{envSlug}/secrets/{secretId}": {
+      "put": {
+        "tags": [
+          "Secrets"
+        ],
+        "summary": "Update a secret",
+        "operationId": "UpdateSecret",
+        "parameters": [
+          {
+            "name": "projectSlug",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "envSlug",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "secretId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateSecretRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SecretDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HttpValidationProblemDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Secrets"
+        ],
+        "summary": "Delete a secret",
+        "operationId": "DeleteSecret",
+        "parameters": [
+          {
+            "name": "projectSlug",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "envSlug",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "secretId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "No Content"
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
             "content": {
               "application/problem+json": {
                 "schema": {
@@ -981,6 +1749,216 @@
         }
       }
     },
+    "/api/projects/{projectSlug}/environments/{envSlug}/networks": {
+      "get": {
+        "tags": [
+          "Networks"
+        ],
+        "summary": "Get all networks in an environment",
+        "operationId": "GetNetworks",
+        "parameters": [
+          {
+            "name": "projectSlug",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "envSlug",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/NetworkDto"
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Networks"
+        ],
+        "summary": "Create a new network",
+        "operationId": "CreateNetwork",
+        "parameters": [
+          {
+            "name": "projectSlug",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "envSlug",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateNetworkRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NetworkDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HttpValidationProblemDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/projects/{projectSlug}/environments/{envSlug}/networks/{networkId}": {
+      "delete": {
+        "tags": [
+          "Networks"
+        ],
+        "summary": "Delete a network",
+        "operationId": "DeleteNetwork",
+        "parameters": [
+          {
+            "name": "projectSlug",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "envSlug",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "networkId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "No Content"
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/projects/{projectSlug}/environments": {
       "get": {
         "tags": [
@@ -1233,6 +2211,302 @@
         }
       }
     },
+    "/api/projects/{projectSlug}/environments/{envSlug}/configs": {
+      "get": {
+        "tags": [
+          "Configs"
+        ],
+        "summary": "Get all configs in an environment",
+        "operationId": "GetConfigs",
+        "parameters": [
+          {
+            "name": "projectSlug",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "envSlug",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ConfigDto"
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Configs"
+        ],
+        "summary": "Create a new config",
+        "operationId": "CreateConfig",
+        "parameters": [
+          {
+            "name": "projectSlug",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "envSlug",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateConfigRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ConfigDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HttpValidationProblemDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/projects/{projectSlug}/environments/{envSlug}/configs/{configId}": {
+      "put": {
+        "tags": [
+          "Configs"
+        ],
+        "summary": "Update a config",
+        "operationId": "UpdateConfig",
+        "parameters": [
+          {
+            "name": "projectSlug",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "envSlug",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "configId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateConfigRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ConfigDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HttpValidationProblemDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Configs"
+        ],
+        "summary": "Delete a config",
+        "operationId": "DeleteConfig",
+        "parameters": [
+          {
+            "name": "projectSlug",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "envSlug",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "configId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "No Content"
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/auth/login": {
       "post": {
         "tags": [
@@ -1347,6 +2621,157 @@
           }
         }
       },
+      "ApplyTemplateRequest": {
+        "required": [
+          "parameters"
+        ],
+        "type": "object",
+        "properties": {
+          "parameters": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "string"
+            }
+          }
+        }
+      },
+      "ApplyTemplateResult": {
+        "required": [
+          "services"
+        ],
+        "type": "object",
+        "properties": {
+          "services": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/CreatedServiceDto"
+            }
+          }
+        }
+      },
+      "ConfigDto": {
+        "required": [
+          "id",
+          "environmentId",
+          "name",
+          "content",
+          "filePath",
+          "external",
+          "externalName",
+          "createdAt"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "environmentId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "name": {
+            "type": "string"
+          },
+          "content": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "filePath": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "external": {
+            "type": "boolean"
+          },
+          "externalName": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "ConfigSummaryDto": {
+        "required": [
+          "id",
+          "name"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "name": {
+            "type": "string"
+          }
+        }
+      },
+      "CreateConfigRequest": {
+        "required": [
+          "name",
+          "content",
+          "filePath",
+          "external",
+          "externalName"
+        ],
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "content": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "filePath": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "external": {
+            "type": "boolean"
+          },
+          "externalName": {
+            "type": [
+              "null",
+              "string"
+            ]
+          }
+        }
+      },
+      "CreatedServiceDto": {
+        "required": [
+          "id",
+          "name",
+          "slug"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "name": {
+            "type": "string"
+          },
+          "slug": {
+            "type": "string"
+          }
+        }
+      },
       "CreateEnvironmentRequest": {
         "required": [
           "name",
@@ -1365,46 +2790,68 @@
           }
         }
       },
-      "CreatePostgreSQLResourceRequest": {
+      "CreateNetworkRequest": {
         "required": [
           "name",
-          "description",
-          "databaseName",
-          "username",
-          "password"
+          "driver",
+          "driverOpts",
+          "ipamDriver",
+          "ipamConfig",
+          "internal",
+          "attachable",
+          "labels",
+          "external",
+          "externalName"
         ],
         "type": "object",
         "properties": {
           "name": {
             "type": "string"
           },
-          "description": {
+          "driver": {
             "type": [
               "null",
               "string"
             ]
           },
-          "databaseName": {
-            "type": "string"
-          },
-          "username": {
-            "type": "string"
-          },
-          "password": {
-            "type": "string"
-          },
-          "version": {
-            "type": "string",
-            "default": "16"
-          },
-          "port": {
-            "pattern": "^-?(?:0|[1-9]\\d*)$",
+          "driverOpts": {
             "type": [
-              "integer",
+              "null",
               "string"
-            ],
-            "format": "int32",
-            "default": 5432
+            ]
+          },
+          "ipamDriver": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "ipamConfig": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "internal": {
+            "type": "boolean"
+          },
+          "attachable": {
+            "type": "boolean"
+          },
+          "labels": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "external": {
+            "type": "boolean"
+          },
+          "externalName": {
+            "type": [
+              "null",
+              "string"
+            ]
           }
         }
       },
@@ -1437,6 +2884,336 @@
           }
         }
       },
+      "CreateSecretRequest": {
+        "required": [
+          "name",
+          "content",
+          "filePath",
+          "external",
+          "externalName"
+        ],
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "content": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "filePath": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "external": {
+            "type": "boolean"
+          },
+          "externalName": {
+            "type": [
+              "null",
+              "string"
+            ]
+          }
+        }
+      },
+      "CreateServiceRequest": {
+        "required": [
+          "name",
+          "description",
+          "image",
+          "buildContext",
+          "buildDockerfile",
+          "buildArgs",
+          "command",
+          "entrypoint",
+          "workingDir",
+          "user",
+          "ports",
+          "expose",
+          "hostname",
+          "domainname",
+          "dns",
+          "extraHosts",
+          "environmentVariables",
+          "envFile",
+          "volumes",
+          "tmpfs",
+          "dependsOn",
+          "links",
+          "healthcheckTest",
+          "healthcheckInterval",
+          "healthcheckTimeout",
+          "healthcheckRetries",
+          "healthcheckStartPeriod",
+          "healthcheckDisabled",
+          "cpuLimit",
+          "memoryLimit",
+          "cpuReservation",
+          "memoryReservation",
+          "restart",
+          "stopGracePeriod",
+          "stopSignal",
+          "replicas",
+          "labels"
+        ],
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "description": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "image": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "buildContext": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "buildDockerfile": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "buildArgs": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "command": {
+            "type": [
+              "null",
+              "array"
+            ],
+            "items": {
+              "type": "string"
+            }
+          },
+          "entrypoint": {
+            "type": [
+              "null",
+              "array"
+            ],
+            "items": {
+              "type": "string"
+            }
+          },
+          "workingDir": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "user": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "ports": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "expose": {
+            "type": [
+              "null",
+              "array"
+            ],
+            "items": {
+              "pattern": "^-?(?:0|[1-9]\\d*)$",
+              "type": [
+                "integer",
+                "string"
+              ],
+              "format": "int32"
+            }
+          },
+          "hostname": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "domainname": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "dns": {
+            "type": [
+              "null",
+              "array"
+            ],
+            "items": {
+              "type": "string"
+            }
+          },
+          "extraHosts": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "environmentVariables": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "envFile": {
+            "type": [
+              "null",
+              "array"
+            ],
+            "items": {
+              "type": "string"
+            }
+          },
+          "volumes": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "tmpfs": {
+            "type": [
+              "null",
+              "array"
+            ],
+            "items": {
+              "type": "string"
+            }
+          },
+          "dependsOn": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "links": {
+            "type": [
+              "null",
+              "array"
+            ],
+            "items": {
+              "type": "string"
+            }
+          },
+          "healthcheckTest": {
+            "type": [
+              "null",
+              "array"
+            ],
+            "items": {
+              "type": "string"
+            }
+          },
+          "healthcheckInterval": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "healthcheckTimeout": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "healthcheckRetries": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "null",
+              "integer",
+              "string"
+            ],
+            "format": "int32"
+          },
+          "healthcheckStartPeriod": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "healthcheckDisabled": {
+            "type": "boolean"
+          },
+          "cpuLimit": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "memoryLimit": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "cpuReservation": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "memoryReservation": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "restart": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "stopGracePeriod": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "stopSignal": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "replicas": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "format": "int32"
+          },
+          "labels": {
+            "type": [
+              "null",
+              "string"
+            ]
+          }
+        }
+      },
       "CreateUserRequest": {
         "required": [
           "email",
@@ -1456,14 +3233,46 @@
           }
         }
       },
-      "DeployResourceRequest": {
+      "CreateVolumeRequest": {
         "required": [
-          "resourceType"
+          "name",
+          "driver",
+          "driverOpts",
+          "labels",
+          "external",
+          "externalName"
         ],
         "type": "object",
         "properties": {
-          "resourceType": {
+          "name": {
             "type": "string"
+          },
+          "driver": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "driverOpts": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "labels": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "external": {
+            "type": "boolean"
+          },
+          "externalName": {
+            "type": [
+              "null",
+              "string"
+            ]
           }
         }
       },
@@ -1476,8 +3285,11 @@
           "projectId",
           "isDefault",
           "createdAt",
-          "variables",
-          "resources"
+          "services",
+          "volumes",
+          "networks",
+          "configs",
+          "secrets"
         ],
         "type": "object",
         "properties": {
@@ -1508,16 +3320,34 @@
             "type": "string",
             "format": "date-time"
           },
-          "variables": {
+          "services": {
             "type": "array",
             "items": {
-              "$ref": "#/components/schemas/EnvironmentVariableDto"
+              "$ref": "#/components/schemas/ServiceSummaryDto"
             }
           },
-          "resources": {
+          "volumes": {
             "type": "array",
             "items": {
-              "$ref": "#/components/schemas/ResourceSummaryDto"
+              "$ref": "#/components/schemas/VolumeSummaryDto"
+            }
+          },
+          "networks": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/NetworkSummaryDto"
+            }
+          },
+          "configs": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ConfigSummaryDto"
+            }
+          },
+          "secrets": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/SecretSummaryDto"
             }
           }
         }
@@ -1531,8 +3361,9 @@
           "projectId",
           "isDefault",
           "createdAt",
-          "variableCount",
-          "resourceCount"
+          "serviceCount",
+          "volumeCount",
+          "networkCount"
         ],
         "type": "object",
         "properties": {
@@ -1563,7 +3394,7 @@
             "type": "string",
             "format": "date-time"
           },
-          "variableCount": {
+          "serviceCount": {
             "pattern": "^-?(?:0|[1-9]\\d*)$",
             "type": [
               "integer",
@@ -1571,42 +3402,21 @@
             ],
             "format": "int32"
           },
-          "resourceCount": {
+          "volumeCount": {
             "pattern": "^-?(?:0|[1-9]\\d*)$",
             "type": [
               "integer",
               "string"
             ],
             "format": "int32"
-          }
-        }
-      },
-      "EnvironmentVariableDto": {
-        "required": [
-          "id",
-          "key",
-          "value",
-          "isSecret",
-          "createdAt"
-        ],
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "string",
-            "format": "uuid"
           },
-          "key": {
-            "type": "string"
-          },
-          "value": {
-            "type": "string"
-          },
-          "isSecret": {
-            "type": "boolean"
-          },
-          "createdAt": {
-            "type": "string",
-            "format": "date-time"
+          "networkCount": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "format": "int32"
           }
         }
       },
@@ -1692,20 +3502,91 @@
           }
         }
       },
-      "PostgreSQLResourceDto": {
+      "NetworkDto": {
+        "required": [
+          "id",
+          "environmentId",
+          "name",
+          "driver",
+          "driverOpts",
+          "ipamDriver",
+          "ipamConfig",
+          "internal",
+          "attachable",
+          "labels",
+          "external",
+          "externalName",
+          "createdAt"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "environmentId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "name": {
+            "type": "string"
+          },
+          "driver": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "driverOpts": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "ipamDriver": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "ipamConfig": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "internal": {
+            "type": "boolean"
+          },
+          "attachable": {
+            "type": "boolean"
+          },
+          "labels": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "external": {
+            "type": "boolean"
+          },
+          "externalName": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "NetworkSummaryDto": {
         "required": [
           "id",
           "name",
-          "slug",
-          "description",
-          "version",
-          "port",
-          "databaseName",
-          "username",
-          "status",
-          "serviceName",
-          "createdAt",
-          "lastDeployedAt"
+          "driver"
         ],
         "type": "object",
         "properties": {
@@ -1716,48 +3597,8 @@
           "name": {
             "type": "string"
           },
-          "slug": {
+          "driver": {
             "type": "string"
-          },
-          "description": {
-            "type": [
-              "null",
-              "string"
-            ]
-          },
-          "version": {
-            "type": "string"
-          },
-          "port": {
-            "pattern": "^-?(?:0|[1-9]\\d*)$",
-            "type": [
-              "integer",
-              "string"
-            ],
-            "format": "int32"
-          },
-          "databaseName": {
-            "type": "string"
-          },
-          "username": {
-            "type": "string"
-          },
-          "status": {
-            "type": "string"
-          },
-          "serviceName": {
-            "type": "string"
-          },
-          "createdAt": {
-            "type": "string",
-            "format": "date-time"
-          },
-          "lastDeployedAt": {
-            "type": [
-              "null",
-              "string"
-            ],
-            "format": "date-time"
           }
         }
       },
@@ -1951,11 +3792,650 @@
           }
         }
       },
-      "ResourceSummaryDto": {
+      "SecretDto": {
+        "required": [
+          "id",
+          "environmentId",
+          "name",
+          "hasContent",
+          "filePath",
+          "external",
+          "externalName",
+          "createdAt"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "environmentId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "name": {
+            "type": "string"
+          },
+          "hasContent": {
+            "type": "boolean"
+          },
+          "filePath": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "external": {
+            "type": "boolean"
+          },
+          "externalName": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "SecretSummaryDto": {
+        "required": [
+          "id",
+          "name"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "name": {
+            "type": "string"
+          }
+        }
+      },
+      "ServiceConfigDto": {
+        "required": [
+          "configId",
+          "configName",
+          "target",
+          "uid",
+          "gid",
+          "mode"
+        ],
+        "type": "object",
+        "properties": {
+          "configId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "configName": {
+            "type": "string"
+          },
+          "target": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "uid": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "gid": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "mode": {
+            "type": [
+              "null",
+              "string"
+            ]
+          }
+        }
+      },
+      "ServiceDetailDto": {
+        "required": [
+          "id",
+          "environmentId",
+          "name",
+          "slug",
+          "description",
+          "image",
+          "buildContext",
+          "buildDockerfile",
+          "buildArgs",
+          "command",
+          "entrypoint",
+          "workingDir",
+          "user",
+          "ports",
+          "expose",
+          "hostname",
+          "domainname",
+          "dns",
+          "extraHosts",
+          "environmentVariables",
+          "envFile",
+          "volumes",
+          "tmpfs",
+          "dependsOn",
+          "links",
+          "healthcheckTest",
+          "healthcheckInterval",
+          "healthcheckTimeout",
+          "healthcheckRetries",
+          "healthcheckStartPeriod",
+          "healthcheckDisabled",
+          "cpuLimit",
+          "memoryLimit",
+          "cpuReservation",
+          "memoryReservation",
+          "restart",
+          "stopGracePeriod",
+          "stopSignal",
+          "replicas",
+          "labels",
+          "deploymentStatus",
+          "lastDeployedAt",
+          "lastError",
+          "createdAt",
+          "updatedAt",
+          "networks",
+          "configs",
+          "secrets"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "environmentId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "name": {
+            "type": "string"
+          },
+          "slug": {
+            "type": "string"
+          },
+          "description": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "image": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "buildContext": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "buildDockerfile": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "buildArgs": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "command": {
+            "type": [
+              "null",
+              "array"
+            ],
+            "items": {
+              "type": "string"
+            }
+          },
+          "entrypoint": {
+            "type": [
+              "null",
+              "array"
+            ],
+            "items": {
+              "type": "string"
+            }
+          },
+          "workingDir": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "user": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "ports": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "expose": {
+            "type": [
+              "null",
+              "array"
+            ],
+            "items": {
+              "pattern": "^-?(?:0|[1-9]\\d*)$",
+              "type": [
+                "integer",
+                "string"
+              ],
+              "format": "int32"
+            }
+          },
+          "hostname": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "domainname": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "dns": {
+            "type": [
+              "null",
+              "array"
+            ],
+            "items": {
+              "type": "string"
+            }
+          },
+          "extraHosts": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "environmentVariables": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "envFile": {
+            "type": [
+              "null",
+              "array"
+            ],
+            "items": {
+              "type": "string"
+            }
+          },
+          "volumes": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "tmpfs": {
+            "type": [
+              "null",
+              "array"
+            ],
+            "items": {
+              "type": "string"
+            }
+          },
+          "dependsOn": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "links": {
+            "type": [
+              "null",
+              "array"
+            ],
+            "items": {
+              "type": "string"
+            }
+          },
+          "healthcheckTest": {
+            "type": [
+              "null",
+              "array"
+            ],
+            "items": {
+              "type": "string"
+            }
+          },
+          "healthcheckInterval": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "healthcheckTimeout": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "healthcheckRetries": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "null",
+              "integer",
+              "string"
+            ],
+            "format": "int32"
+          },
+          "healthcheckStartPeriod": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "healthcheckDisabled": {
+            "type": "boolean"
+          },
+          "cpuLimit": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "memoryLimit": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "cpuReservation": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "memoryReservation": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "restart": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "stopGracePeriod": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "stopSignal": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "replicas": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "format": "int32"
+          },
+          "labels": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "deploymentStatus": {
+            "type": "string"
+          },
+          "lastDeployedAt": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "format": "date-time"
+          },
+          "lastError": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updatedAt": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "format": "date-time"
+          },
+          "networks": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ServiceNetworkDto"
+            }
+          },
+          "configs": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ServiceConfigDto"
+            }
+          },
+          "secrets": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ServiceSecretDto"
+            }
+          }
+        }
+      },
+      "ServiceDto": {
+        "required": [
+          "id",
+          "environmentId",
+          "name",
+          "slug",
+          "description",
+          "image",
+          "buildContext",
+          "buildDockerfile",
+          "deploymentStatus",
+          "lastDeployedAt",
+          "lastError",
+          "createdAt",
+          "updatedAt"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "environmentId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "name": {
+            "type": "string"
+          },
+          "slug": {
+            "type": "string"
+          },
+          "description": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "image": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "buildContext": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "buildDockerfile": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "deploymentStatus": {
+            "type": "string"
+          },
+          "lastDeployedAt": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "format": "date-time"
+          },
+          "lastError": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updatedAt": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "format": "date-time"
+          }
+        }
+      },
+      "ServiceNetworkDto": {
+        "required": [
+          "networkId",
+          "networkName",
+          "aliases",
+          "ipv4Address",
+          "ipv6Address"
+        ],
+        "type": "object",
+        "properties": {
+          "networkId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "networkName": {
+            "type": "string"
+          },
+          "aliases": {
+            "type": [
+              "null",
+              "array"
+            ],
+            "items": {
+              "type": "string"
+            }
+          },
+          "ipv4Address": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "ipv6Address": {
+            "type": [
+              "null",
+              "string"
+            ]
+          }
+        }
+      },
+      "ServiceSecretDto": {
+        "required": [
+          "secretId",
+          "secretName",
+          "target",
+          "uid",
+          "gid",
+          "mode"
+        ],
+        "type": "object",
+        "properties": {
+          "secretId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "secretName": {
+            "type": "string"
+          },
+          "target": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "uid": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "gid": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "mode": {
+            "type": [
+              "null",
+              "string"
+            ]
+          }
+        }
+      },
+      "ServiceSummaryDto": {
         "required": [
           "id",
           "name",
-          "type",
+          "slug",
+          "image",
           "status"
         ],
         "type": "object",
@@ -1967,8 +4447,14 @@
           "name": {
             "type": "string"
           },
-          "type": {
+          "slug": {
             "type": "string"
+          },
+          "image": {
+            "type": [
+              "null",
+              "string"
+            ]
           },
           "status": {
             "type": "string"
@@ -1993,14 +4479,135 @@
           }
         }
       },
-      "StopResourceRequest": {
+      "TemplateDto": {
         "required": [
-          "resourceType"
+          "id",
+          "name",
+          "description",
+          "category",
+          "icon",
+          "services",
+          "parameters"
         ],
         "type": "object",
         "properties": {
-          "resourceType": {
+          "id": {
             "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "category": {
+            "type": "string"
+          },
+          "icon": {
+            "type": "string"
+          },
+          "services": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/TemplateServiceDto"
+            }
+          },
+          "parameters": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/TemplateParameterDto"
+            }
+          }
+        }
+      },
+      "TemplateParameterDto": {
+        "required": [
+          "name",
+          "key",
+          "type",
+          "defaultValue",
+          "required",
+          "description"
+        ],
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "key": {
+            "type": "string"
+          },
+          "type": {
+            "type": "string"
+          },
+          "defaultValue": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "required": {
+            "type": "boolean"
+          },
+          "description": {
+            "type": [
+              "null",
+              "string"
+            ]
+          }
+        }
+      },
+      "TemplateServiceDto": {
+        "required": [
+          "name",
+          "image",
+          "description"
+        ],
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "image": {
+            "type": "string"
+          },
+          "description": {
+            "type": [
+              "null",
+              "string"
+            ]
+          }
+        }
+      },
+      "UpdateConfigRequest": {
+        "required": [
+          "content",
+          "filePath",
+          "external",
+          "externalName"
+        ],
+        "type": "object",
+        "properties": {
+          "content": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "filePath": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "external": {
+            "type": "boolean"
+          },
+          "externalName": {
+            "type": [
+              "null",
+              "string"
+            ]
           }
         }
       },
@@ -2015,6 +4622,332 @@
             "type": "string"
           },
           "description": {
+            "type": [
+              "null",
+              "string"
+            ]
+          }
+        }
+      },
+      "UpdateSecretRequest": {
+        "required": [
+          "content",
+          "filePath",
+          "external",
+          "externalName"
+        ],
+        "type": "object",
+        "properties": {
+          "content": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "filePath": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "external": {
+            "type": "boolean"
+          },
+          "externalName": {
+            "type": [
+              "null",
+              "string"
+            ]
+          }
+        }
+      },
+      "UpdateServiceRequest": {
+        "required": [
+          "name",
+          "description",
+          "image",
+          "buildContext",
+          "buildDockerfile",
+          "buildArgs",
+          "command",
+          "entrypoint",
+          "workingDir",
+          "user",
+          "ports",
+          "expose",
+          "hostname",
+          "domainname",
+          "dns",
+          "extraHosts",
+          "environmentVariables",
+          "envFile",
+          "volumes",
+          "tmpfs",
+          "dependsOn",
+          "links",
+          "healthcheckTest",
+          "healthcheckInterval",
+          "healthcheckTimeout",
+          "healthcheckRetries",
+          "healthcheckStartPeriod",
+          "healthcheckDisabled",
+          "cpuLimit",
+          "memoryLimit",
+          "cpuReservation",
+          "memoryReservation",
+          "restart",
+          "stopGracePeriod",
+          "stopSignal",
+          "replicas",
+          "labels"
+        ],
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "description": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "image": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "buildContext": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "buildDockerfile": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "buildArgs": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "command": {
+            "type": [
+              "null",
+              "array"
+            ],
+            "items": {
+              "type": "string"
+            }
+          },
+          "entrypoint": {
+            "type": [
+              "null",
+              "array"
+            ],
+            "items": {
+              "type": "string"
+            }
+          },
+          "workingDir": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "user": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "ports": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "expose": {
+            "type": [
+              "null",
+              "array"
+            ],
+            "items": {
+              "pattern": "^-?(?:0|[1-9]\\d*)$",
+              "type": [
+                "integer",
+                "string"
+              ],
+              "format": "int32"
+            }
+          },
+          "hostname": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "domainname": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "dns": {
+            "type": [
+              "null",
+              "array"
+            ],
+            "items": {
+              "type": "string"
+            }
+          },
+          "extraHosts": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "environmentVariables": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "envFile": {
+            "type": [
+              "null",
+              "array"
+            ],
+            "items": {
+              "type": "string"
+            }
+          },
+          "volumes": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "tmpfs": {
+            "type": [
+              "null",
+              "array"
+            ],
+            "items": {
+              "type": "string"
+            }
+          },
+          "dependsOn": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "links": {
+            "type": [
+              "null",
+              "array"
+            ],
+            "items": {
+              "type": "string"
+            }
+          },
+          "healthcheckTest": {
+            "type": [
+              "null",
+              "array"
+            ],
+            "items": {
+              "type": "string"
+            }
+          },
+          "healthcheckInterval": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "healthcheckTimeout": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "healthcheckRetries": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "null",
+              "integer",
+              "string"
+            ],
+            "format": "int32"
+          },
+          "healthcheckStartPeriod": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "healthcheckDisabled": {
+            "type": "boolean"
+          },
+          "cpuLimit": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "memoryLimit": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "cpuReservation": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "memoryReservation": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "restart": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "stopGracePeriod": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "stopSignal": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "replicas": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "format": "int32"
+          },
+          "labels": {
             "type": [
               "null",
               "string"
@@ -2076,21 +5009,114 @@
             "format": "date-time"
           }
         }
+      },
+      "VolumeDto": {
+        "required": [
+          "id",
+          "environmentId",
+          "name",
+          "driver",
+          "driverOpts",
+          "labels",
+          "external",
+          "externalName",
+          "createdAt"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "environmentId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "name": {
+            "type": "string"
+          },
+          "driver": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "driverOpts": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "labels": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "external": {
+            "type": "boolean"
+          },
+          "externalName": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "VolumeSummaryDto": {
+        "required": [
+          "id",
+          "name",
+          "driver"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "name": {
+            "type": "string"
+          },
+          "driver": {
+            "type": "string"
+          }
+        }
       }
     }
   },
   "tags": [
     {
+      "name": "Templates"
+    },
+    {
+      "name": "Volumes"
+    },
+    {
       "name": "Users"
     },
     {
-      "name": "Resources"
+      "name": "Services"
+    },
+    {
+      "name": "Secrets"
     },
     {
       "name": "Projects"
     },
     {
+      "name": "Networks"
+    },
+    {
       "name": "Environments"
+    },
+    {
+      "name": "Configs"
     },
     {
       "name": "Auth"

@@ -61,13 +61,9 @@ public sealed partial class CreateEnvironmentCommandHandler(IApplicationDbContex
 
         // Reload with collections for proper DTO mapping
         var createdEnvironment = await db.Environments
-            .Include(e => e.Variables)
-            .Include(e => e.DockerImageResources)
-            .Include(e => e.DockerfileResources)
-            .Include(e => e.DockerComposeResources)
-            .Include(e => e.PostgreSQLResources)
-            .Include(e => e.RedisResources)
-            .Include(e => e.PreMadeAppResources)
+            .Include(e => e.Services)
+            .Include(e => e.Volumes)
+            .Include(e => e.Networks)
             .FirstAsync(e => e.Id == environment.Id, cancellationToken);
 
         return Result.Success(createdEnvironment.ToDto());

@@ -34,12 +34,9 @@ public sealed class GetEnvironmentsByProjectQueryHandler(IApplicationDbContext d
 
         var environments = await db.Environments
             .AsNoTracking()
-            .Include(e => e.Variables)
-            .Include(e => e.DockerImageResources)
-            .Include(e => e.DockerfileResources)
-            .Include(e => e.DockerComposeResources)
-            .Include(e => e.PostgreSQLResources)
-            .Include(e => e.RedisResources)
+            .Include(e => e.Services)
+            .Include(e => e.Volumes)
+            .Include(e => e.Networks)
             .Where(e => e.ProjectId == project.Id)
             .OrderBy(e => e.Name)
             .ToListAsync(cancellationToken);

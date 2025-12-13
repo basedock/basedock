@@ -49,39 +49,29 @@ public class EnvironmentConfiguration : IEntityTypeConfiguration<Environment>
             .HasMaxLength(500);
 
         // Relationships
-        builder.HasMany(e => e.Variables)
+        builder.HasMany(e => e.Services)
+            .WithOne(s => s.ParentEnvironment)
+            .HasForeignKey(s => s.EnvironmentId)
+            .OnDelete(DeleteBehavior.Cascade);
+
+        builder.HasMany(e => e.Volumes)
             .WithOne(v => v.Environment)
             .HasForeignKey(v => v.EnvironmentId)
             .OnDelete(DeleteBehavior.Cascade);
 
-        builder.HasMany(e => e.DockerImageResources)
-            .WithOne(r => r.Environment)
-            .HasForeignKey(r => r.EnvironmentId)
+        builder.HasMany(e => e.Networks)
+            .WithOne(n => n.Environment)
+            .HasForeignKey(n => n.EnvironmentId)
             .OnDelete(DeleteBehavior.Cascade);
 
-        builder.HasMany(e => e.DockerfileResources)
-            .WithOne(r => r.Environment)
-            .HasForeignKey(r => r.EnvironmentId)
+        builder.HasMany(e => e.Configs)
+            .WithOne(c => c.Environment)
+            .HasForeignKey(c => c.EnvironmentId)
             .OnDelete(DeleteBehavior.Cascade);
 
-        builder.HasMany(e => e.DockerComposeResources)
-            .WithOne(r => r.Environment)
-            .HasForeignKey(r => r.EnvironmentId)
-            .OnDelete(DeleteBehavior.Cascade);
-
-        builder.HasMany(e => e.PostgreSQLResources)
-            .WithOne(r => r.Environment)
-            .HasForeignKey(r => r.EnvironmentId)
-            .OnDelete(DeleteBehavior.Cascade);
-
-        builder.HasMany(e => e.RedisResources)
-            .WithOne(r => r.Environment)
-            .HasForeignKey(r => r.EnvironmentId)
-            .OnDelete(DeleteBehavior.Cascade);
-
-        builder.HasMany(e => e.PreMadeAppResources)
-            .WithOne(r => r.Environment)
-            .HasForeignKey(r => r.EnvironmentId)
+        builder.HasMany(e => e.Secrets)
+            .WithOne(s => s.Environment)
+            .HasForeignKey(s => s.EnvironmentId)
             .OnDelete(DeleteBehavior.Cascade);
     }
 }

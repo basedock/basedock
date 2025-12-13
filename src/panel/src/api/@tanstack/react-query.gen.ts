@@ -9,64 +9,116 @@ import {
 import { client } from "../client.gen";
 import {
   addProjectMembers,
+  applyTemplate,
   checkSlugAvailability,
+  createConfig,
   createEnvironment,
-  createPostgreSqlResource,
+  createNetwork,
   createProject,
+  createSecret,
+  createService,
   createUser,
+  createVolume,
+  deleteConfig,
   deleteEnvironment,
+  deleteNetwork,
   deleteProject,
+  deleteSecret,
+  deleteService,
   deleteUser,
-  deployResource,
+  deleteVolume,
+  getConfigs,
   getEnvironmentBySlug,
   getEnvironments,
+  getNetworks,
   getProjectById,
   getProjectBySlug,
   getProjects,
+  getSecrets,
+  getServiceById,
+  getServices,
+  getTemplates,
   getUserById,
   getUsers,
+  getVolumes,
   login,
   logout,
   type Options,
   refreshToken,
   removeProjectMembers,
-  stopResource,
+  updateConfig,
   updateProject,
+  updateSecret,
+  updateService,
   updateUser,
 } from "../sdk.gen";
 import type {
   AddProjectMembersData,
   AddProjectMembersError,
   AddProjectMembersResponse,
+  ApplyTemplateData,
+  ApplyTemplateError,
+  ApplyTemplateResponse,
   CheckSlugAvailabilityData,
   CheckSlugAvailabilityResponse,
+  CreateConfigData,
+  CreateConfigError,
+  CreateConfigResponse,
   CreateEnvironmentData,
   CreateEnvironmentError,
   CreateEnvironmentResponse,
-  CreatePostgreSqlResourceData,
-  CreatePostgreSqlResourceError,
-  CreatePostgreSqlResourceResponse,
+  CreateNetworkData,
+  CreateNetworkError,
+  CreateNetworkResponse,
   CreateProjectData,
   CreateProjectError,
   CreateProjectResponse,
+  CreateSecretData,
+  CreateSecretError,
+  CreateSecretResponse,
+  CreateServiceData,
+  CreateServiceError,
+  CreateServiceResponse,
   CreateUserData,
   CreateUserError,
   CreateUserResponse,
+  CreateVolumeData,
+  CreateVolumeError,
+  CreateVolumeResponse,
+  DeleteConfigData,
+  DeleteConfigError,
+  DeleteConfigResponse,
   DeleteEnvironmentData,
   DeleteEnvironmentError,
   DeleteEnvironmentResponse,
+  DeleteNetworkData,
+  DeleteNetworkError,
+  DeleteNetworkResponse,
   DeleteProjectData,
   DeleteProjectError,
+  DeleteSecretData,
+  DeleteSecretError,
+  DeleteSecretResponse,
+  DeleteServiceData,
+  DeleteServiceError,
+  DeleteServiceResponse,
   DeleteUserData,
   DeleteUserError,
-  DeployResourceData,
-  DeployResourceError,
+  DeleteVolumeData,
+  DeleteVolumeError,
+  DeleteVolumeResponse,
+  GetConfigsData,
+  GetConfigsError,
+  GetConfigsResponse,
   GetEnvironmentBySlugData,
   GetEnvironmentBySlugError,
   GetEnvironmentBySlugResponse,
   GetEnvironmentsData,
   GetEnvironmentsError,
   GetEnvironmentsResponse,
+  GetNetworksData,
+  GetNetworksError,
+  GetNetworksResponse,
   GetProjectByIdData,
   GetProjectByIdError,
   GetProjectByIdResponse,
@@ -75,12 +127,26 @@ import type {
   GetProjectBySlugResponse,
   GetProjectsData,
   GetProjectsResponse,
+  GetSecretsData,
+  GetSecretsError,
+  GetSecretsResponse,
+  GetServiceByIdData,
+  GetServiceByIdError,
+  GetServiceByIdResponse,
+  GetServicesData,
+  GetServicesError,
+  GetServicesResponse,
+  GetTemplatesData,
+  GetTemplatesResponse,
   GetUserByIdData,
   GetUserByIdError,
   GetUserByIdResponse,
   GetUsersData,
   GetUsersError,
   GetUsersResponse,
+  GetVolumesData,
+  GetVolumesError,
+  GetVolumesResponse,
   LoginData,
   LoginError,
   LoginResponse,
@@ -93,11 +159,18 @@ import type {
   RemoveProjectMembersData,
   RemoveProjectMembersError,
   RemoveProjectMembersResponse,
-  StopResourceData,
-  StopResourceError,
+  UpdateConfigData,
+  UpdateConfigError,
+  UpdateConfigResponse,
   UpdateProjectData,
   UpdateProjectError,
   UpdateProjectResponse,
+  UpdateSecretData,
+  UpdateSecretError,
+  UpdateSecretResponse,
+  UpdateServiceData,
+  UpdateServiceError,
+  UpdateServiceResponse,
   UpdateUserData,
   UpdateUserError,
   UpdateUserResponse,
@@ -141,6 +214,137 @@ const createQueryKey = <TOptions extends Options>(
     params.query = options.query;
   }
   return [params];
+};
+
+export const getTemplatesQueryKey = (options?: Options<GetTemplatesData>) =>
+  createQueryKey("getTemplates", options);
+
+/**
+ * Get all available templates
+ */
+export const getTemplatesOptions = (options?: Options<GetTemplatesData>) =>
+  queryOptions<
+    GetTemplatesResponse,
+    DefaultError,
+    GetTemplatesResponse,
+    ReturnType<typeof getTemplatesQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await getTemplates({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: getTemplatesQueryKey(options),
+  });
+
+/**
+ * Apply a template to create services in an environment
+ */
+export const applyTemplateMutation = (
+  options?: Partial<Options<ApplyTemplateData>>,
+): UseMutationOptions<
+  ApplyTemplateResponse,
+  ApplyTemplateError,
+  Options<ApplyTemplateData>
+> => {
+  const mutationOptions: UseMutationOptions<
+    ApplyTemplateResponse,
+    ApplyTemplateError,
+    Options<ApplyTemplateData>
+  > = {
+    mutationFn: async (fnOptions) => {
+      const { data } = await applyTemplate({
+        ...options,
+        ...fnOptions,
+        throwOnError: true,
+      });
+      return data;
+    },
+  };
+  return mutationOptions;
+};
+
+export const getVolumesQueryKey = (options: Options<GetVolumesData>) =>
+  createQueryKey("getVolumes", options);
+
+/**
+ * Get all volumes in an environment
+ */
+export const getVolumesOptions = (options: Options<GetVolumesData>) =>
+  queryOptions<
+    GetVolumesResponse,
+    GetVolumesError,
+    GetVolumesResponse,
+    ReturnType<typeof getVolumesQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await getVolumes({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: getVolumesQueryKey(options),
+  });
+
+/**
+ * Create a new volume
+ */
+export const createVolumeMutation = (
+  options?: Partial<Options<CreateVolumeData>>,
+): UseMutationOptions<
+  CreateVolumeResponse,
+  CreateVolumeError,
+  Options<CreateVolumeData>
+> => {
+  const mutationOptions: UseMutationOptions<
+    CreateVolumeResponse,
+    CreateVolumeError,
+    Options<CreateVolumeData>
+  > = {
+    mutationFn: async (fnOptions) => {
+      const { data } = await createVolume({
+        ...options,
+        ...fnOptions,
+        throwOnError: true,
+      });
+      return data;
+    },
+  };
+  return mutationOptions;
+};
+
+/**
+ * Delete a volume
+ */
+export const deleteVolumeMutation = (
+  options?: Partial<Options<DeleteVolumeData>>,
+): UseMutationOptions<
+  DeleteVolumeResponse,
+  DeleteVolumeError,
+  Options<DeleteVolumeData>
+> => {
+  const mutationOptions: UseMutationOptions<
+    DeleteVolumeResponse,
+    DeleteVolumeError,
+    Options<DeleteVolumeData>
+  > = {
+    mutationFn: async (fnOptions) => {
+      const { data } = await deleteVolume({
+        ...options,
+        ...fnOptions,
+        throwOnError: true,
+      });
+      return data;
+    },
+  };
+  return mutationOptions;
 };
 
 export const getUsersQueryKey = (options?: Options<GetUsersData>) =>
@@ -270,23 +474,48 @@ export const updateUserMutation = (
   return mutationOptions;
 };
 
+export const getServicesQueryKey = (options: Options<GetServicesData>) =>
+  createQueryKey("getServices", options);
+
 /**
- * Create a new PostgreSQL resource
+ * Get all services in an environment
  */
-export const createPostgreSqlResourceMutation = (
-  options?: Partial<Options<CreatePostgreSqlResourceData>>,
+export const getServicesOptions = (options: Options<GetServicesData>) =>
+  queryOptions<
+    GetServicesResponse,
+    GetServicesError,
+    GetServicesResponse,
+    ReturnType<typeof getServicesQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await getServices({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: getServicesQueryKey(options),
+  });
+
+/**
+ * Create a new service
+ */
+export const createServiceMutation = (
+  options?: Partial<Options<CreateServiceData>>,
 ): UseMutationOptions<
-  CreatePostgreSqlResourceResponse,
-  CreatePostgreSqlResourceError,
-  Options<CreatePostgreSqlResourceData>
+  CreateServiceResponse,
+  CreateServiceError,
+  Options<CreateServiceData>
 > => {
   const mutationOptions: UseMutationOptions<
-    CreatePostgreSqlResourceResponse,
-    CreatePostgreSqlResourceError,
-    Options<CreatePostgreSqlResourceData>
+    CreateServiceResponse,
+    CreateServiceError,
+    Options<CreateServiceData>
   > = {
     mutationFn: async (fnOptions) => {
-      const { data } = await createPostgreSqlResource({
+      const { data } = await createService({
         ...options,
         ...fnOptions,
         throwOnError: true,
@@ -298,22 +527,126 @@ export const createPostgreSqlResourceMutation = (
 };
 
 /**
- * Deploy a resource
+ * Delete a service
  */
-export const deployResourceMutation = (
-  options?: Partial<Options<DeployResourceData>>,
+export const deleteServiceMutation = (
+  options?: Partial<Options<DeleteServiceData>>,
 ): UseMutationOptions<
-  unknown,
-  DeployResourceError,
-  Options<DeployResourceData>
+  DeleteServiceResponse,
+  DeleteServiceError,
+  Options<DeleteServiceData>
 > => {
   const mutationOptions: UseMutationOptions<
-    unknown,
-    DeployResourceError,
-    Options<DeployResourceData>
+    DeleteServiceResponse,
+    DeleteServiceError,
+    Options<DeleteServiceData>
   > = {
     mutationFn: async (fnOptions) => {
-      const { data } = await deployResource({
+      const { data } = await deleteService({
+        ...options,
+        ...fnOptions,
+        throwOnError: true,
+      });
+      return data;
+    },
+  };
+  return mutationOptions;
+};
+
+export const getServiceByIdQueryKey = (options: Options<GetServiceByIdData>) =>
+  createQueryKey("getServiceById", options);
+
+/**
+ * Get service details by ID
+ */
+export const getServiceByIdOptions = (options: Options<GetServiceByIdData>) =>
+  queryOptions<
+    GetServiceByIdResponse,
+    GetServiceByIdError,
+    GetServiceByIdResponse,
+    ReturnType<typeof getServiceByIdQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await getServiceById({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: getServiceByIdQueryKey(options),
+  });
+
+/**
+ * Update a service
+ */
+export const updateServiceMutation = (
+  options?: Partial<Options<UpdateServiceData>>,
+): UseMutationOptions<
+  UpdateServiceResponse,
+  UpdateServiceError,
+  Options<UpdateServiceData>
+> => {
+  const mutationOptions: UseMutationOptions<
+    UpdateServiceResponse,
+    UpdateServiceError,
+    Options<UpdateServiceData>
+  > = {
+    mutationFn: async (fnOptions) => {
+      const { data } = await updateService({
+        ...options,
+        ...fnOptions,
+        throwOnError: true,
+      });
+      return data;
+    },
+  };
+  return mutationOptions;
+};
+
+export const getSecretsQueryKey = (options: Options<GetSecretsData>) =>
+  createQueryKey("getSecrets", options);
+
+/**
+ * Get all secrets in an environment
+ */
+export const getSecretsOptions = (options: Options<GetSecretsData>) =>
+  queryOptions<
+    GetSecretsResponse,
+    GetSecretsError,
+    GetSecretsResponse,
+    ReturnType<typeof getSecretsQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await getSecrets({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: getSecretsQueryKey(options),
+  });
+
+/**
+ * Create a new secret
+ */
+export const createSecretMutation = (
+  options?: Partial<Options<CreateSecretData>>,
+): UseMutationOptions<
+  CreateSecretResponse,
+  CreateSecretError,
+  Options<CreateSecretData>
+> => {
+  const mutationOptions: UseMutationOptions<
+    CreateSecretResponse,
+    CreateSecretError,
+    Options<CreateSecretData>
+  > = {
+    mutationFn: async (fnOptions) => {
+      const { data } = await createSecret({
         ...options,
         ...fnOptions,
         throwOnError: true,
@@ -325,22 +658,49 @@ export const deployResourceMutation = (
 };
 
 /**
- * Stop a resource
+ * Delete a secret
  */
-export const stopResourceMutation = (
-  options?: Partial<Options<StopResourceData>>,
+export const deleteSecretMutation = (
+  options?: Partial<Options<DeleteSecretData>>,
 ): UseMutationOptions<
-  unknown,
-  StopResourceError,
-  Options<StopResourceData>
+  DeleteSecretResponse,
+  DeleteSecretError,
+  Options<DeleteSecretData>
 > => {
   const mutationOptions: UseMutationOptions<
-    unknown,
-    StopResourceError,
-    Options<StopResourceData>
+    DeleteSecretResponse,
+    DeleteSecretError,
+    Options<DeleteSecretData>
   > = {
     mutationFn: async (fnOptions) => {
-      const { data } = await stopResource({
+      const { data } = await deleteSecret({
+        ...options,
+        ...fnOptions,
+        throwOnError: true,
+      });
+      return data;
+    },
+  };
+  return mutationOptions;
+};
+
+/**
+ * Update a secret
+ */
+export const updateSecretMutation = (
+  options?: Partial<Options<UpdateSecretData>>,
+): UseMutationOptions<
+  UpdateSecretResponse,
+  UpdateSecretError,
+  Options<UpdateSecretData>
+> => {
+  const mutationOptions: UseMutationOptions<
+    UpdateSecretResponse,
+    UpdateSecretError,
+    Options<UpdateSecretData>
+  > = {
+    mutationFn: async (fnOptions) => {
+      const { data } = await updateSecret({
         ...options,
         ...fnOptions,
         throwOnError: true,
@@ -592,6 +952,85 @@ export const removeProjectMembersMutation = (
   return mutationOptions;
 };
 
+export const getNetworksQueryKey = (options: Options<GetNetworksData>) =>
+  createQueryKey("getNetworks", options);
+
+/**
+ * Get all networks in an environment
+ */
+export const getNetworksOptions = (options: Options<GetNetworksData>) =>
+  queryOptions<
+    GetNetworksResponse,
+    GetNetworksError,
+    GetNetworksResponse,
+    ReturnType<typeof getNetworksQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await getNetworks({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: getNetworksQueryKey(options),
+  });
+
+/**
+ * Create a new network
+ */
+export const createNetworkMutation = (
+  options?: Partial<Options<CreateNetworkData>>,
+): UseMutationOptions<
+  CreateNetworkResponse,
+  CreateNetworkError,
+  Options<CreateNetworkData>
+> => {
+  const mutationOptions: UseMutationOptions<
+    CreateNetworkResponse,
+    CreateNetworkError,
+    Options<CreateNetworkData>
+  > = {
+    mutationFn: async (fnOptions) => {
+      const { data } = await createNetwork({
+        ...options,
+        ...fnOptions,
+        throwOnError: true,
+      });
+      return data;
+    },
+  };
+  return mutationOptions;
+};
+
+/**
+ * Delete a network
+ */
+export const deleteNetworkMutation = (
+  options?: Partial<Options<DeleteNetworkData>>,
+): UseMutationOptions<
+  DeleteNetworkResponse,
+  DeleteNetworkError,
+  Options<DeleteNetworkData>
+> => {
+  const mutationOptions: UseMutationOptions<
+    DeleteNetworkResponse,
+    DeleteNetworkError,
+    Options<DeleteNetworkData>
+  > = {
+    mutationFn: async (fnOptions) => {
+      const { data } = await deleteNetwork({
+        ...options,
+        ...fnOptions,
+        throwOnError: true,
+      });
+      return data;
+    },
+  };
+  return mutationOptions;
+};
+
 export const getEnvironmentsQueryKey = (
   options: Options<GetEnvironmentsData>,
 ) => createQueryKey("getEnvironments", options);
@@ -699,6 +1138,112 @@ export const getEnvironmentBySlugOptions = (
     },
     queryKey: getEnvironmentBySlugQueryKey(options),
   });
+
+export const getConfigsQueryKey = (options: Options<GetConfigsData>) =>
+  createQueryKey("getConfigs", options);
+
+/**
+ * Get all configs in an environment
+ */
+export const getConfigsOptions = (options: Options<GetConfigsData>) =>
+  queryOptions<
+    GetConfigsResponse,
+    GetConfigsError,
+    GetConfigsResponse,
+    ReturnType<typeof getConfigsQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await getConfigs({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: getConfigsQueryKey(options),
+  });
+
+/**
+ * Create a new config
+ */
+export const createConfigMutation = (
+  options?: Partial<Options<CreateConfigData>>,
+): UseMutationOptions<
+  CreateConfigResponse,
+  CreateConfigError,
+  Options<CreateConfigData>
+> => {
+  const mutationOptions: UseMutationOptions<
+    CreateConfigResponse,
+    CreateConfigError,
+    Options<CreateConfigData>
+  > = {
+    mutationFn: async (fnOptions) => {
+      const { data } = await createConfig({
+        ...options,
+        ...fnOptions,
+        throwOnError: true,
+      });
+      return data;
+    },
+  };
+  return mutationOptions;
+};
+
+/**
+ * Delete a config
+ */
+export const deleteConfigMutation = (
+  options?: Partial<Options<DeleteConfigData>>,
+): UseMutationOptions<
+  DeleteConfigResponse,
+  DeleteConfigError,
+  Options<DeleteConfigData>
+> => {
+  const mutationOptions: UseMutationOptions<
+    DeleteConfigResponse,
+    DeleteConfigError,
+    Options<DeleteConfigData>
+  > = {
+    mutationFn: async (fnOptions) => {
+      const { data } = await deleteConfig({
+        ...options,
+        ...fnOptions,
+        throwOnError: true,
+      });
+      return data;
+    },
+  };
+  return mutationOptions;
+};
+
+/**
+ * Update a config
+ */
+export const updateConfigMutation = (
+  options?: Partial<Options<UpdateConfigData>>,
+): UseMutationOptions<
+  UpdateConfigResponse,
+  UpdateConfigError,
+  Options<UpdateConfigData>
+> => {
+  const mutationOptions: UseMutationOptions<
+    UpdateConfigResponse,
+    UpdateConfigError,
+    Options<UpdateConfigData>
+  > = {
+    mutationFn: async (fnOptions) => {
+      const { data } = await updateConfig({
+        ...options,
+        ...fnOptions,
+        throwOnError: true,
+      });
+      return data;
+    },
+  };
+  return mutationOptions;
+};
 
 /**
  * Authenticate user and return access token
