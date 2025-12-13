@@ -67,6 +67,7 @@ public sealed partial class CreateEnvironmentCommandHandler(IApplicationDbContex
             .Include(e => e.DockerComposeResources)
             .Include(e => e.PostgreSQLResources)
             .Include(e => e.RedisResources)
+            .Include(e => e.PreMadeAppResources)
             .FirstAsync(e => e.Id == environment.Id, cancellationToken);
 
         return Result.Success(createdEnvironment.ToDto());

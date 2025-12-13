@@ -1,5 +1,6 @@
 import { useState } from "react"
 import { useForm } from "@tanstack/react-form"
+import { useRouter, useParams } from "@tanstack/react-router"
 import {
   Dialog,
   DialogContent,
@@ -12,10 +13,12 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import { Field, FieldLabel, FieldError, FieldGroup } from "@/components/ui/field"
-import { Container, FileCode, Database, Layers, type LucideIcon } from "lucide-react"
+import { Container, FileCode, Database, Layers, Package, type LucideIcon, Loader2 } from "lucide-react"
 import { cn } from "@/lib/utils"
+import { createPostgreSqlResource } from "@/api/sdk.gen"
+import { toast } from "sonner"
 
-type ResourceCategory = "application" | "database" | "compose"
+type ResourceCategory = "application" | "database" | "compose" | "premade"
 
 interface ResourceType {
   type: string
@@ -36,18 +39,25 @@ const resourceTypes: Record<ResourceCategory, ResourceType[]> = {
   compose: [
     { type: "DockerCompose", label: "Docker Compose", icon: Layers, description: "Multi-container app" },
   ],
+  premade: [
+    { type: "WordPress", label: "WordPress", icon: Package, description: "Blog & CMS platform" },
+    { type: "Ghost", label: "Ghost", icon: Package, description: "Modern publishing platform" },
+    { type: "Gitea", label: "Gitea", icon: Package, description: "Git hosting service" },
+  ],
 }
 
 const categoryTitles: Record<ResourceCategory, string> = {
   application: "Applications",
   database: "Databases",
   compose: "Compose",
+  premade: "Pre-made Apps",
 }
 
 const categoryDescriptions: Record<ResourceCategory, string> = {
   application: "Select an application type",
   database: "Select a database",
   compose: "Select a compose type",
+  premade: "Select a pre-made application",
 }
 
 interface CreateResourceDialogProps {
@@ -62,6 +72,9 @@ export function CreateResourceDialog({
   onOpenChange,
 }: CreateResourceDialogProps) {
   const [selectedType, setSelectedType] = useState<string | null>(null)
+  const [isSubmitting, setIsSubmitting] = useState(false)
+  const router = useRouter()
+  const params = useParams({ strict: false }) as { slug?: string; env?: string }
 
   const form = useForm({
     defaultValues: {
@@ -84,9 +97,44 @@ export function CreateResourceDialog({
       composeFileContent: "",
     },
     onSubmit: async ({ value }) => {
-      // TODO: Implement API call when endpoint is available
-      console.log("Creating resource:", { type: selectedType, ...value })
-      handleClose()
+      if (!params.slug || !params.env) {
+        toast.error("Missing project or environment context")
+        return
+      }
+
+      setIsSubmitting(true)
+      try {
+        if (selectedType === "PostgreSQL") {
+          const response = await createPostgreSqlResource({
+            path: { projectSlug: params.slug, envSlug: params.env },
+            body: {
+              name: value.name,
+              description: value.description || null,
+              databaseName: value.databaseName,
+              username: value.databaseUser,
+              password: value.databasePassword,
+              version: value.version || "16",
+            },
+          })
+          if (response.error) {
+            toast.error("Failed to create PostgreSQL resource")
+            return
+          }
+          toast.success("PostgreSQL resource created")
+        } else {
+          // TODO: Implement other resource types when API endpoints are available
+          toast.info(`Creating ${selectedType} is not yet implemented`)
+          handleClose()
+          return
+        }
+
+        router.invalidate()
+        handleClose()
+      } catch {
+        toast.error("Failed to create resource")
+      } finally {
+        setIsSubmitting(false)
+      }
     },
   })
 
@@ -452,11 +500,18 @@ export function CreateResourceDialog({
           </FieldGroup>
 
           <DialogFooter>
-            <Button type="button" variant="outline" onClick={handleClose}>
+            <Button type="button" variant="outline" onClick={handleClose} disabled={isSubmitting}>
               Cancel
             </Button>
-            <Button type="submit" disabled={!selectedType}>
-              {selectedType ? `Create ${selectedTypeInfo?.label}` : "Create"}
+            <Button type="submit" disabled={!selectedType || isSubmitting}>
+              {isSubmitting ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  Creating...
+                </>
+              ) : (
+                selectedType ? `Create ${selectedTypeInfo?.label}` : "Create"
+              )}
             </Button>
           </DialogFooter>
         </form>

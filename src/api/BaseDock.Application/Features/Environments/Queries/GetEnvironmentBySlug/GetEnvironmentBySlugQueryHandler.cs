@@ -40,6 +40,7 @@ public sealed class GetEnvironmentBySlugQueryHandler(IApplicationDbContext db)
             .Include(e => e.DockerComposeResources)
             .Include(e => e.PostgreSQLResources)
             .Include(e => e.RedisResources)
+            .Include(e => e.PreMadeAppResources)
             .FirstOrDefaultAsync(
                 e => e.ProjectId == project.Id && e.Slug == query.EnvironmentSlug,
                 cancellationToken);

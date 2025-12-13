@@ -17,6 +17,8 @@ public sealed class Environment : Entity
 
     public bool IsDefault { get; private set; }
 
+    public string? ComposeFilePath { get; private set; }
+
     // Navigation properties
     public Project Project { get; private set; } = null!;
 
@@ -31,6 +33,8 @@ public sealed class Environment : Entity
     public ICollection<PostgreSQLResource> PostgreSQLResources { get; private set; } = new List<PostgreSQLResource>();
 
     public ICollection<RedisResource> RedisResources { get; private set; } = new List<RedisResource>();
+
+    public ICollection<PreMadeAppResource> PreMadeAppResources { get; private set; } = new List<PreMadeAppResource>();
 
     private Environment()
     {
@@ -64,5 +68,10 @@ public sealed class Environment : Entity
     public void UpdateSlug(string slug)
     {
         Slug = slug;
+    }
+
+    public void SetComposeFilePath(string? path)
+    {
+        ComposeFilePath = path;
     }
 }

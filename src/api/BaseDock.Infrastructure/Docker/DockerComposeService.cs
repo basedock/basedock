@@ -256,6 +256,197 @@ public class DockerComposeService : IDockerComposeService
         }, ct);
     }
 
+    public async Task<Result> DeployServiceAsync(
+        string projectName,
+        string composeFilePath,
+        string serviceName,
+        CancellationToken ct = default)
+    {
+        try
+        {
+            _logger.LogInformation(
+                "Deploying service {ServiceName} in project {ProjectName}",
+                serviceName, projectName);
+
+            var startInfo = new ProcessStartInfo
+            {
+                FileName = "docker",
+                Arguments = $"compose -f \"{composeFilePath}\" -p {projectName.ToLowerInvariant()} up -d {serviceName}",
+                RedirectStandardOutput = true,
+                RedirectStandardError = true,
+                UseShellExecute = false,
+                CreateNoWindow = true
+            };
+
+            using var process = Process.Start(startInfo);
+            if (process == null)
+            {
+                return Result.Failure(Error.DockerError("Failed to start docker compose process"));
+            }
+
+            await process.WaitForExitAsync(ct);
+
+            var output = await process.StandardOutput.ReadToEndAsync(ct);
+            var error = await process.StandardError.ReadToEndAsync(ct);
+
+            _logger.LogInformation("Docker compose service deploy output: {Output}", output);
+
+            if (process.ExitCode != 0)
+            {
+                _logger.LogError("Docker compose service deploy failed: {Error}", error);
+                return Result.Failure(Error.DockerError($"Failed to deploy service: {error}"));
+            }
+
+            return Result.Success();
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Failed to deploy service {ServiceName}", serviceName);
+            return Result.Failure(Error.DockerError(ex.Message));
+        }
+    }
+
+    public async Task<Result> StopServiceAsync(
+        string projectName,
+        string composeFilePath,
+        string serviceName,
+        CancellationToken ct = default)
+    {
+        try
+        {
+            _logger.LogInformation(
+                "Stopping service {ServiceName} in project {ProjectName}",
+                serviceName, projectName);
+
+            var startInfo = new ProcessStartInfo
+            {
+                FileName = "docker",
+                Arguments = $"compose -f \"{composeFilePath}\" -p {projectName.ToLowerInvariant()} stop {serviceName}",
+                RedirectStandardOutput = true,
+                RedirectStandardError = true,
+                UseShellExecute = false,
+                CreateNoWindow = true
+            };
+
+            using var process = Process.Start(startInfo);
+            if (process == null)
+            {
+                return Result.Failure(Error.DockerError("Failed to start docker compose process"));
+            }
+
+            await process.WaitForExitAsync(ct);
+
+            var error = await process.StandardError.ReadToEndAsync(ct);
+
+            if (process.ExitCode != 0)
+            {
+                _logger.LogError("Docker compose service stop failed: {Error}", error);
+                return Result.Failure(Error.DockerError($"Failed to stop service: {error}"));
+            }
+
+            return Result.Success();
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Failed to stop service {ServiceName}", serviceName);
+            return Result.Failure(Error.DockerError(ex.Message));
+        }
+    }
+
+    public async Task<Result> RestartServiceAsync(
+        string projectName,
+        string composeFilePath,
+        string serviceName,
+        CancellationToken ct = default)
+    {
+        try
+        {
+            _logger.LogInformation(
+                "Restarting service {ServiceName} in project {ProjectName}",
+                serviceName, projectName);
+
+            var startInfo = new ProcessStartInfo
+            {
+                FileName = "docker",
+                Arguments = $"compose -f \"{composeFilePath}\" -p {projectName.ToLowerInvariant()} restart {serviceName}",
+                RedirectStandardOutput = true,
+                RedirectStandardError = true,
+                UseShellExecute = false,
+                CreateNoWindow = true
+            };
+
+            using var process = Process.Start(startInfo);
+            if (process == null)
+            {
+                return Result.Failure(Error.DockerError("Failed to start docker compose process"));
+            }
+
+            await process.WaitForExitAsync(ct);
+
+            var error = await process.StandardError.ReadToEndAsync(ct);
+
+            if (process.ExitCode != 0)
+            {
+                _logger.LogError("Docker compose service restart failed: {Error}", error);
+                return Result.Failure(Error.DockerError($"Failed to restart service: {error}"));
+            }
+
+            return Result.Success();
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Failed to restart service {ServiceName}", serviceName);
+            return Result.Failure(Error.DockerError(ex.Message));
+        }
+    }
+
+    public async Task<Result> StartServiceAsync(
+        string projectName,
+        string composeFilePath,
+        string serviceName,
+        CancellationToken ct = default)
+    {
+        try
+        {
+            _logger.LogInformation(
+                "Starting service {ServiceName} in project {ProjectName}",
+                serviceName, projectName);
+
+            var startInfo = new ProcessStartInfo
+            {
+                FileName = "docker",
+                Arguments = $"compose -f \"{composeFilePath}\" -p {projectName.ToLowerInvariant()} start {serviceName}",
+                RedirectStandardOutput = true,
+                RedirectStandardError = true,
+                UseShellExecute = false,
+                CreateNoWindow = true
+            };
+
+            using var process = Process.Start(startInfo);
+            if (process == null)
+            {
+                return Result.Failure(Error.DockerError("Failed to start docker compose process"));
+            }
+
+            await process.WaitForExitAsync(ct);
+
+            var error = await process.StandardError.ReadToEndAsync(ct);
+
+            if (process.ExitCode != 0)
+            {
+                _logger.LogError("Docker compose service start failed: {Error}", error);
+                return Result.Failure(Error.DockerError($"Failed to start service: {error}"));
+            }
+
+            return Result.Success();
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Failed to start service {ServiceName}", serviceName);
+            return Result.Failure(Error.DockerError(ex.Message));
+        }
+    }
+
     private static ContainerInfo MapToContainerInfo(IContainerService container)
     {
         var config = container.GetConfiguration();

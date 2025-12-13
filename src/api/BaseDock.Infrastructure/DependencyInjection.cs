@@ -51,6 +51,7 @@ public static class DependencyInjection
         services.AddSingleton<IProjectFileService, ProjectFileService>();
         services.AddSingleton<IDockerComposeService, DockerComposeService>();
         services.AddSingleton<IDockerContainerService, DockerContainerService>();
+        services.AddScoped<IComposeGeneratorService, ComposeGeneratorService>();
 
         return services;
     }

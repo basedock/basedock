@@ -44,6 +44,10 @@ public class EnvironmentConfiguration : IEntityTypeConfiguration<Environment>
             .HasColumnName("is_default")
             .HasDefaultValue(false);
 
+        builder.Property(e => e.ComposeFilePath)
+            .HasColumnName("compose_file_path")
+            .HasMaxLength(500);
+
         // Relationships
         builder.HasMany(e => e.Variables)
             .WithOne(v => v.Environment)
@@ -71,6 +75,11 @@ public class EnvironmentConfiguration : IEntityTypeConfiguration<Environment>
             .OnDelete(DeleteBehavior.Cascade);
 
         builder.HasMany(e => e.RedisResources)
+            .WithOne(r => r.Environment)
+            .HasForeignKey(r => r.EnvironmentId)
+            .OnDelete(DeleteBehavior.Cascade);
+
+        builder.HasMany(e => e.PreMadeAppResources)
             .WithOne(r => r.Environment)
             .HasForeignKey(r => r.EnvironmentId)
             .OnDelete(DeleteBehavior.Cascade);

@@ -13,6 +13,16 @@ export type CreateEnvironmentRequest = {
   description: null | string;
 };
 
+export type CreatePostgreSqlResourceRequest = {
+  name: string;
+  description: null | string;
+  databaseName: string;
+  username: string;
+  password: string;
+  version?: string;
+  port?: number | string;
+};
+
 export type CreateProjectRequest = {
   name: string;
   description: null | string;
@@ -23,6 +33,10 @@ export type CreateUserRequest = {
   email: string;
   displayName: string;
   password: string;
+};
+
+export type DeployResourceRequest = {
+  resourceType: string;
 };
 
 export type EnvironmentDetailDto = {
@@ -77,6 +91,21 @@ export type LoginApiResponse = {
 export type LoginRequest = {
   email: string;
   password: string;
+};
+
+export type PostgreSqlResourceDto = {
+  id: string;
+  name: string;
+  slug: string;
+  description: null | string;
+  version: string;
+  port: number | string;
+  databaseName: string;
+  username: string;
+  status: string;
+  serviceName: string;
+  createdAt: string;
+  lastDeployedAt: null | string;
 };
 
 export type ProblemDetails = {
@@ -134,6 +163,10 @@ export type ResourceSummaryDto = {
 export type SlugAvailabilityResponse = {
   isAvailable: boolean;
   suggestedSlug: null | string;
+};
+
+export type StopResourceRequest = {
+  resourceType: string;
 };
 
 export type UpdateProjectRequest = {
@@ -314,6 +347,107 @@ export type UpdateUserResponses = {
 };
 
 export type UpdateUserResponse = UpdateUserResponses[keyof UpdateUserResponses];
+
+export type CreatePostgreSqlResourceData = {
+  body: CreatePostgreSqlResourceRequest;
+  path: {
+    projectSlug: string;
+    envSlug: string;
+  };
+  query?: never;
+  url: "/api/projects/{projectSlug}/environments/{envSlug}/resources/postgresql";
+};
+
+export type CreatePostgreSqlResourceErrors = {
+  /**
+   * Bad Request
+   */
+  400: HttpValidationProblemDetails;
+  /**
+   * Not Found
+   */
+  404: ProblemDetails;
+  /**
+   * Conflict
+   */
+  409: ProblemDetails;
+};
+
+export type CreatePostgreSqlResourceError =
+  CreatePostgreSqlResourceErrors[keyof CreatePostgreSqlResourceErrors];
+
+export type CreatePostgreSqlResourceResponses = {
+  /**
+   * Created
+   */
+  201: PostgreSqlResourceDto;
+};
+
+export type CreatePostgreSqlResourceResponse =
+  CreatePostgreSqlResourceResponses[keyof CreatePostgreSqlResourceResponses];
+
+export type DeployResourceData = {
+  body: DeployResourceRequest;
+  path: {
+    projectSlug: string;
+    envSlug: string;
+    resourceId: string;
+  };
+  query?: never;
+  url: "/api/projects/{projectSlug}/environments/{envSlug}/resources/{resourceId}/deploy";
+};
+
+export type DeployResourceErrors = {
+  /**
+   * Bad Request
+   */
+  400: ProblemDetails;
+  /**
+   * Not Found
+   */
+  404: ProblemDetails;
+};
+
+export type DeployResourceError =
+  DeployResourceErrors[keyof DeployResourceErrors];
+
+export type DeployResourceResponses = {
+  /**
+   * OK
+   */
+  200: unknown;
+};
+
+export type StopResourceData = {
+  body: StopResourceRequest;
+  path: {
+    projectSlug: string;
+    envSlug: string;
+    resourceId: string;
+  };
+  query?: never;
+  url: "/api/projects/{projectSlug}/environments/{envSlug}/resources/{resourceId}/stop";
+};
+
+export type StopResourceErrors = {
+  /**
+   * Bad Request
+   */
+  400: ProblemDetails;
+  /**
+   * Not Found
+   */
+  404: ProblemDetails;
+};
+
+export type StopResourceError = StopResourceErrors[keyof StopResourceErrors];
+
+export type StopResourceResponses = {
+  /**
+   * OK
+   */
+  200: unknown;
+};
 
 export type GetProjectsData = {
   body?: never;

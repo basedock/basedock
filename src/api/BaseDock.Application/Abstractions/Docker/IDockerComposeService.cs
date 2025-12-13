@@ -16,4 +16,12 @@ public interface IDockerComposeService
     Task<Result<IEnumerable<ContainerInfo>>> GetStatusAsync(string projectName, CancellationToken ct = default);
 
     Task<Result<string>> GetLogsAsync(string projectName, string? serviceName, int tailLines, CancellationToken ct = default);
+
+    Task<Result> DeployServiceAsync(string projectName, string composeFilePath, string serviceName, CancellationToken ct = default);
+
+    Task<Result> StopServiceAsync(string projectName, string composeFilePath, string serviceName, CancellationToken ct = default);
+
+    Task<Result> RestartServiceAsync(string projectName, string composeFilePath, string serviceName, CancellationToken ct = default);
+
+    Task<Result> StartServiceAsync(string projectName, string composeFilePath, string serviceName, CancellationToken ct = default);
 }

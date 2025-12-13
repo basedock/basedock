@@ -28,5 +28,7 @@ public interface IApplicationDbContext
 
     DbSet<RedisResource> RedisResources { get; }
 
+    DbSet<PreMadeAppResource> PreMadeAppResources { get; }
+
     Task<int> SaveChangesAsync(CancellationToken cancellationToken = default);
 }

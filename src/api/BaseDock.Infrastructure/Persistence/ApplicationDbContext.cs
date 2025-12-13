@@ -33,6 +33,8 @@ public class ApplicationDbContext : DbContext, IApplicationDbContext
 
     public DbSet<RedisResource> RedisResources => Set<RedisResource>();
 
+    public DbSet<PreMadeAppResource> PreMadeAppResources => Set<PreMadeAppResource>();
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.ApplyConfigurationsFromAssembly(typeof(ApplicationDbContext).Assembly);

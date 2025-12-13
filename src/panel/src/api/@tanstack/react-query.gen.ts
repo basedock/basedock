@@ -11,11 +11,13 @@ import {
   addProjectMembers,
   checkSlugAvailability,
   createEnvironment,
+  createPostgreSqlResource,
   createProject,
   createUser,
   deleteEnvironment,
   deleteProject,
   deleteUser,
+  deployResource,
   getEnvironmentBySlug,
   getEnvironments,
   getProjectById,
@@ -28,6 +30,7 @@ import {
   type Options,
   refreshToken,
   removeProjectMembers,
+  stopResource,
   updateProject,
   updateUser,
 } from "../sdk.gen";
@@ -40,6 +43,9 @@ import type {
   CreateEnvironmentData,
   CreateEnvironmentError,
   CreateEnvironmentResponse,
+  CreatePostgreSqlResourceData,
+  CreatePostgreSqlResourceError,
+  CreatePostgreSqlResourceResponse,
   CreateProjectData,
   CreateProjectError,
   CreateProjectResponse,
@@ -53,6 +59,8 @@ import type {
   DeleteProjectError,
   DeleteUserData,
   DeleteUserError,
+  DeployResourceData,
+  DeployResourceError,
   GetEnvironmentBySlugData,
   GetEnvironmentBySlugError,
   GetEnvironmentBySlugResponse,
@@ -85,6 +93,8 @@ import type {
   RemoveProjectMembersData,
   RemoveProjectMembersError,
   RemoveProjectMembersResponse,
+  StopResourceData,
+  StopResourceError,
   UpdateProjectData,
   UpdateProjectError,
   UpdateProjectResponse,
@@ -250,6 +260,87 @@ export const updateUserMutation = (
   > = {
     mutationFn: async (fnOptions) => {
       const { data } = await updateUser({
+        ...options,
+        ...fnOptions,
+        throwOnError: true,
+      });
+      return data;
+    },
+  };
+  return mutationOptions;
+};
+
+/**
+ * Create a new PostgreSQL resource
+ */
+export const createPostgreSqlResourceMutation = (
+  options?: Partial<Options<CreatePostgreSqlResourceData>>,
+): UseMutationOptions<
+  CreatePostgreSqlResourceResponse,
+  CreatePostgreSqlResourceError,
+  Options<CreatePostgreSqlResourceData>
+> => {
+  const mutationOptions: UseMutationOptions<
+    CreatePostgreSqlResourceResponse,
+    CreatePostgreSqlResourceError,
+    Options<CreatePostgreSqlResourceData>
+  > = {
+    mutationFn: async (fnOptions) => {
+      const { data } = await createPostgreSqlResource({
+        ...options,
+        ...fnOptions,
+        throwOnError: true,
+      });
+      return data;
+    },
+  };
+  return mutationOptions;
+};
+
+/**
+ * Deploy a resource
+ */
+export const deployResourceMutation = (
+  options?: Partial<Options<DeployResourceData>>,
+): UseMutationOptions<
+  unknown,
+  DeployResourceError,
+  Options<DeployResourceData>
+> => {
+  const mutationOptions: UseMutationOptions<
+    unknown,
+    DeployResourceError,
+    Options<DeployResourceData>
+  > = {
+    mutationFn: async (fnOptions) => {
+      const { data } = await deployResource({
+        ...options,
+        ...fnOptions,
+        throwOnError: true,
+      });
+      return data;
+    },
+  };
+  return mutationOptions;
+};
+
+/**
+ * Stop a resource
+ */
+export const stopResourceMutation = (
+  options?: Partial<Options<StopResourceData>>,
+): UseMutationOptions<
+  unknown,
+  StopResourceError,
+  Options<StopResourceData>
+> => {
+  const mutationOptions: UseMutationOptions<
+    unknown,
+    StopResourceError,
+    Options<StopResourceData>
+  > = {
+    mutationFn: async (fnOptions) => {
+      const { data } = await stopResource({
         ...options,
         ...fnOptions,
         throwOnError: true,

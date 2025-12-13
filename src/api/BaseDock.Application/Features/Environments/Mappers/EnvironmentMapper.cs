@@ -13,7 +13,8 @@ public static class EnvironmentMapper
             entity.DockerfileResources.Count +
             entity.DockerComposeResources.Count +
             entity.PostgreSQLResources.Count +
-            entity.RedisResources.Count;
+            entity.RedisResources.Count +
+            entity.PreMadeAppResources.Count;
 
         return new EnvironmentDto(
             entity.Id,
@@ -96,6 +97,13 @@ public static class EnvironmentMapper
             r.Id,
             r.Name,
             "Redis",
+            r.DeploymentStatus.ToString())));
+
+        // Pre-Made App Resources
+        resources.AddRange(entity.PreMadeAppResources.Select(r => new ResourceSummaryDto(
+            r.Id,
+            r.Name,
+            "PreMadeApp",
             r.DeploymentStatus.ToString())));
 
         return resources;

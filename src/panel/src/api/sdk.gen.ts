@@ -11,6 +11,9 @@ import type {
   CreateEnvironmentData,
   CreateEnvironmentErrors,
   CreateEnvironmentResponses,
+  CreatePostgreSqlResourceData,
+  CreatePostgreSqlResourceErrors,
+  CreatePostgreSqlResourceResponses,
   CreateProjectData,
   CreateProjectErrors,
   CreateProjectResponses,
@@ -26,6 +29,9 @@ import type {
   DeleteUserData,
   DeleteUserErrors,
   DeleteUserResponses,
+  DeployResourceData,
+  DeployResourceErrors,
+  DeployResourceResponses,
   GetEnvironmentBySlugData,
   GetEnvironmentBySlugErrors,
   GetEnvironmentBySlugResponses,
@@ -58,6 +64,9 @@ import type {
   RemoveProjectMembersData,
   RemoveProjectMembersErrors,
   RemoveProjectMembersResponses,
+  StopResourceData,
+  StopResourceErrors,
+  StopResourceResponses,
   UpdateProjectData,
   UpdateProjectErrors,
   UpdateProjectResponses,
@@ -150,6 +159,63 @@ export const updateUser = <ThrowOnError extends boolean = false>(
     ThrowOnError
   >({
     url: "/api/users/{id}",
+    ...options,
+    headers: {
+      "Content-Type": "application/json",
+      ...options.headers,
+    },
+  });
+
+/**
+ * Create a new PostgreSQL resource
+ */
+export const createPostgreSqlResource = <ThrowOnError extends boolean = false>(
+  options: Options<CreatePostgreSqlResourceData, ThrowOnError>,
+) =>
+  (options.client ?? client).post<
+    CreatePostgreSqlResourceResponses,
+    CreatePostgreSqlResourceErrors,
+    ThrowOnError
+  >({
+    url: "/api/projects/{projectSlug}/environments/{envSlug}/resources/postgresql",
+    ...options,
+    headers: {
+      "Content-Type": "application/json",
+      ...options.headers,
+    },
+  });
+
+/**
+ * Deploy a resource
+ */
+export const deployResource = <ThrowOnError extends boolean = false>(
+  options: Options<DeployResourceData, ThrowOnError>,
+) =>
+  (options.client ?? client).post<
+    DeployResourceResponses,
+    DeployResourceErrors,
+    ThrowOnError
+  >({
+    url: "/api/projects/{projectSlug}/environments/{envSlug}/resources/{resourceId}/deploy",
+    ...options,
+    headers: {
+      "Content-Type": "application/json",
+      ...options.headers,
+    },
+  });
+
+/**
+ * Stop a resource
+ */
+export const stopResource = <ThrowOnError extends boolean = false>(
+  options: Options<StopResourceData, ThrowOnError>,
+) =>
+  (options.client ?? client).post<
+    StopResourceResponses,
+    StopResourceErrors,
+    ThrowOnError
+  >({
+    url: "/api/projects/{projectSlug}/environments/{envSlug}/resources/{resourceId}/stop",
     ...options,
     headers: {
       "Content-Type": "application/json",

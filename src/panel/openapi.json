@@ -292,6 +292,227 @@
         }
       }
     },
+    "/api/projects/{projectSlug}/environments/{envSlug}/resources/postgresql": {
+      "post": {
+        "tags": [
+          "Resources"
+        ],
+        "summary": "Create a new PostgreSQL resource",
+        "operationId": "CreatePostgreSQLResource",
+        "parameters": [
+          {
+            "name": "projectSlug",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "envSlug",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreatePostgreSQLResourceRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PostgreSQLResourceDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HttpValidationProblemDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/projects/{projectSlug}/environments/{envSlug}/resources/{resourceId}/deploy": {
+      "post": {
+        "tags": [
+          "Resources"
+        ],
+        "summary": "Deploy a resource",
+        "operationId": "DeployResource",
+        "parameters": [
+          {
+            "name": "projectSlug",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "envSlug",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "resourceId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DeployResourceRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/projects/{projectSlug}/environments/{envSlug}/resources/{resourceId}/stop": {
+      "post": {
+        "tags": [
+          "Resources"
+        ],
+        "summary": "Stop a resource",
+        "operationId": "StopResource",
+        "parameters": [
+          {
+            "name": "projectSlug",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "envSlug",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "resourceId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/StopResourceRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/projects": {
       "get": {
         "tags": [
@@ -1144,6 +1365,49 @@
           }
         }
       },
+      "CreatePostgreSQLResourceRequest": {
+        "required": [
+          "name",
+          "description",
+          "databaseName",
+          "username",
+          "password"
+        ],
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "description": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "databaseName": {
+            "type": "string"
+          },
+          "username": {
+            "type": "string"
+          },
+          "password": {
+            "type": "string"
+          },
+          "version": {
+            "type": "string",
+            "default": "16"
+          },
+          "port": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "format": "int32",
+            "default": 5432
+          }
+        }
+      },
       "CreateProjectRequest": {
         "required": [
           "name",
@@ -1188,6 +1452,17 @@
             "type": "string"
           },
           "password": {
+            "type": "string"
+          }
+        }
+      },
+      "DeployResourceRequest": {
+        "required": [
+          "resourceType"
+        ],
+        "type": "object",
+        "properties": {
+          "resourceType": {
             "type": "string"
           }
         }
@@ -1414,6 +1689,75 @@
           },
           "password": {
             "type": "string"
+          }
+        }
+      },
+      "PostgreSQLResourceDto": {
+        "required": [
+          "id",
+          "name",
+          "slug",
+          "description",
+          "version",
+          "port",
+          "databaseName",
+          "username",
+          "status",
+          "serviceName",
+          "createdAt",
+          "lastDeployedAt"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "name": {
+            "type": "string"
+          },
+          "slug": {
+            "type": "string"
+          },
+          "description": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "version": {
+            "type": "string"
+          },
+          "port": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "format": "int32"
+          },
+          "databaseName": {
+            "type": "string"
+          },
+          "username": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string"
+          },
+          "serviceName": {
+            "type": "string"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "lastDeployedAt": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "format": "date-time"
           }
         }
       },
@@ -1649,6 +1993,17 @@
           }
         }
       },
+      "StopResourceRequest": {
+        "required": [
+          "resourceType"
+        ],
+        "type": "object",
+        "properties": {
+          "resourceType": {
+            "type": "string"
+          }
+        }
+      },
       "UpdateProjectRequest": {
         "required": [
           "name",
@@ -1727,6 +2082,9 @@
   "tags": [
     {
       "name": "Users"
+    },
+    {
+      "name": "Resources"
     },
     {
       "name": "Projects"
