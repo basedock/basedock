@@ -1,5 +1,5 @@
 import { createFileRoute, Outlet, useNavigate, Link, useLocation, useParams, useRouter } from "@tanstack/react-router"
-import { getProjectById, getProjectBySlug, deleteEnvironment } from "@/api/sdk.gen"
+import { getProjectById, getProjectBySlug } from "@/api/sdk.gen"
 import type { ProjectDto } from "@/api/types.gen"
 import { Button } from "@/components/ui/button"
 import {
@@ -10,19 +10,8 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import { CreateEnvironmentDialog } from "@/components/create-environment-dialog"
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from "@/components/ui/alert-dialog"
-import { Settings, ChevronDown, Plus, Trash2 } from "lucide-react"
+import { Settings, ChevronDown, Plus } from "lucide-react"
 import { useEffect, useState } from "react"
-import { useMutation } from "@tanstack/react-query"
 
 type LoaderData = {
   name: string
@@ -67,30 +56,7 @@ function ProjectLayout() {
   const { env } = useParams({ strict: false })
   const currentEnv = project.environments.find(e => e.slug === env)
   const [createEnvDialogOpen, setCreateEnvDialogOpen] = useState(false)
-  const [envToDelete, setEnvToDelete] = useState<{ slug: string; name: string } | null>(null)
   const router = useRouter()
-
-  const deleteMutation = useMutation({
-    mutationFn: async (envSlug: string) => {
-      const response = await deleteEnvironment({
-        path: { projectSlug: project.slug, envSlug }
-      })
-      if (response.error) throw new Error("Failed to delete environment")
-      return response.data
-    },
-    onSuccess: (_, deletedEnvSlug) => {
-      // Re-run the route loader to refresh project data
-      router.invalidate()
-      // If we deleted the current environment, navigate to default
-      if (deletedEnvSlug === env && defaultEnvSlug && deletedEnvSlug !== defaultEnvSlug) {
-        navigate({
-          to: "/projects/$slug/$env",
-          params: { slug: project.slug, env: defaultEnvSlug },
-          replace: true
-        })
-      }
-    }
-  })
 
   // Check if we're at the base project URL (no env selected)
   const isBaseProjectUrl = location.pathname === `/projects/${project.slug}` ||
@@ -129,28 +95,12 @@ function ProjectLayout() {
                 <DropdownMenuContent align="start">
                   {project.environments.map((e) => (
                     <DropdownMenuItem key={e.id} asChild>
-                      <div className="flex items-center justify-between gap-4 w-full">
-                        <Link
-                          to="/projects/$slug/$env"
-                          params={{ slug: project.slug, env: e.slug }}
-                          className="flex-1"
-                        >
-                          {e.name}
-                        </Link>
-                        {!e.isDefault && (
-                          <button
-                            type="button"
-                            className="p-1 rounded hover:bg-destructive/10"
-                            onClick={(event) => {
-                              event.preventDefault()
-                              event.stopPropagation()
-                              setEnvToDelete({ slug: e.slug, name: e.name })
-                            }}
-                          >
-                            <Trash2 className="h-4 w-4 text-muted-foreground hover:text-destructive" />
-                          </button>
-                        )}
-                      </div>
+                      <Link
+                        to="/projects/$slug/$env"
+                        params={{ slug: project.slug, env: e.slug }}
+                      >
+                        {e.name}
+                      </Link>
                     </DropdownMenuItem>
                   ))}
                   <DropdownMenuSeparator />
@@ -166,28 +116,6 @@ function ProjectLayout() {
                 onOpenChange={setCreateEnvDialogOpen}
                 onSuccess={() => router.invalidate()}
               />
-              <AlertDialog open={!!envToDelete} onOpenChange={(open) => !open && setEnvToDelete(null)}>
-                <AlertDialogContent>
-                  <AlertDialogHeader>
-                    <AlertDialogTitle>Delete Environment</AlertDialogTitle>
-                    <AlertDialogDescription>
-                      Are you sure you want to delete "{envToDelete?.name}"? This action cannot be undone.
-                    </AlertDialogDescription>
-                  </AlertDialogHeader>
-                  <AlertDialogFooter>
-                    <AlertDialogCancel>Cancel</AlertDialogCancel>
-                    <AlertDialogAction
-                      onClick={() => {
-                        if (envToDelete) {
-                          deleteMutation.mutate(envToDelete.slug)
-                        }
-                      }}
-                    >
-                      Delete
-                    </AlertDialogAction>
-                  </AlertDialogFooter>
-                </AlertDialogContent>
-              </AlertDialog>
             </>
           )}
         </div>
