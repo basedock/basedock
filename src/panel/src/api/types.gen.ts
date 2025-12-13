@@ -342,6 +342,7 @@ export type ServiceDto = {
   lastError: null | string;
   createdAt: string;
   updatedAt: null | string;
+  dependsOn: null | string;
 };
 
 export type ServiceNetworkDto = {

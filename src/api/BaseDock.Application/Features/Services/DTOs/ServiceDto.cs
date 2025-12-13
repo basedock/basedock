@@ -13,7 +13,8 @@ public sealed record ServiceDto(
     DateTimeOffset? LastDeployedAt,
     string? LastError,
     DateTimeOffset CreatedAt,
-    DateTimeOffset? UpdatedAt);
+    DateTimeOffset? UpdatedAt,
+    string? DependsOn);
 
 public sealed record ServiceDetailDto(
     Guid Id,

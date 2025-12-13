@@ -20,7 +20,8 @@ public static class ServiceMapper
             entity.LastDeployedAt,
             entity.LastError,
             entity.CreatedAt,
-            entity.UpdatedAt);
+            entity.UpdatedAt,
+            entity.DependsOn);
     }
 
     public static IEnumerable<ServiceDto> ToDtos(this IEnumerable<Service> entities)

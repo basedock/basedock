@@ -27,7 +27,8 @@ import {
   DropdownMenuTrigger,
   DropdownMenuSeparator,
 } from "@/components/ui/dropdown-menu"
-import { Container, Plus, MoreHorizontal, Trash2, Edit, LayoutTemplate } from "lucide-react"
+import { Container, Plus, MoreHorizontal, Trash2, Edit, LayoutTemplate, TableIcon, Workflow } from "lucide-react"
+import { ServicesFlow } from "@/components/flow"
 import { toast } from "sonner"
 import { ServiceFormDialog } from "./service-form-dialog"
 import { TemplateDialog } from "@/components/templates/template-dialog"
@@ -51,8 +52,11 @@ function getStatusVariant(status: string): "default" | "secondary" | "destructiv
   }
 }
 
+type ViewMode = "table" | "flow"
+
 export function ServicesTab({ projectSlug, envSlug, isAdmin }: ServicesTabProps) {
   const router = useRouter()
+  const [viewMode, setViewMode] = useState<ViewMode>("table")
   const [createDialogOpen, setCreateDialogOpen] = useState(false)
   const [templateDialogOpen, setTemplateDialogOpen] = useState(false)
   const [editingService, setEditingService] = useState<ServiceDetailDto | null>(null)
@@ -126,18 +130,38 @@ export function ServicesTab({ projectSlug, envSlug, isAdmin }: ServicesTabProps)
                 Docker containers and applications in this environment
               </CardDescription>
             </div>
-            {isAdmin && (
-              <div className="flex gap-2">
-                <Button variant="outline" onClick={() => setTemplateDialogOpen(true)}>
-                  <LayoutTemplate className="mr-2 h-4 w-4" />
-                  From Template
+            <div className="flex items-center gap-4">
+              <div className="flex rounded-md border">
+                <Button
+                  variant={viewMode === "table" ? "secondary" : "ghost"}
+                  size="sm"
+                  onClick={() => setViewMode("table")}
+                  className="rounded-r-none"
+                >
+                  <TableIcon className="h-4 w-4" />
                 </Button>
-                <Button onClick={() => setCreateDialogOpen(true)}>
-                  <Plus className="mr-2 h-4 w-4" />
-                  Add Service
+                <Button
+                  variant={viewMode === "flow" ? "secondary" : "ghost"}
+                  size="sm"
+                  onClick={() => setViewMode("flow")}
+                  className="rounded-l-none"
+                >
+                  <Workflow className="h-4 w-4" />
                 </Button>
               </div>
-            )}
+              {isAdmin && (
+                <div className="flex gap-2">
+                  <Button variant="outline" onClick={() => setTemplateDialogOpen(true)}>
+                    <LayoutTemplate className="mr-2 h-4 w-4" />
+                    From Template
+                  </Button>
+                  <Button onClick={() => setCreateDialogOpen(true)}>
+                    <Plus className="mr-2 h-4 w-4" />
+                    Add Service
+                  </Button>
+                </div>
+              )}
+            </div>
           </div>
         </CardHeader>
         <CardContent>
@@ -161,6 +185,8 @@ export function ServicesTab({ projectSlug, envSlug, isAdmin }: ServicesTabProps)
                 </div>
               )}
             </div>
+          ) : viewMode === "flow" ? (
+            <ServicesFlow services={services} />
           ) : (
             <div className="rounded-md border">
               <Table>

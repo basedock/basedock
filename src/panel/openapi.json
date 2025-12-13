@@ -4275,7 +4275,8 @@
           "lastDeployedAt",
           "lastError",
           "createdAt",
-          "updatedAt"
+          "updatedAt",
+          "dependsOn"
         ],
         "type": "object",
         "properties": {
@@ -4343,6 +4344,12 @@
               "string"
             ],
             "format": "date-time"
+          },
+          "dependsOn": {
+            "type": [
+              "null",
+              "string"
+            ]
           }
         }
       },
