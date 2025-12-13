@@ -368,6 +368,7 @@ export type ServiceSummaryDto = {
   slug: string;
   image: null | string;
   status: string;
+  dependsOn: null | string;
 };
 
 export type SlugAvailabilityResponse = {

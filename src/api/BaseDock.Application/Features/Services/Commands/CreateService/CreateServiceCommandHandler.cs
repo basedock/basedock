@@ -5,6 +5,7 @@ using BaseDock.Application.Abstractions.Data;
 using BaseDock.Application.Abstractions.Messaging;
 using BaseDock.Application.Features.Services.DTOs;
 using BaseDock.Application.Features.Services.Mappers;
+using BaseDock.Application.Features.Services.Validators;
 using BaseDock.Domain.Entities;
 using BaseDock.Domain.Primitives;
 using Microsoft.EntityFrameworkCore;
@@ -43,6 +44,25 @@ public sealed partial class CreateServiceCommandHandler(IApplicationDbContext db
         {
             return Result.Failure<ServiceDto>(
                 Error.NotFound("Environment.NotFound", $"Environment with slug '{command.EnvironmentSlug}' not found."));
+        }
+
+        // Validate circular dependencies
+        if (!string.IsNullOrWhiteSpace(command.DependsOn))
+        {
+            var allServices = await db.Services
+                .AsNoTracking()
+                .Where(s => s.EnvironmentId == environment.Id)
+                .ToListAsync(cancellationToken);
+
+            var circularError = CircularDependencyValidator.Validate(
+                command.Name,
+                command.DependsOn,
+                allServices);
+
+            if (circularError is not null)
+            {
+                return Result.Failure<ServiceDto>(circularError);
+            }
         }
 
         // Check name uniqueness within environment

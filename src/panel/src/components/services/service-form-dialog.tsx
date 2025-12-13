@@ -1,5 +1,5 @@
-import { useState } from "react"
-import type { ServiceDetailDto, CreateServiceRequest, UpdateServiceRequest } from "@/api/types.gen"
+import { useState, useMemo } from "react"
+import type { ServiceDetailDto, ServiceSummaryDto, CreateServiceRequest, UpdateServiceRequest } from "@/api/types.gen"
 import { createService, updateService } from "@/api/sdk.gen"
 import {
   Dialog,
@@ -26,22 +26,61 @@ import {
   SelectValue,
 } from "@/components/ui/select"
 import { Switch } from "@/components/ui/switch"
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover"
+import {
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+  CommandList,
+} from "@/components/ui/command"
+import { Badge } from "@/components/ui/badge"
 import { toast } from "sonner"
-import { Loader2 } from "lucide-react"
+import { Loader2, ChevronsUpDown, X, Check } from "lucide-react"
+import { cn } from "@/lib/utils"
+import { getValidDependencyOptions } from "@/lib/dependency-utils"
 
 interface ServiceFormDialogProps {
   projectSlug: string
   envSlug: string
   service?: ServiceDetailDto
+  availableServices?: ServiceSummaryDto[]
   open: boolean
   onOpenChange: (open: boolean) => void
   onSuccess: () => void
+}
+
+// Helper to parse dependsOn JSON to array of service names
+function parseDependsOn(dependsOn: string | null | undefined): string[] {
+  if (!dependsOn) return []
+  try {
+    const parsed = JSON.parse(dependsOn)
+    return Object.keys(parsed)
+  } catch {
+    return []
+  }
+}
+
+// Helper to serialize array of service names to dependsOn JSON
+function serializeDependsOn(services: string[]): string | null {
+  if (services.length === 0) return null
+  const obj: Record<string, { condition: string }> = {}
+  for (const service of services) {
+    obj[service] = { condition: "service_started" }
+  }
+  return JSON.stringify(obj)
 }
 
 export function ServiceFormDialog({
   projectSlug,
   envSlug,
   service,
+  availableServices = [],
   open,
   onOpenChange,
   onSuccess,
@@ -49,6 +88,7 @@ export function ServiceFormDialog({
   const isEdit = !!service
   const [loading, setLoading] = useState(false)
   const [activeTab, setActiveTab] = useState("basic")
+  const [dependsOnOpen, setDependsOnOpen] = useState(false)
 
   // Form state
   const [name, setName] = useState(service?.name ?? "")
@@ -66,6 +106,18 @@ export function ServiceFormDialog({
   const [cpuLimit, setCpuLimit] = useState(service?.cpuLimit ?? "")
   const [memoryLimit, setMemoryLimit] = useState(service?.memoryLimit ?? "")
   const [replicas, setReplicas] = useState(service?.replicas ?? 1)
+  const [selectedDependencies, setSelectedDependencies] = useState<string[]>(
+    () => parseDependsOn(service?.dependsOn)
+  )
+
+  // Filter out current service and services that would create circular dependencies
+  const selectableServices = useMemo(() => {
+    if (!name.trim()) {
+      // No name yet, filter out only the current service
+      return availableServices.filter(s => s.id !== service?.id)
+    }
+    return getValidDependencyOptions(availableServices, name, service?.id, selectedDependencies)
+  }, [availableServices, service?.id, name, selectedDependencies])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -109,7 +161,7 @@ export function ServiceFormDialog({
           envFile: null,
           volumes: volumes || null,
           tmpfs: null,
-          dependsOn: null,
+          dependsOn: serializeDependsOn(selectedDependencies),
           links: null,
           healthcheckTest: healthTest,
           healthcheckInterval: healthcheckInterval || null,
@@ -161,7 +213,7 @@ export function ServiceFormDialog({
           envFile: null,
           volumes: volumes || null,
           tmpfs: null,
-          dependsOn: null,
+          dependsOn: serializeDependsOn(selectedDependencies),
           links: null,
           healthcheckTest: healthTest,
           healthcheckInterval: healthcheckInterval || null,
@@ -313,6 +365,77 @@ export function ServiceFormDialog({
                 />
                 <p className="text-xs text-muted-foreground">
                   JSON array of volume mounts
+                </p>
+              </div>
+
+              <div className="space-y-2">
+                <Label>Depends On</Label>
+                <Popover open={dependsOnOpen} onOpenChange={setDependsOnOpen}>
+                  <PopoverTrigger asChild>
+                    <Button
+                      variant="outline"
+                      role="combobox"
+                      aria-expanded={dependsOnOpen}
+                      className="w-full justify-between font-normal"
+                      disabled={selectableServices.length === 0}
+                    >
+                      {selectedDependencies.length === 0
+                        ? "Select services..."
+                        : `${selectedDependencies.length} service${selectedDependencies.length > 1 ? "s" : ""} selected`}
+                      <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-[400px] p-0" align="start">
+                    <Command>
+                      <CommandInput placeholder="Search services..." />
+                      <CommandList>
+                        <CommandEmpty>No services found.</CommandEmpty>
+                        <CommandGroup>
+                          {selectableServices.map((s) => (
+                            <CommandItem
+                              key={s.id}
+                              value={s.name}
+                              onSelect={() => {
+                                setSelectedDependencies((prev) =>
+                                  prev.includes(s.name)
+                                    ? prev.filter((name) => name !== s.name)
+                                    : [...prev, s.name]
+                                )
+                              }}
+                            >
+                              <Check
+                                className={cn(
+                                  "mr-2 h-4 w-4",
+                                  selectedDependencies.includes(s.name) ? "opacity-100" : "opacity-0"
+                                )}
+                              />
+                              <span className="font-medium">{s.name}</span>
+                              <span className="ml-2 text-xs text-muted-foreground">{s.image}</span>
+                            </CommandItem>
+                          ))}
+                        </CommandGroup>
+                      </CommandList>
+                    </Command>
+                  </PopoverContent>
+                </Popover>
+                {selectedDependencies.length > 0 && (
+                  <div className="flex flex-wrap gap-1 mt-2">
+                    {selectedDependencies.map((name) => (
+                      <Badge key={name} variant="secondary" className="gap-1">
+                        {name}
+                        <button
+                          type="button"
+                          onClick={() => setSelectedDependencies((prev) => prev.filter((n) => n !== name))}
+                          className="ml-1 rounded-full outline-none ring-offset-background focus:ring-2 focus:ring-ring focus:ring-offset-2"
+                        >
+                          <X className="h-3 w-3" />
+                        </button>
+                      </Badge>
+                    ))}
+                  </div>
+                )}
+                <p className="text-xs text-muted-foreground">
+                  Services that must be running before this service starts
                 </p>
               </div>
             </TabsContent>

@@ -252,6 +252,14 @@ export function ServicesTab({ projectSlug, envSlug, isAdmin }: ServicesTabProps)
       <ServiceFormDialog
         projectSlug={projectSlug}
         envSlug={envSlug}
+        availableServices={services.map(s => ({
+          id: s.id,
+          name: s.name,
+          slug: s.slug,
+          image: s.image,
+          status: s.deploymentStatus,
+          dependsOn: s.dependsOn,
+        }))}
         open={createDialogOpen}
         onOpenChange={setCreateDialogOpen}
         onSuccess={handleCreated}
@@ -262,6 +270,14 @@ export function ServicesTab({ projectSlug, envSlug, isAdmin }: ServicesTabProps)
           projectSlug={projectSlug}
           envSlug={envSlug}
           service={editingService}
+          availableServices={services.map(s => ({
+            id: s.id,
+            name: s.name,
+            slug: s.slug,
+            image: s.image,
+            status: s.deploymentStatus,
+            dependsOn: s.dependsOn,
+          }))}
           open={!!editingService}
           onOpenChange={(open) => !open && setEditingService(null)}
           onSuccess={handleCreated}

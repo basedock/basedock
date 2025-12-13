@@ -32,7 +32,8 @@ public static class EnvironmentMapper
             s.Name,
             s.Slug,
             s.Image,
-            s.DeploymentStatus.ToString()));
+            s.DeploymentStatus.ToString(),
+            s.DependsOn));
 
         var volumes = entity.Volumes.Select(v => new VolumeSummaryDto(
             v.Id,

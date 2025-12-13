@@ -4443,7 +4443,8 @@
           "name",
           "slug",
           "image",
-          "status"
+          "status",
+          "dependsOn"
         ],
         "type": "object",
         "properties": {
@@ -4465,6 +4466,12 @@
           },
           "status": {
             "type": "string"
+          },
+          "dependsOn": {
+            "type": [
+              "null",
+              "string"
+            ]
           }
         }
       },

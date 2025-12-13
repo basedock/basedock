@@ -4,6 +4,7 @@ using BaseDock.Application.Abstractions.Data;
 using BaseDock.Application.Abstractions.Messaging;
 using BaseDock.Application.Features.Services.DTOs;
 using BaseDock.Application.Features.Services.Mappers;
+using BaseDock.Application.Features.Services.Validators;
 using BaseDock.Domain.Primitives;
 using Microsoft.EntityFrameworkCore;
 
@@ -51,6 +52,26 @@ public sealed class UpdateServiceCommandHandler(IApplicationDbContext db, TimePr
         {
             return Result.Failure<ServiceDto>(
                 Error.NotFound("Service.NotFound", "Service not found."));
+        }
+
+        // Validate circular dependencies
+        if (!string.IsNullOrWhiteSpace(command.DependsOn))
+        {
+            var allServices = await db.Services
+                .AsNoTracking()
+                .Where(s => s.EnvironmentId == environment.Id)
+                .ToListAsync(cancellationToken);
+
+            var circularError = CircularDependencyValidator.Validate(
+                command.Name,
+                command.DependsOn,
+                allServices,
+                service.Id); // Exclude current service from graph
+
+            if (circularError is not null)
+            {
+                return Result.Failure<ServiceDto>(circularError);
+            }
         }
 
         // Check name uniqueness if name changed

@@ -29,7 +29,7 @@ interface ServiceNodeProps {
 function ServiceNodeComponent({ data }: ServiceNodeProps) {
   return (
     <div className="px-4 py-3 shadow-md rounded-lg bg-card border min-w-[180px]">
-      <Handle type="target" position={Position.Top} className="!bg-primary" />
+      <Handle type="target" position={Position.Left} className="!bg-primary" />
       <div className="flex items-center gap-2 mb-1">
         <Container className="h-4 w-4 text-muted-foreground" />
         <span className="font-medium text-sm">{data.name}</span>
@@ -42,7 +42,7 @@ function ServiceNodeComponent({ data }: ServiceNodeProps) {
       <Badge variant={getStatusVariant(data.status)} className="text-xs">
         {data.status}
       </Badge>
-      <Handle type="source" position={Position.Bottom} className="!bg-primary" />
+      <Handle type="source" position={Position.Right} className="!bg-primary" />
     </div>
   )
 }

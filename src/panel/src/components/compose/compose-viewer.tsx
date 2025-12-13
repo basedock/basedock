@@ -54,6 +54,20 @@ export function ComposeViewer({
         if (service.image) {
           lines.push(`    image: ${service.image}`)
         }
+        if (service.dependsOn) {
+          try {
+            const deps = JSON.parse(service.dependsOn)
+            const depNames = Object.keys(deps)
+            if (depNames.length > 0) {
+              lines.push("    depends_on:")
+              for (const dep of depNames) {
+                lines.push(`      - ${dep}`)
+              }
+            }
+          } catch {
+            // Invalid JSON, skip
+          }
+        }
         lines.push("")
       }
     }

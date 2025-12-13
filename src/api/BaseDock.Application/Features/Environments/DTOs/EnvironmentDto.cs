@@ -31,7 +31,8 @@ public sealed record ServiceSummaryDto(
     string Name,
     string Slug,
     string? Image,
-    string Status);
+    string Status,
+    string? DependsOn);
 
 public sealed record VolumeSummaryDto(
     Guid Id,
