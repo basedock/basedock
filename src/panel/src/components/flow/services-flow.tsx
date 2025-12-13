@@ -276,12 +276,12 @@ export function ServicesFlow({ services }: ServicesFlowProps) {
       >
         <Background />
         <Controls />
-        <MiniMap
+        {/* <MiniMap
           nodeStrokeWidth={3}
           zoomable
           pannable
           className="!bg-background !border"
-        />
+        /> */}
       </ReactFlow>
     </div>
   )
